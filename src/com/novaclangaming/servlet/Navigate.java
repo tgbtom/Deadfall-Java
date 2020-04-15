@@ -41,12 +41,20 @@ public class Navigate extends HttpServlet {
 		}
 		else {
 			RequestDispatcher dispatcher;
-			if(loc.equals("dashboard")) {
+			if (loc.equals("logout")) {
+				request.getSession().removeAttribute("user");
+				request.getSession().setAttribute("message", "You have logged out");
+				dispatcher = request.getRequestDispatcher("index.jsp");
+			}
+			else if(loc.equals("dashboard")) {
 				ICharacterDao charDao = new JPACharacterDao();
 				List<Character> characters = charDao.findByUserId(user.getId());
 				request.getSession().setAttribute("characters", characters);
 				dispatcher = request.getRequestDispatcher("WEB-INF/dashboard.jsp");
-			}
+			} 
+			else if (loc.equals("joinTown")) {
+				dispatcher = request.getRequestDispatcher("WEB-INF/joinTown.jsp");
+			} 
 			else {
 				dispatcher = request.getRequestDispatcher("WEB-INF/dashboard.jsp");
 			}

@@ -12,13 +12,24 @@ pageEncoding="ISO-8859-1"%>
     />
     <link rel="stylesheet" href="css/main.css" />
 
-    <script src="js/home.js"></script>
     <script src="js/main.js"></script>
+    <script src="js/dashboard.js"></script>
   </head>
   <body>
+      <% if (request.getSession().getAttribute("message") != null){ %>
+    <div class="page-message" id="page-message">
+      <%= request.getSession().getAttribute("message") %>
+      <img src="img/small-x.png" id="msg-close" alt="close message" />
+    </div>
+    <% request.getSession().removeAttribute("message");} %>
+    
     <nav class="nav-bar" id="nav-desktop">
-      <button class="btn-nav left">Dashboard</button>
-      <button class="btn-nav right" id="login-btn">Logout</button>
+	  <a href="Navigate?loc=dashboard">
+	  	<button class="btn-nav left" id="login-btn">Dashboard</button>
+	  </a>
+	  <a href="Navigate?loc=logout">
+	  	<button class="btn-nav right" id="login-btn">Logout</button>
+	  </a>
     </nav>
 
     <nav class="nav-bar" id="nav-mobile">
@@ -46,15 +57,19 @@ pageEncoding="ISO-8859-1"%>
             <%@ page import="java.util.List" %>
             <%
             List<Character> characters = (List<Character>) request.getSession().getAttribute("characters");
+            request.getSession().removeAttribute("characters");
             
             for(Character c : characters){
             	%>
 				<div class="row bb">
+				<form action="PlayCharacter" method="POST">
+					<input type="hidden" name="char-id" value="<%= c.getCharId() %>">
 					<div class="sub-5 text-bold"><%= c.getName() %> [0]</div>
 					<div class="sub-5"><%= c.getClassification() %></div>
 					<div class="sub-2">
-						<button class="btn-play">Play</button>
+						<input type="submit" value="Play" class="btn-play">
 					</div>
+				</form>
 				</div>
             	<% } %>
               

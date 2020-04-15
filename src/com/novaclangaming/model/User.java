@@ -110,5 +110,5 @@ public class User {
 	public void setCharacters(List<Character> characters) {
 		this.characters = characters;
 	}
-
+	
 }

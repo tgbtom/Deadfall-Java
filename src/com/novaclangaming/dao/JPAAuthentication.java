@@ -14,14 +14,12 @@ import com.novaclangaming.model.User;
 
 public class JPAAuthentication implements IAuthenticationDao{
 	
-	private IUserDao userDao;
+	private IUserDao userDao = new JPAUserDao();
 	
 	public JPAAuthentication() {
 		super();
-		userDao = new JPAUserDao();
 	}
 
-	@Override
 	public void register(User user) {
 		EntityManager em = JPAConnection.getInstance().createEntityManager();
 		em.getTransaction().begin();
@@ -30,7 +28,6 @@ public class JPAAuthentication implements IAuthenticationDao{
 		em.close();
 	}
 
-	@Override
 	public Optional<User> authenticate(String username, String password) {
 		Optional<User> user = userDao.findByName(username);
 		if(user.isPresent() && user.get().getPassword().equals(hashPassword(password, toByteArray(user.get().getSalt())).getHashedPass())) {
@@ -41,7 +38,6 @@ public class JPAAuthentication implements IAuthenticationDao{
 		}
 	}
 
-	@Override
 	public Password hashPassword(String password) {
 		MessageDigest md;
 		Password output;
@@ -71,7 +67,6 @@ public class JPAAuthentication implements IAuthenticationDao{
 		return null;
 	}
 
-	@Override
 	public Password hashPassword(String password, byte[] salt) {
 		MessageDigest md;
 		Password output;

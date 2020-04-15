@@ -8,9 +8,12 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 
-public class JPAUserDao implements IUserDao {
+public class JPAUserDao implements IUserDao{
 
-	@Override
+	public JPAUserDao() {
+		super();
+	}
+
 	public void create(User user) {
 		EntityManager em = JPAConnection.getInstance().createEntityManager();
 		em.getTransaction().begin();
@@ -19,7 +22,6 @@ public class JPAUserDao implements IUserDao {
 		em.close();
 	}
 
-	@Override
 	public Optional<User> findByName(String username) {
 		User user = null;
 		EntityManager em = JPAConnection.getInstance().createEntityManager();
@@ -32,13 +34,11 @@ public class JPAUserDao implements IUserDao {
 		return Optional.ofNullable(user);
 	}
 
-	@Override
 	public User findById(int id) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
 	public User update(User user) {
 		// TODO Auto-generated method stub
 		return null;
