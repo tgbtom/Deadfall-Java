@@ -1,0 +1,47 @@
+package com.novaclangaming.dao;
+
+import com.novaclangaming.model.User;
+
+import java.util.Optional;
+
+import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.TypedQuery;
+
+public class JPAUserDao implements IUserDao {
+
+	@Override
+	public void create(User user) {
+		EntityManager em = JPAConnection.getInstance().createEntityManager();
+		em.getTransaction().begin();
+		em.persist(user);
+		em.getTransaction().commit();
+		em.close();
+	}
+
+	@Override
+	public Optional<User> findByName(String username) {
+		User user = null;
+		EntityManager em = JPAConnection.getInstance().createEntityManager();
+		em.getTransaction().begin();
+		TypedQuery<User> query = em.createNamedQuery("User.findByName", User.class);
+		query.setParameter("name", username);
+		try {
+			user = query.getSingleResult();
+		} catch (NoResultException e) {}
+		return Optional.ofNullable(user);
+	}
+
+	@Override
+	public User findById(int id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public User update(User user) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+}
