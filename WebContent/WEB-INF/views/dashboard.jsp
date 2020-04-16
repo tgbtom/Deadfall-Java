@@ -10,31 +10,31 @@ pageEncoding="ISO-8859-1"%>
       href="https://fonts.googleapis.com/css?family=Khand"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="css/main.css" />
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/main.css" />
 
-    <script src="js/main.js"></script>
-    <script src="js/dashboard.js"></script>
+    <script src="${pageContext.request.contextPath}/resources/js/main.js"></script>
+    <script src="${pageContext.request.contextPath}/resources/js/dashboard.js"></script>
   </head>
   <body>
       <% if (request.getSession().getAttribute("message") != null){ %>
     <div class="page-message" id="page-message">
       <%= request.getSession().getAttribute("message") %>
-      <img src="img/small-x.png" id="msg-close" alt="close message" />
+      <img src="${pageContext.request.contextPath}/resources/img/small-x.png" id="msg-close" alt="close message" />
     </div>
-    <% request.getSession().removeAttribute("message");} %>
+    <%} request.getSession().removeAttribute("message"); %>
     
     <nav class="nav-bar" id="nav-desktop">
-	  <a href="Navigate?loc=dashboard">
+	  <a href="dashboard">
 	  	<button class="btn-nav left" id="login-btn">Dashboard</button>
 	  </a>
-	  <a href="Navigate?loc=logout">
+	  <a href="${pageContext.request.contextPath}/logout">
 	  	<button class="btn-nav right" id="login-btn">Logout</button>
 	  </a>
     </nav>
 
     <nav class="nav-bar" id="nav-mobile">
       <button class="btn-nav left dropdown-btn">
-        <img src="img/hamburger-menu.png" alt="Menu" />
+        <img src="${pageContext.request.contextPath}/resources/img/hamburger-menu.png" alt="Menu" />
         <div class="dropdown-content">
           <div class="dropdown-link">Homepage</div>
           <div class="dropdown-link">Logout</div>
@@ -43,7 +43,7 @@ pageEncoding="ISO-8859-1"%>
     </nav>
 
     <header id="banner">
-      <img src="img/MainBanner.png" id="banner-img" alt="Deadfall Banner" />
+      <img src="${pageContext.request.contextPath}/resources/img/MainBanner.png" id="banner-img" alt="Deadfall Banner" />
     </header>
 
     <div class="container">
@@ -53,17 +53,20 @@ pageEncoding="ISO-8859-1"%>
             <div class="card-top">Characters</div>
             <div class="card-content">
             
+            <%@ page import="com.novaclangaming.model.User" %>
             <%@ page import="com.novaclangaming.model.Character" %>
+            <%@ page import="com.novaclangaming.dao.JPACharacterDao" %>
             <%@ page import="java.util.List" %>
             <%
-            List<Character> characters = (List<Character>) request.getSession().getAttribute("characters");
-            request.getSession().removeAttribute("characters");
+            User user = (User) request.getSession().getAttribute("user"); 
+            JPACharacterDao charDao = new JPACharacterDao();
+            List<Character> characters = charDao.findByUserId(user.getId());
             
             for(Character c : characters){
             	%>
 				<div class="row bb">
-				<form action="PlayCharacter" method="POST">
-					<input type="hidden" name="char-id" value="<%= c.getCharId() %>">
+				<form action="${pageContext.request.contextPath}/character/check" method="POST">
+					<input type="hidden" name="charId" value="<%= c.getCharId() %>">
 					<div class="sub-5 text-bold"><%= c.getName() %> [0]</div>
 					<div class="sub-5"><%= c.getClassification() %></div>
 					<div class="sub-2">
@@ -79,12 +82,12 @@ pageEncoding="ISO-8859-1"%>
             <div class="card dash-char">
               <div class="card-top">Create Character</div>
               <div class="card-content card-form">
-                <form action="Create?type=character" method="POST">
+                <form action="${pageContext.request.contextPath}/character/create" method="POST">
                   <div class="input-group">
                     <label for="char-name">Name: </label>
                     <input
                       type="text"
-                      name="char-name"
+                      name="charName"
                       placeholder="Character Name"
                       class="char-form"
                       required
@@ -92,7 +95,7 @@ pageEncoding="ISO-8859-1"%>
                   </div>
                   <div class="input-group">
                     <label for="char-class">Class: </label>
-                    <Select name="char-class" class="char-form" id="char-class">
+                    <Select name="charClass" class="char-form" id="char-class">
                       <option value="Survivor" selected>Survivor</option>
                       <option value="Builder">Builder</option>
                       <option value="Looter">Looter</option>
@@ -184,7 +187,7 @@ pageEncoding="ISO-8859-1"%>
     </div>
 
     <div id="modal-container">
-      <img src="img/exit.png" alt="close modal" id="modal-exit" />
+      <img src="${pageContext.request.contextPath}/resources/img/exit.png" alt="close modal" id="modal-exit" />
     </div>
   </body>
 </html>

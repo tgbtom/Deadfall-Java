@@ -1,8 +1,10 @@
 package com.novaclangaming.dao;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 
 import com.novaclangaming.model.Character;
@@ -51,6 +53,19 @@ public class JPACharacterDao implements ICharacterDao{
 	public void delete(Character character) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	public Optional<Character> findByCharName(int userId, String charName) {
+		Character character = null;
+		EntityManager em = JPAConnection.getInstance().createEntityManager();
+		em.getTransaction().begin();
+		TypedQuery<Character> query = em.createNamedQuery("Character.findByName", Character.class);
+		query.setParameter("userId", userId);
+		query.setParameter("charName", charName);
+		try {
+			character = query.getSingleResult();
+		} catch (NoResultException e) {}
+		return Optional.ofNullable(character);
 	}
 
 }

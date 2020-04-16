@@ -10,18 +10,18 @@ pageEncoding="ISO-8859-1"%>
       href="https://fonts.googleapis.com/css?family=Khand"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="css/main.css" />
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/main.css">
 
-    <script src="js/main.js"></script>
-    <script src="js/home.js"></script>
+    <script src="${pageContext.request.contextPath}/resources/js/main.js"></script>
+    <script src="${pageContext.request.contextPath}/resources/js/home.js"></script>
   </head>
   <body>
     <% if (request.getSession().getAttribute("message") != null){ %>
     <div class="page-message" id="page-message">
       <%= request.getSession().getAttribute("message") %>
-      <img src="img/small-x.png" id="msg-close" alt="close message" />
+      <img src="${pageContext.request.contextPath}/resources/img/small-x.png" id="msg-close" alt="close message" />
     </div>
-    <% request.getSession().removeAttribute("message");} %>
+    <%} request.getSession().removeAttribute("message"); %>
 
     <nav class="nav-bar" id="nav-desktop">
       <button class="btn-nav left">Homepage</button>
@@ -31,7 +31,7 @@ pageEncoding="ISO-8859-1"%>
 
     <nav class="nav-bar" id="nav-mobile">
       <button class="btn-nav left dropdown-btn">
-        <img src="img/hamburger-menu.png" alt="Menu" />
+        <img src="${pageContext.request.contextPath}/resources/img/hamburger-menu.png" alt="Menu" />
         <div class="dropdown-content">
           <div class="dropdown-link">Homepage</div>
           <div class="dropdown-link">Login</div>
@@ -41,7 +41,7 @@ pageEncoding="ISO-8859-1"%>
     </nav>
 
     <header id="banner">
-      <img src="img/MainBanner.png" id="banner-img" alt="Deadfall Banner" />
+      <img src="${pageContext.request.contextPath}/resources/img/MainBanner.png" id="banner-img" alt="Deadfall Banner" />
     </header>
 
     <div class="container">
@@ -103,7 +103,7 @@ pageEncoding="ISO-8859-1"%>
                 <div class="sub-4">
                   <div class="card bg-faded text-center" id="featured">
                     <img
-                      src="img/items/Water Ration.png"
+                      src="${pageContext.request.contextPath}/resources/img/items/Water Ration.png"
                       alt="Water Ration"
                       title="Water Ration"
                     />
@@ -124,14 +124,14 @@ pageEncoding="ISO-8859-1"%>
     </div>
 
     <div id="modal-container">
-      <img src="img/exit.png" alt="close modal" id="modal-exit" />
+      <img src="${pageContext.request.contextPath}/resources/img/exit.png" alt="close modal" id="modal-exit" />
       <div class="modal" id="modal-login">
         <div class="col-3"><!-- Spacer --></div>
         <div class="col-6">
           <div class="card">
             <div class="card-top">Login</div>
             <div class="card-content">
-              <form action="Login" method="POST" class="text-center">
+              <form action="${pageContext.request.contextPath}/user/login" method="POST" class="text-center">
                 <div class="input-group">
                   <input
                     type="text"
@@ -165,7 +165,7 @@ pageEncoding="ISO-8859-1"%>
           <div class="card">
             <div class="card-top">Register</div>
             <div class="card-content card-form">
-              <form action="Register" method="POST" class="text-center">
+              <form action="${pageContext.request.contextPath}/user/create" method="POST" class="text-center">
                 <div class="input-group">
                   <input
                     type="text"

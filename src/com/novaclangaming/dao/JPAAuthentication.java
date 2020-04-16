@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 import javax.persistence.EntityManager;
+import javax.servlet.http.HttpServletRequest;
 
 import com.novaclangaming.model.Password;
 import com.novaclangaming.model.User;
@@ -19,7 +20,12 @@ public class JPAAuthentication implements IAuthenticationDao{
 	public JPAAuthentication() {
 		super();
 	}
-
+	
+	public User loggedUser(HttpServletRequest request) {
+		User user = (User) request.getSession().getAttribute("user"); 
+		return user;
+	}
+	
 	public void register(User user) {
 		EntityManager em = JPAConnection.getInstance().createEntityManager();
 		em.getTransaction().begin();

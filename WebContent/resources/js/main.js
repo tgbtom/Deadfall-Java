@@ -19,6 +19,10 @@ window.onload = function() {
 	  formJs();
   }
   
+  if (typeof setListeners == "function"){
+	  setListeners();
+  }
+  
   if (typeof setModalListeners == "function") {
     setModalListeners();
     exitModalListener();

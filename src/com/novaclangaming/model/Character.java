@@ -15,7 +15,8 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 @NamedQueries({
-	@NamedQuery(name = "Character.findByUser", query = "SELECT c FROM character c WHERE user_id = :user")
+	@NamedQuery(name = "Character.findByUser", query = "SELECT c FROM character c WHERE user_id = :user"),
+	@NamedQuery(name = "Character.findByName", query = "SELECT c FROM character c WHERE user_id = :userId AND name = :charName")
 })
 @Entity(name = "character")
 @Table(name = "df_characters")
@@ -44,7 +45,6 @@ public class Character {
 
 	public Character() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	public Character(User user, Town town, String name, CharacterClass classification) {

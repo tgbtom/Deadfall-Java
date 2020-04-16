@@ -10,24 +10,24 @@
       href="https://fonts.googleapis.com/css?family=Khand"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="css/main.css" />
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/main.css" />
 
-    <script src="js/main.js"></script>
-    <script src="js/home.js"></script>
+    <script src="${pageContext.request.contextPath}/resources/js/main.js"></script>  
+    <script src="${pageContext.request.contextPath}/resources/js/joinTown.js"></script>   
   </head>
   <body>
     <nav class="nav-bar" id="nav-desktop">
-	  <a href="Navigate?loc=dashboard">
+	  <a href="../dashboard">
 	  	<button class="btn-nav left" id="login-btn">Dashboard</button>
 	  </a>
-	  <a href="Navigate?loc=logout">
+	  <a href="../logout">
 	  	<button class="btn-nav right" id="login-btn">Logout</button>
 	  </a>
     </nav>
 
     <nav class="nav-bar" id="nav-mobile">
       <button class="btn-nav left dropdown-btn">
-        <img src="img/hamburger-menu.png" alt="Menu" />
+        <img src="${pageContext.request.contextPath}/resources/img/hamburger-menu.png" alt="Menu" />
         <div class="dropdown-content">
           <div class="dropdown-link">Homepage</div>
           <div class="dropdown-link">Logout</div>
@@ -36,7 +36,7 @@
     </nav>
 
     <header id="banner">
-      <img src="img/MainBanner.png" id="banner-img" alt="Deadfall Banner" />
+      <img src="${pageContext.request.contextPath}/resources/img/MainBanner.png" id="banner-img" alt="Deadfall Banner" />
     </header>
 
     <div class="container">
@@ -52,15 +52,20 @@
               <%@ page import="java.util.ArrayList" %>
               <%@ page import="java.util.List" %>
               <%
-              int charId = Integer.parseInt(request.getParameter("char-id"));
               User user = (User) request.getSession().getAttribute("user");
+              Character character = (Character) request.getSession().getAttribute("character");
+              int charId = character.getCharId();
               JPACharacterDao charDao = new JPACharacterDao();
               List<Character> characters = charDao.findByUserId(user.getId());
+              
 			  List<Integer> charIdIn = new ArrayList<Integer>();
 			  List<Integer> charIdOut = new ArrayList<Integer>();
+			  
 			  charIdIn.add(charId);
+			  request.getSession().setAttribute("character-ids", charIdIn);
+
 			  for (Character c : characters){
-				  if(! charIdIn.contains(c.getCharId())){
+				  if(! charIdIn.contains(c.getCharId()) && c.getTown() == null){
 					  charIdOut.add(c.getCharId());
 				  } 
 			  }
@@ -68,20 +73,20 @@
             
               <div class="row bb">
                 <div class="col-8">
-                  <select>
-                  <%
-                  for(int curId : charIdOut){
-                	  Character c = charDao.findById(curId);
-                	  %>
-                	  <option value="<%= c.getName() %>"><%= c.getName() %></option>
-                	  <%
-                  }
-                  %>
-                  </select>
+                <span id="charOptions">
+                  <select id="charOption">
+	                  <%
+	                  for(int curId : charIdOut){
+	                	  Character c = charDao.findById(curId);
+	                	  %>
+	                	  <option value="<%= c.getCharId() %>"><%= c.getName() %></option>
+	                	  <% }%>
+                  </select></span>
                 </div>
-                <div class="col-4"><button class="btn-play">Add</button></div>
+                <div class="col-4"><button class="btn-play" id="addChar">Add</button></div>
               </div>
               
+              <span id="charsSelected">
               <%
               for(int curId : charIdIn){
             	  Character c = charDao.findById(curId);
@@ -93,6 +98,7 @@
             	  <%
               }
               %>
+              </span>
              
             </div>
           </div>
@@ -117,12 +123,44 @@
               </div>
             </div>
           </div>
+          <div class="row mt-6">
+      		<div class="card">
+      			<div class="card-top"> Create new Town </div>
+      			<div class="card-content">
+      				<div class="input-group">
+      					<label for="townName">Town Name: </label>
+      					<input type="text" name="townName" class="char-form" required>
+      				</div>
+      				<div class="input-group">
+      					<label for="townSize">Population: </label>
+      					<select name="townSize" class="char-form">
+      						<option value="1">Band of Survivors (10)</option>
+      					</select>
+      				</div>
+      				<div class="input-group">
+      					<label for="mapSize">Map Size: </label>
+      					<select name="mapSize" class="char-form">
+      						<option value="1">Regular (11 x 11)</option>
+      					</select>
+      				</div>
+      				<div class="input-group">
+      					<label for="townMode">Game Mode: </label>
+      					<select name="townMode" class="char-form">
+      						<option value="1">Regular</option>
+      					</select>
+      				</div>
+      				<div class="input-group">
+      					<input type="submit" value="Create Town" class="char-form">
+      				</div>
+      			</div>
+      		</div>
+      	  </div>
         </div>
       </div>
     </div>
 
     <div id="modal-container">
-      <img src="img/exit.png" alt="close modal" id="modal-exit" />
+      <img src="${pageContext.request.contextPath}/resources/img/exit.png" alt="close modal" id="modal-exit" />
     </div>
   </body>
 </html>
