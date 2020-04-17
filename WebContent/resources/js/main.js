@@ -23,6 +23,10 @@ window.onload = function() {
 	  setListeners();
   }
   
+  if (typeof confirmDelete == "function"){
+	  confirmDelete();
+  }
+  
   if (typeof setModalListeners == "function") {
     setModalListeners();
     exitModalListener();

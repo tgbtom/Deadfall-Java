@@ -16,6 +16,14 @@
     <script src="${pageContext.request.contextPath}/resources/js/joinTown.js"></script>   
   </head>
   <body>
+  
+    <% if (request.getSession().getAttribute("message") != null){ %>
+    <div class="page-message" id="page-message">
+    	<%= request.getSession().getAttribute("message") %>
+      	<img src="${pageContext.request.contextPath}/resources/img/small-x.png" id="msg-close" alt="close message" />
+    </div>
+    <%} request.getSession().removeAttribute("message"); %>
+    
     <nav class="nav-bar" id="nav-desktop">
 	  <a href="../dashboard">
 	  	<button class="btn-nav left" id="login-btn">Dashboard</button>
@@ -107,6 +115,18 @@
           <div class="card">
             <div class="card-top">Towns</div>
             <div class="card-content">
+            
+            <%@ page import="com.novaclangaming.model.Town" %>
+            <%@ page import="com.novaclangaming.dao.JPATownDao" %>
+            
+            <%
+            JPATownDao townDao = new JPATownDao();
+            List<Town> towns = townDao.findAllOpenTowns();
+            for (Town t: towns){
+            	System.out.println(t.getName());
+            }
+            %>
+            
               <div class="row bb">
                 <div class="sub-5 text-bold">Town of Winterfell</div>
                 <div class="sub-5">[5/10]</div>
@@ -127,6 +147,7 @@
       		<div class="card">
       			<div class="card-top"> Create new Town </div>
       			<div class="card-content">
+      			<form action="../town/create" method="POST">
       				<div class="input-group">
       					<label for="townName">Town Name: </label>
       					<input type="text" name="townName" class="char-form" required>
@@ -134,24 +155,25 @@
       				<div class="input-group">
       					<label for="townSize">Population: </label>
       					<select name="townSize" class="char-form">
-      						<option value="1">Band of Survivors (10)</option>
+      						<option value="10">Band of Survivors (10)</option>
       					</select>
       				</div>
       				<div class="input-group">
       					<label for="mapSize">Map Size: </label>
       					<select name="mapSize" class="char-form">
-      						<option value="1">Regular (11 x 11)</option>
+      						<option value="11">Regular (11 x 11)</option>
       					</select>
       				</div>
       				<div class="input-group">
       					<label for="townMode">Game Mode: </label>
       					<select name="townMode" class="char-form">
-      						<option value="1">Regular</option>
+      						<option value="Regular">Regular</option>
       					</select>
       				</div>
       				<div class="input-group">
       					<input type="submit" value="Create Town" class="char-form">
       				</div>
+      			</form>
       			</div>
       		</div>
       	  </div>

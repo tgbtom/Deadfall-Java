@@ -51,8 +51,12 @@ public class JPACharacterDao implements ICharacterDao{
 	}
 
 	public void delete(Character character) {
-		// TODO Auto-generated method stub
-		
+		EntityManager em = JPAConnection.getInstance().createEntityManager();
+		em.getTransaction().begin();
+		character = em.merge(character);
+		em.remove(character);
+		em.getTransaction().commit();
+		em.close();
 	}
 
 	public Optional<Character> findByCharName(int userId, String charName) {

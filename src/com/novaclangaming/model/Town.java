@@ -4,14 +4,25 @@ import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+@NamedQueries({
+	@NamedQuery(name = "Town.findByName", query = "SELECT t FROM town t WHERE name = :name"),
+	@NamedQuery(name = "Town.findOpen", query = "SELECT t.townId, COUNT(c.town) FROM town t JOIN t.characters c GROUP BY t.townId")
+})
 @Entity(name = "town")
 @Table(name = "df_towns")
 public class Town {
 	
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "town_seq")
+	@SequenceGenerator(name = "town_seq", sequenceName = "df_town_id_seq", allocationSize = 1)
 	@Id
 	@Column(name = "town_id")
 	private int townId;
@@ -20,13 +31,19 @@ public class Town {
 	private String name;
 	
 	@Column(name = "max_chars")
-	private int maxSize;
+	private int townSize;
 	
 	@Column(name = "horde_size")
 	private int hordeSize;
 	
 	@Column
 	private int defence;
+	
+	@Column(name = "map_size")
+	private int mapSize;
+	
+	@Column(name = "game_mode")
+	private String gameMode;
 	
 	@Column(name = "day_number")
 	private int dayNumber;
@@ -37,6 +54,16 @@ public class Town {
 	public Town() {
 		super();
 		// TODO Auto-generated constructor stub
+	}
+
+	public Town(String name, int townSize, int hordeSize, int defence, int mapSize, String gameMode) {
+		super();
+		this.name = name;
+		this.townSize = townSize;
+		this.hordeSize = hordeSize;
+		this.defence = defence;
+		this.mapSize = mapSize;
+		this.gameMode = gameMode;
 	}
 
 	public int getTownId() {
@@ -55,12 +82,12 @@ public class Town {
 		this.name = name;
 	}
 
-	public int getMaxSize() {
-		return maxSize;
+	public int getTownSize() {
+		return townSize;
 	}
 
-	public void setMaxSize(int maxSize) {
-		this.maxSize = maxSize;
+	public void setTownSize(int townSize) {
+		this.townSize = townSize;
 	}
 
 	public int getHordeSize() {
@@ -93,6 +120,22 @@ public class Town {
 
 	public void setCharacters(List<Character> characters) {
 		this.characters = characters;
+	}
+
+	public int getMapSize() {
+		return mapSize;
+	}
+
+	public void setMapSize(int mapSize) {
+		this.mapSize = mapSize;
+	}
+
+	public String getGameMode() {
+		return gameMode;
+	}
+
+	public void setGameMode(String gameMode) {
+		this.gameMode = gameMode;
 	}
 	
 }

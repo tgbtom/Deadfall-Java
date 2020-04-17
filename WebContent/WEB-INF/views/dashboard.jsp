@@ -67,7 +67,7 @@ pageEncoding="ISO-8859-1"%>
 				<div class="row bb">
 				<form action="${pageContext.request.contextPath}/character/check" method="POST">
 					<input type="hidden" name="charId" value="<%= c.getCharId() %>">
-					<div class="sub-5 text-bold"><%= c.getName() %> [0]</div>
+					<div class="sub-5 text-bold"><a class="charLink" href="${pageContext.request.contextPath}/character/<%= c.getCharId() %>"><%= c.getName() %> [0]</a></div>
 					<div class="sub-5"><%= c.getClassification() %></div>
 					<div class="sub-2">
 						<input type="submit" value="Play" class="btn-play">
