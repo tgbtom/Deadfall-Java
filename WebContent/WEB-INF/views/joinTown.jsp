@@ -5,7 +5,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dashboard</title>
+    <title>Join Town</title>
     <link
       href="https://fonts.googleapis.com/css?family=Khand"
       rel="stylesheet"
@@ -91,7 +91,15 @@
 	                	  <% }%>
                   </select></span>
                 </div>
-                <div class="col-4"><button class="btn-play" id="addChar">Add</button></div>
+                
+            <%  if(charIdOut.size() == 0){ %>
+                	<div class="col-4"><button class="btn-play" id="addChar" disabled>Add</button></div>
+                	
+            <%  }
+                else{ %>
+                	<div class="col-4"><button class="btn-play" id="addChar">Add</button></div>      	
+            <%  } %>
+            
               </div>
               
               <span id="charsSelected">
@@ -101,7 +109,9 @@
             	  %>
             	  	<div class="row">
 	                	<div class="sub-7 text-bold"><%= c.getName() %> []</div>
-	                	<div class="sub-5"><%= c.getClassification() %></div>
+	                	<div class="sub-4"><%= c.getClassification() %></div>
+	                	<div class="sub-1"><img src="${pageContext.request.contextPath}/resources/
+	                	img/small-x-red.png" alt="remove" onclick="unselectChar(<%=c.getCharId()%>)" class="msg-close"></div>
                 	</div>
             	  <%
               }
@@ -118,29 +128,24 @@
             
             <%@ page import="com.novaclangaming.model.Town" %>
             <%@ page import="com.novaclangaming.dao.JPATownDao" %>
-            
-            <%
-            JPATownDao townDao = new JPATownDao();
-            List<Town> towns = townDao.findAllOpenTowns();
-            for (Town t: towns){
-            	System.out.println(t.getName());
-            }
-            %>
-            
-              <div class="row bb">
-                <div class="sub-5 text-bold">Town of Winterfell</div>
-                <div class="sub-5">[5/10]</div>
-                <div class="sub-2">
-                  <button class="btn-play">Join</button>
-                </div>
-              </div>
-              <div class="row bb">
-                <div class="sub-5 text-bold">King's Landing</div>
-                <div class="sub-5">[0/10]</div>
-                <div class="sub-2">
-                  <button class="btn-play">Join</button>
-                </div>
-              </div>
+            <span id="availableTowns">
+	            
+	        <%  JPATownDao townDao = new JPATownDao();
+	            List<Town> towns = townDao.findAllOpenTowns();
+	            for (Town t: towns){
+	            	if(t.getTownSize() - t.getCharacters().size() >= charIdIn.size()){ %>
+	            	<div class="row bb">
+		                <div class="sub-5 text-bold"><%= t.getName() %></div>
+		                <div class="sub-5">[ <%= t.getCharacters().size() %> / <%= t.getTownSize() %>]</div>
+		                <div class="sub-2">
+		                  <button class="btn-play join-town" id="<%= t.getTownId() %>">Join</button>
+		                </div>
+	              	</div>
+	            	<%
+	            	}
+	            }
+	            %>
+            </span>
             </div>
           </div>
           <div class="row mt-6">

@@ -62,3 +62,22 @@ function showModalContainer() {
   var modalContainer = document.getElementById("modal-container");
   modalContainer.style.display = "block";
 }
+
+function colourizeRarity(rarity){
+	switch (rarity) {
+	case "Common":
+		return "#848484";
+	case "UnCommon":
+		return "#00cc66";
+	case "Rare":
+		return "#0088f7";
+	case "Epic":
+		return "#be00ff";
+	case "Legendary":
+		return "#ff9700";
+	case "Scrap":
+		return "#5f5d5d";
+	default:
+		break;
+	}
+}

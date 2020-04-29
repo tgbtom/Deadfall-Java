@@ -1,5 +1,6 @@
 package com.novaclangaming.controller;
 
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.stereotype.Controller;
@@ -11,6 +12,7 @@ import com.novaclangaming.dao.ITownDao;
 import com.novaclangaming.dao.JPAAuthentication;
 import com.novaclangaming.dao.JPATownDao;
 import com.novaclangaming.model.Town;
+import com.novaclangaming.model.TownStatus;
 import com.novaclangaming.model.User;
 
 @Controller
@@ -25,7 +27,7 @@ public class TownController {
 		User user = auth.loggedUser(request);
 		if(user != null) {
 			if(townDao.findByName(townName).isEmpty()) {
-				Town town = new Town(townName, townSize, 300, 350, mapSize, townMode);
+				Town town = new Town(townName, townSize, 300, 350, mapSize, townMode, TownStatus.New);
 				townDao.create(town);
 				request.getSession().setAttribute("message", "Town has been created");
 			}

@@ -25,20 +25,25 @@ public class UserController {
 	JPAUserDao jud = new JPAUserDao();
 	
 	@RequestMapping(value = "/user/create", method = RequestMethod.POST)
-	public ModelAndView register(@RequestParam String username, @RequestParam String password, @RequestParam String email) {
+	public ModelAndView register(@RequestParam String username, @RequestParam String password, @RequestParam String passwordRpt, @RequestParam String email) {
 
 		ModelAndView mv = new ModelAndView("index");
 		IUserDao userDao = new JPAUserDao();
 		IAuthenticationDao authDao = new JPAAuthentication();
 		Optional<User> user = userDao.findByName(username);
 		if(user.isEmpty()) {
-			Password convertedPass = authDao.hashPassword(password);
-			String hashedPass = convertedPass.getHashedPass();
-			String salt = convertedPass.getSalt();
-			
-			User newUser = new User(username, hashedPass, salt, email);
-			authDao.register(newUser);
-			mv.addObject("message", "Registration Successful");
+			if(password.equals(passwordRpt)) {
+				Password convertedPass = authDao.hashPassword(password);
+				String hashedPass = convertedPass.getHashedPass();
+				String salt = convertedPass.getSalt();
+				
+				User newUser = new User(username, hashedPass, salt, email);
+				authDao.register(newUser);
+				mv.addObject("message", "Registration Successful");
+			}else {
+				mv.addObject("message", "Passwords must match");
+			}
+
 		}else {
 			mv.addObject("message", "Registration Failed");
 		}

@@ -13,10 +13,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.novaclangaming.dao.ICharacterDao;
+import com.novaclangaming.dao.ITownDao;
 import com.novaclangaming.dao.JPAAuthentication;
 import com.novaclangaming.dao.JPACharacterDao;
+import com.novaclangaming.dao.JPATownDao;
 import com.novaclangaming.dao.JPAUserDao;
 import com.novaclangaming.model.CharacterClass;
+import com.novaclangaming.model.Town;
 import com.novaclangaming.model.User;
 import com.novaclangaming.model.Character;
 
@@ -25,6 +29,7 @@ public class CharacterController {
 
 	JPACharacterDao charDao = new JPACharacterDao();
 	JPAUserDao userDao = new JPAUserDao();
+	JPATownDao townDao = new JPATownDao();
 	JPAAuthentication auth = new JPAAuthentication();
 	
 	@RequestMapping(value = "/character/create", method = RequestMethod.POST)
@@ -135,21 +140,33 @@ public class CharacterController {
 		}
 	}
 	
-	@RequestMapping(value = "/character/JoinTownAjax", method = RequestMethod.POST)
+	@RequestMapping(value = "/character/JoinTownAjax/{dir}", method = RequestMethod.POST)
 	@ResponseBody
-	public String ajaxCall(HttpServletRequest request, @RequestParam int charId) {
+	public String ajaxCall(HttpServletRequest request, @RequestParam int charId, @PathVariable String dir) {
 		
 		User user = (User) request.getSession().getAttribute("user");
+		
+		@SuppressWarnings("unchecked")
 		List<Integer> charIds = (List<Integer>) request.getSession().getAttribute("character-ids");
-		if(! charIds.contains(charId)) {
-			charIds.add(charId);
+		
+		if(dir.equals("add")) {
+			if(! charIds.contains(charId)) {
+				charIds.add(charId);
+			}
 		}
+		else if(dir.equals("remove") && charIds.contains(charId)) {
+			charIds.remove(charIds.indexOf(charId));
+		}
+		
+		
 		List<Character> allChars = charDao.findByUserId(user.getId());
 		List<Character> outChars = new ArrayList<Character>();
+		int charsIn = allChars.size();
 		
 		for (Character c: allChars) {
 			if(! charIds.contains(c.getCharId())) {
 				outChars.add(c);
+				charsIn--;
 			}
 		}
 		
@@ -164,11 +181,55 @@ public class CharacterController {
 			Character c = charDao.findById(curId);
       	  result += "<div class=\"row\">"
       	  		+ "<div class=\"sub-7 text-bold\">"+ c.getName() +"</div>"
-      	  		+ "<div class=\"sub-5\">"+ c.getClassification() +"</div>"
+      	  		+ "<div class=\"sub-4\">"+ c.getClassification() +"</div>"
+				+ "<div class=\"sub-1\"><img src=\""+ request.getContextPath() +"/resources/" + 
+						"img/small-x-red.png\" alt=\"remove\" onclick=\"unselectChar("+ curId +")\" class=\"msg-close\"></div>"
       	  		+ "</div>";
         }
 		
+		result += "&";
+		
+		//towns
+		List<Town> towns = townDao.findAllOpenTowns();
+		for(Town t: towns) {
+			if(t.getTownSize() - t.getCharacters().size() >= charsIn) {
+				result += "<div class=\"row bb\">" + 
+						"<div class=\"sub-5 text-bold\">"+ t.getName() +"</div>" + 
+						"<div class=\"sub-5\">[ "+ t.getCharacters().size() +" / "+ t.getTownSize() +"]</div>" + 
+						"<div class=\"sub-2\">" + 
+						"<button class=\"btn-play\">Join</button>" + 
+						"</div>" + 
+						"</div>";
+			}
+		}
 		return result;
 	}
 	
+	@RequestMapping(value = "character/ajax/town/join", method = RequestMethod.POST)
+	@ResponseBody
+	public String join(HttpServletRequest request, @RequestParam int townId) {
+		ITownDao townDao = new JPATownDao();
+		ICharacterDao charDao = new JPACharacterDao();
+		String result = "";
+		
+		//ensure there is space for all the selected chars. Loop through to add chars, double-checking that the char is not in a town already
+		@SuppressWarnings("unchecked")
+		List<Integer> charIds = (List<Integer>) request.getSession().getAttribute("character-ids");
+		Town town = townDao.findById(townId);
+		if (town.getTownSize() - town.getCharacters().size() >= 0) {
+			for (int id : charIds) {
+				Character c = charDao.findById(id);
+				if(c.getTown() == null) {
+					
+					result += c.getName() + " joined. ";
+				}else {
+					result += c.getName() + " was already in a town. ";
+				}
+			}
+		}
+		else {
+			result += "Not enough space. ";
+		}
+		return result;
+	}
 }

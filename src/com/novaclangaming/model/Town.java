@@ -4,6 +4,8 @@ import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -15,7 +17,7 @@ import javax.persistence.Table;
 
 @NamedQueries({
 	@NamedQuery(name = "Town.findByName", query = "SELECT t FROM town t WHERE name = :name"),
-	@NamedQuery(name = "Town.findOpen", query = "SELECT t.townId, COUNT(c.town) FROM town t JOIN t.characters c GROUP BY t.townId")
+	@NamedQuery(name = "Town.findOpen", query = "SELECT t FROM town t WHERE status = 'New'")
 })
 @Entity(name = "town")
 @Table(name = "df_towns")
@@ -51,12 +53,16 @@ public class Town {
 	@OneToMany(mappedBy = "town")
 	private List<Character> characters;
 
+	@Column
+	@Enumerated(EnumType.STRING)
+	private TownStatus status;
+	
 	public Town() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-	public Town(String name, int townSize, int hordeSize, int defence, int mapSize, String gameMode) {
+	public Town(String name, int townSize, int hordeSize, int defence, int mapSize, String gameMode, TownStatus status) {
 		super();
 		this.name = name;
 		this.townSize = townSize;
@@ -64,6 +70,7 @@ public class Town {
 		this.defence = defence;
 		this.mapSize = mapSize;
 		this.gameMode = gameMode;
+		this.status = status;
 	}
 
 	public int getTownId() {
@@ -136,6 +143,14 @@ public class Town {
 
 	public void setGameMode(String gameMode) {
 		this.gameMode = gameMode;
+	}
+
+	public TownStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(TownStatus status) {
+		this.status = status;
 	}
 	
 }

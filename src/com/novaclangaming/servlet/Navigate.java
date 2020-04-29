@@ -34,33 +34,33 @@ public class Navigate extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		User user = (User) request.getSession().getAttribute("user");
-		String loc = request.getParameter("loc");
-		if(user == null){
-			response.sendRedirect("index.jsp");
-		}
-		else {
-			RequestDispatcher dispatcher;
-			if (loc.equals("logout")) {
-				request.getSession().removeAttribute("user");
-				request.getSession().setAttribute("message", "You have logged out");
-				dispatcher = request.getRequestDispatcher("index.jsp");
-			}
-			else if(loc.equals("dashboard")) {
-				ICharacterDao charDao = new JPACharacterDao();
-				List<Character> characters = charDao.findByUserId(user.getId());
-				request.getSession().setAttribute("characters", characters);
-				dispatcher = request.getRequestDispatcher("WEB-INF/dashboard.jsp");
-			} 
-			else if (loc.equals("joinTown")) {
-				dispatcher = request.getRequestDispatcher("WEB-INF/joinTown.jsp");
-			} 
-			else {
-				dispatcher = request.getRequestDispatcher("WEB-INF/dashboard.jsp");
-			}
-			dispatcher.forward(request, response);
-		}
-		
+//		User user = (User) request.getSession().getAttribute("user");
+//		String loc = request.getParameter("loc");
+//		if(user == null){
+//			response.sendRedirect("index.jsp");
+//		}
+//		else {
+//			RequestDispatcher dispatcher;
+//			if (loc.equals("logout")) {
+//				request.getSession().removeAttribute("user");
+//				request.getSession().setAttribute("message", "You have logged out");
+//				dispatcher = request.getRequestDispatcher("index.jsp");
+//			}
+//			else if(loc.equals("dashboard")) {
+//				ICharacterDao charDao = new JPACharacterDao();
+//				List<Character> characters = charDao.findByUserId(user.getId());
+//				request.getSession().setAttribute("characters", characters);
+//				dispatcher = request.getRequestDispatcher("WEB-INF/dashboard.jsp");
+//			} 
+//			else if (loc.equals("joinTown")) {
+//				dispatcher = request.getRequestDispatcher("WEB-INF/joinTown.jsp");
+//			} 
+//			else {
+//				dispatcher = request.getRequestDispatcher("WEB-INF/dashboard.jsp");
+//			}
+//			dispatcher.forward(request, response);
+//		}
+//		
 	}
 
 	/**

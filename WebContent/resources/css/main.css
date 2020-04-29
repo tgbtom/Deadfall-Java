@@ -173,9 +173,6 @@ body {
   font-weight: 800;
 }
 
-.card-content {
-}
-
 .input-group {
   margin: 5px;
 }
@@ -346,14 +343,23 @@ input[type="submit"] {
   box-shadow: 0 0 5px black;
 }
 
-#msg-close:hover {
+#msg-close:hover, .msg-close:hover {
   cursor: pointer;
+  opacity: .75;
+}
+
+.msg-close{
+	position: absolute;
 }
 
 .subtitle{
 	text-align: center;
 	background-color: #e08e3c;
 	font-size: 1.3em;
+}
+
+#modal-featured-item{
+	margin-top: 15px;
 }
 
 .charLink {

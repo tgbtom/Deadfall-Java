@@ -64,7 +64,7 @@ pageEncoding="ISO-8859-1"%>
                   Days Survived:
                 </div>
                 <div class="col-6 text-center">
-                  149
+                  0
                 </div>
               </div>
               <div class="row bb">
@@ -72,7 +72,7 @@ pageEncoding="ISO-8859-1"%>
                   Towns:
                 </div>
                 <div class="col-6 text-center">
-                  15
+                  0
                 </div>
               </div>
               <div class="row bb">
@@ -80,7 +80,7 @@ pageEncoding="ISO-8859-1"%>
                   Character Deaths:
                 </div>
                 <div class="col-6 text-center">
-                  47
+                  0
                 </div>
               </div>
               <div class="row bb">
@@ -88,7 +88,7 @@ pageEncoding="ISO-8859-1"%>
                   Zeds Killed:
                 </div>
                 <div class="col-6 text-center">
-                  782
+                  0
                 </div>
               </div>
             </div>
@@ -96,25 +96,36 @@ pageEncoding="ISO-8859-1"%>
         </div>
         <div class="col-4">
           <div class="card">
-            <div class="card-top">Water Ration</div>
+            <div class="card-top" id="featured-title"></div>
             <div class="card-content">
               <div class="row">
                 <div class="sub-4"><!-- spacer --></div>
-                <div class="sub-4">
+                <div class="sub-4" id="featured-item">
                   <div class="card bg-faded text-center" id="featured">
                     <img
-                      src="${pageContext.request.contextPath}/resources/img/items/Water Ration.png"
-                      alt="Water Ration"
-                      title="Water Ration"
+                      src=""
+                      alt=""
+                      title=""
+                      id="preview-featured-item"
                     />
                   </div>
                 </div>
                 <div class="sub-4"><!-- spacer --></div>
               </div>
               <div class="row">
-                <div class="col-12">
-                  Water is essential to keeping your survivors hydrated and
-                  alive. Be sure to ration if you want to survive.
+                <div class="col-12" id="featured-desc">
+	                <div class="row">
+	                  <div class="sub-6 text-right">Rarity:</div>
+	                  <div class="sub-6" id="featured-rarity"></div>
+	                </div>
+	                <div class="row">
+	                  <div class="sub-6 text-right">Mass:</div>
+	                  <div class="sub-6" id="featured-mass"></div>
+	                </div>
+	                <div class="row">
+	                  <div class="sub-6 text-right">Category:</div>
+	                  <div class="sub-6" id="featured-category"></div>
+	                </div>
                 </div>
               </div>
             </div>
@@ -171,7 +182,6 @@ pageEncoding="ISO-8859-1"%>
                     type="text"
                     name="username"
                     placeholder="Username"
-                    value="tom"
                     class="modal-form"
                   />
                   <label for="username">User: </label>
@@ -180,7 +190,6 @@ pageEncoding="ISO-8859-1"%>
                   <input
                     type="password"
                     name="password"
-                    value="none"
                     placeholder="password"
                     class="modal-form"
                   />
@@ -189,8 +198,7 @@ pageEncoding="ISO-8859-1"%>
                 <div class="input-group">
                   <input
                     type="password"
-                    name="password-rpt"
-                    value="none"
+                    name="passwordRpt"
                     placeholder="repeat password"
                     class="modal-form"
                   />
@@ -199,7 +207,6 @@ pageEncoding="ISO-8859-1"%>
                   <input
                     type="email"
                     name="email"
-                    value="tom@gmail.com"
                     placeholder="sample@gmail.com"
                     class="modal-form"
                   />
@@ -213,6 +220,19 @@ pageEncoding="ISO-8859-1"%>
           </div>
         </div>
         <div class="col-3"><!-- Spacer --></div>
+      </div>
+      <div class="modal" id="modal-featured">
+      	<div class="col-3"><!-- Spacer --></div>
+      	<div class="col-6">
+      		<div class="card">
+      			<div class="card-top subtitle" id="modal-featured-title">Water Ration</div>
+      			<div class="card-content text-center">
+      				<img src="" id="modal-featured-item">
+      				<p id="modal-featured-desc">Description for the item should go here</p>
+      			</div>
+      		</div>
+      	</div>
+      	<div class="col-3"><!-- Spacer --></div>
       </div>
     </div>
   </body>

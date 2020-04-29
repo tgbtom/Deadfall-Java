@@ -41,11 +41,11 @@ public class JPATownDao implements ITownDao{
 		
 		try {
 			PreparedStatement ps = conn.prepareStatement(query);
-			ps.addBatch();
-			ps = conn.prepareStatement(query2);
-			ps.addBatch();
-			ps.executeBatch();
+			PreparedStatement ps2 = conn.prepareStatement(query2);
+			ps.executeUpdate();
+			ps2.executeUpdate();
 			ps.close();
+			ps2.close();
 		} catch (SQLException e) { e.printStackTrace();}
 	}
 
@@ -70,9 +70,9 @@ public class JPATownDao implements ITownDao{
 	public List<Town> findAllOpenTowns() {
 		EntityManager em = JPAConnection.getInstance().createEntityManager();
 		em.getTransaction().begin();
-		Query query = em.createNamedQuery("Town.findOpen");
-		System.out.println(query.getResultList());
-		return null;
+		TypedQuery<Town> query = em.createNamedQuery("Town.findOpen", Town.class);
+		List<Town> towns = query.getResultList();
+		return towns;
 	}
 
 	public Optional<Town> findByName(String townName) {
