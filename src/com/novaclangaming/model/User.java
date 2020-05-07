@@ -1,5 +1,8 @@
 package com.novaclangaming.model;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -40,10 +43,12 @@ public class User {
 	
 	@OneToMany(mappedBy = "user")
 	private List<Character> characters;
+	
+	@OneToMany(mappedBy = "user")
+	private List<Bulletin> bulletins;
 
 	public User() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	public User(int id, String username, String password, String salt, String email) {
@@ -111,4 +116,29 @@ public class User {
 		this.characters = characters;
 	}
 
+	public List<Bulletin> getBulletins() {
+		return bulletins;
+	}
+	
+	public List<Bulletin> getOrderedBulletins(){
+		Collections.sort(this.bulletins, new Comparator<Bulletin>() {
+			public int compare(Bulletin o1, Bulletin o2) {
+				return o2.getPostedTime().compareTo(o1.getPostedTime());
+			}
+		});
+		return this.bulletins;
+	}
+
+
+	public void setBulletins(List<Bulletin> bulletins) {
+		this.bulletins = bulletins;
+	}
+	
+	public void addBulletin(Bulletin bulletin) {
+		if(this.bulletins == null || this.bulletins.isEmpty()) {
+			this.bulletins = new ArrayList<Bulletin>();
+		}
+		this.bulletins.add(bulletin);
+	}
+	
 }

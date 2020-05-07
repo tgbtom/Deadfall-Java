@@ -1,25 +1,22 @@
 package com.novaclangaming.dao;
 
+import com.novaclangaming.model.Bulletin;
 import com.novaclangaming.model.User;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Optional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 
-public class JPAUserDao implements IUserDao {
+public class JPAUserDao implements IUserDao{
 
-	@Override
-	public void create(User user) {
-		EntityManager em = JPAConnection.getInstance().createEntityManager();
-		em.getTransaction().begin();
-		em.persist(user);
-		em.getTransaction().commit();
-		em.close();
+	public JPAUserDao() {
+		super();
 	}
 
-	@Override
 	public Optional<User> findByName(String username) {
 		User user = null;
 		EntityManager em = JPAConnection.getInstance().createEntityManager();
@@ -32,13 +29,14 @@ public class JPAUserDao implements IUserDao {
 		return Optional.ofNullable(user);
 	}
 
-	@Override
 	public User findById(int id) {
-		// TODO Auto-generated method stub
-		return null;
+		EntityManager em = JPAConnection.getInstance().createEntityManager();
+		em.getTransaction().begin();
+		User user = em.find(User.class, id);
+		em.close();
+		return user;
 	}
 
-	@Override
 	public User update(User user) {
 		// TODO Auto-generated method stub
 		return null;

@@ -5,32 +5,49 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Optional;
 
 import javax.persistence.EntityManager;
+import javax.servlet.http.HttpServletRequest;
 
 import com.novaclangaming.model.Password;
 import com.novaclangaming.model.User;
+import com.novaclangaming.model.Bulletin;
+import com.novaclangaming.model.Character;
 
 public class JPAAuthentication implements IAuthenticationDao{
 	
-	private IUserDao userDao;
+	private IUserDao userDao = new JPAUserDao();
 	
 	public JPAAuthentication() {
 		super();
-		userDao = new JPAUserDao();
 	}
-
-	@Override
+	
+	public User loggedUser(HttpServletRequest request) {
+		User user = (User) request.getSession().getAttribute("user");
+		if(user != null) {
+			User freshUser = userDao.findById(user.getId());
+			return freshUser;
+		}
+		return user;	
+	}
+	
+	public Character activeCharacter(HttpServletRequest request) {
+		Character character = (Character) request.getSession().getAttribute("character");
+		return character;
+	}
+	
 	public void register(User user) {
 		EntityManager em = JPAConnection.getInstance().createEntityManager();
 		em.getTransaction().begin();
 		em.persist(user);
+		Bulletin bulletin = new Bulletin("Account has been created. Welcome to Deadfall", new Date(), user);
+		em.persist(bulletin);
 		em.getTransaction().commit();
 		em.close();
 	}
 
-	@Override
 	public Optional<User> authenticate(String username, String password) {
 		Optional<User> user = userDao.findByName(username);
 		if(user.isPresent() && user.get().getPassword().equals(hashPassword(password, toByteArray(user.get().getSalt())).getHashedPass())) {
@@ -41,7 +58,6 @@ public class JPAAuthentication implements IAuthenticationDao{
 		}
 	}
 
-	@Override
 	public Password hashPassword(String password) {
 		MessageDigest md;
 		Password output;
@@ -71,7 +87,6 @@ public class JPAAuthentication implements IAuthenticationDao{
 		return null;
 	}
 
-	@Override
 	public Password hashPassword(String password, byte[] salt) {
 		MessageDigest md;
 		Password output;

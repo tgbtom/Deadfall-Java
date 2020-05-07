@@ -42,31 +42,31 @@ public class Create extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		User user = (User) request.getSession().getAttribute("user");
-		if(user == null) {
-			response.sendRedirect("index.jsp");
-		}else {
-			RequestDispatcher dispatcher;
-			String type = request.getParameter("type");
-			String charName = request.getParameter("char-name");
-			CharacterClass charClass = CharacterClass.valueOf(request.getParameter("char-class"));
-			if(type.equals("character")) {
-				//create character
-				ICharacterDao charDao = new JPACharacterDao();
-				if(charDao.findByUserId(user.getId()).size() >= 20) {
-					request.getSession().setAttribute("message", "You already have the maximum of 20 Characters");
-				}
-				else {
-					Character newChar = new Character(user, charName, charClass);
-					charDao.create(newChar);
-					request.getSession().setAttribute("message", "Character: "+ charName +" created successfully");
-				}
-				dispatcher = request.getRequestDispatcher("Navigate?loc=dashboard");
-			}else {
-				dispatcher = request.getRequestDispatcher("Navigate?loc=dashboard");
-			}
-			dispatcher.forward(request, response);
-		}
+//		User user = (User) request.getSession().getAttribute("user");
+//		if(user == null) {
+//			response.sendRedirect("index.jsp");
+//		}else {
+//			RequestDispatcher dispatcher;
+//			String type = request.getParameter("type");
+//			String charName = request.getParameter("char-name");
+//			CharacterClass charClass = CharacterClass.valueOf(request.getParameter("char-class"));
+//			if(type.equals("character")) {
+//				//create character
+//				ICharacterDao charDao = new JPACharacterDao();
+//				if(charDao.findByUserId(user.getId()).size() >= 20) {
+//					request.getSession().setAttribute("message", "You already have the maximum of 20 Characters");
+//				}
+//				else {
+//					Character newChar = new Character(user, charName, charClass);
+//					charDao.create(newChar);
+//					request.getSession().setAttribute("message", "Character: "+ charName +" created successfully");
+//				}
+//				dispatcher = request.getRequestDispatcher("Navigate?loc=dashboard");
+//			}else {
+//				dispatcher = request.getRequestDispatcher("Navigate?loc=dashboard");
+//			}
+//			dispatcher.forward(request, response);
+//		}
 	}
 
 }
