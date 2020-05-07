@@ -12,8 +12,8 @@
     />
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/main.css" />
 
-    <script src="${pageContext.request.contextPath}/resources/js/main.js"></script>  
     <script src="${pageContext.request.contextPath}/resources/js/joinTown.js"></script>   
+    <script src="${pageContext.request.contextPath}/resources/js/main.js"></script>  
   </head>
   <body>
   

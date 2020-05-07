@@ -23,6 +23,7 @@ import com.novaclangaming.model.User;
 public class UserController {
 
 	JPAUserDao jud = new JPAUserDao();
+	JPAAuthentication auth = new JPAAuthentication();
 	
 	@RequestMapping(value = "/user/create", method = RequestMethod.POST)
 	public ModelAndView register(@RequestParam String username, @RequestParam String password, @RequestParam String passwordRpt, @RequestParam String email) {
@@ -62,6 +63,16 @@ public class UserController {
 		}
 		else {
 			request.getSession().setAttribute("message", "Invalid credentials");
+			return "redirect: ../";
+		}
+	}
+	
+	@RequestMapping(value = "/user/profile", method = RequestMethod.GET)
+	public String profile(HttpServletRequest request) {
+		User user = auth.loggedUser(request);
+		if(user != null) {
+			return "profile";
+		}else {
 			return "redirect: ../";
 		}
 	}

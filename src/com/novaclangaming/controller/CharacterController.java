@@ -70,8 +70,7 @@ public class CharacterController {
 					return "redirect: ./join";
 				}
 				else {
-					request.getSession().setAttribute("message", "Char is in a town");
-					return "redirect: ../dashboard";
+					return "redirect: ../town/home";
 				}
 			}
 			else {
@@ -173,7 +172,9 @@ public class CharacterController {
 		request.getSession().setAttribute("character-ids", charIds);
 		String result = "<select id=\"charOption\">";
 		for(Character c : outChars){
-      	  result += "<option value=\"" + c.getCharId() + "\">"+ c.getName() +"</option>";
+			if(c.getTown() == null) {
+				result += "<option value=\"" + c.getCharId() + "\">"+ c.getName() +"</option>";
+			}
         }
 		result += "</select>&";
 		
@@ -197,7 +198,7 @@ public class CharacterController {
 						"<div class=\"sub-5 text-bold\">"+ t.getName() +"</div>" + 
 						"<div class=\"sub-5\">[ "+ t.getCharacters().size() +" / "+ t.getTownSize() +"]</div>" + 
 						"<div class=\"sub-2\">" + 
-						"<button class=\"btn-play\">Join</button>" + 
+						"<button class=\"btn-play join-town\" id=\"" + t.getTownId() + "\">Join</button>" + 
 						"</div>" + 
 						"</div>";
 			}
@@ -208,28 +209,43 @@ public class CharacterController {
 	@RequestMapping(value = "character/ajax/town/join", method = RequestMethod.POST)
 	@ResponseBody
 	public String join(HttpServletRequest request, @RequestParam int townId) {
-		ITownDao townDao = new JPATownDao();
-		ICharacterDao charDao = new JPACharacterDao();
-		String result = "";
-		
-		//ensure there is space for all the selected chars. Loop through to add chars, double-checking that the char is not in a town already
-		@SuppressWarnings("unchecked")
-		List<Integer> charIds = (List<Integer>) request.getSession().getAttribute("character-ids");
-		Town town = townDao.findById(townId);
-		if (town.getTownSize() - town.getCharacters().size() >= 0) {
-			for (int id : charIds) {
-				Character c = charDao.findById(id);
-				if(c.getTown() == null) {
-					
-					result += c.getName() + " joined. ";
-				}else {
-					result += c.getName() + " was already in a town. ";
+		User user = auth.loggedUser(request);
+		if(user != null) {
+			ITownDao townDao = new JPATownDao();
+			ICharacterDao charDao = new JPACharacterDao();
+			String allSuccess = "success";
+			
+			//ensure there is space for all the selected chars. Loop through to add chars, double-checking that the char is not in a town already
+			@SuppressWarnings("unchecked")
+			List<Integer> charIds = (List<Integer>) request.getSession().getAttribute("character-ids");
+			Town town = townDao.findById(townId);
+			if (town.getTownSize() - town.getCharacters().size() >= 0) {
+				for (int id : charIds) {
+					Character c = charDao.findById(id);
+					if(c.getTown() != null){
+						System.out.println("One or more selected characters is already in a town");
+						return "fail";
+					}
+					else {
+						System.out.println(c.getName() + "Joined successfully");
+						c.setTown(town);
+						charDao.update(c);
+					}
 				}
 			}
+			else {
+				System.out.println("Not enough space in the town");
+				return "fail";
+			}
+			
+			if (allSuccess.equals("success")) {
+				System.out.println("Success joining");
+				
+			}
+	
+			return allSuccess;
+		}else {
+			return "fail";
 		}
-		else {
-			result += "Not enough space. ";
-		}
-		return result;
 	}
 }

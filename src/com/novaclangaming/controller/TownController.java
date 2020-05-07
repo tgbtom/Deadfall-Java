@@ -40,4 +40,14 @@ public class TownController {
 			return "redirect: ../";
 		}
 	}
+	
+	@RequestMapping(value = "/town/home", method = RequestMethod.GET)
+	public String home(HttpServletRequest request) {
+		if(auth.loggedUser(request) != null) {
+			if(auth.activeCharacter(request) != null) {
+				return "town/home";
+			}
+		}
+		return "redirect: ../";
+	}
 }

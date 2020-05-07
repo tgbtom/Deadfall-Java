@@ -1,7 +1,10 @@
 package com.novaclangaming.dao;
 
+import com.novaclangaming.model.Bulletin;
 import com.novaclangaming.model.User;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Optional;
 
 import javax.persistence.EntityManager;
@@ -12,14 +15,6 @@ public class JPAUserDao implements IUserDao{
 
 	public JPAUserDao() {
 		super();
-	}
-
-	public void create(User user) {
-		EntityManager em = JPAConnection.getInstance().createEntityManager();
-		em.getTransaction().begin();
-		em.persist(user);
-		em.getTransaction().commit();
-		em.close();
 	}
 
 	public Optional<User> findByName(String username) {
@@ -35,8 +30,11 @@ public class JPAUserDao implements IUserDao{
 	}
 
 	public User findById(int id) {
-		// TODO Auto-generated method stub
-		return null;
+		EntityManager em = JPAConnection.getInstance().createEntityManager();
+		em.getTransaction().begin();
+		User user = em.find(User.class, id);
+		em.close();
+		return user;
 	}
 
 	public User update(User user) {

@@ -1,53 +1,16 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
 pageEncoding="ISO-8859-1"%>
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dashboard</title>
-    <link
-      href="https://fonts.googleapis.com/css?family=Khand"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/main.css" />
+<%@taglib prefix="t" tagdir="/WEB-INF/tags" %>
+<%@ taglib prefix="c" uri = "http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix = "fmt" uri = "http://java.sun.com/jsp/jstl/fmt" %>
 
-    <script src="${pageContext.request.contextPath}/resources/js/main.js"></script>
-    <script src="${pageContext.request.contextPath}/resources/js/dashboard.js"></script>
-  </head>
-  <body>
-      <% if (request.getSession().getAttribute("message") != null){ %>
-    <div class="page-message" id="page-message">
-      <%= request.getSession().getAttribute("message") %>
-      <img src="${pageContext.request.contextPath}/resources/img/small-x.png" id="msg-close" alt="close message" />
-    </div>
-    <%} request.getSession().removeAttribute("message"); %>
-    
-    <nav class="nav-bar" id="nav-desktop">
-	  <a href="dashboard">
-	  	<button class="btn-nav left" id="login-btn">Dashboard</button>
-	  </a>
-	  <a href="${pageContext.request.contextPath}/logout">
-	  	<button class="btn-nav right" id="login-btn">Logout</button>
-	  </a>
-    </nav>
+<script src="${pageContext.request.contextPath}/resources/js/dashboard.js"></script>
+<title>Dashboard</title>
 
-    <nav class="nav-bar" id="nav-mobile">
-      <button class="btn-nav left dropdown-btn">
-        <img src="${pageContext.request.contextPath}/resources/img/hamburger-menu.png" alt="Menu" />
-        <div class="dropdown-content">
-          <div class="dropdown-link">Homepage</div>
-          <div class="dropdown-link">Logout</div>
-        </div>
-      </button>
-    </nav>
-
-    <header id="banner">
-      <img src="${pageContext.request.contextPath}/resources/img/MainBanner.png" id="banner-img" alt="Deadfall Banner" />
-    </header>
-
-    <div class="container">
-      <div class="row">
+<t:generic>
+	<jsp:attribute name="mainContent">
+	
+	  <div class="row">
         <div class="col-8">
           <div class="card dash-char">
             <div class="card-top">Characters</div>
@@ -57,24 +20,26 @@ pageEncoding="ISO-8859-1"%>
             <%@ page import="com.novaclangaming.model.Character" %>
             <%@ page import="com.novaclangaming.dao.JPACharacterDao" %>
             <%@ page import="java.util.List" %>
-            <%
-            User user = (User) request.getSession().getAttribute("user"); 
-            JPACharacterDao charDao = new JPACharacterDao();
-            List<Character> characters = charDao.findByUserId(user.getId());
             
-            for(Character c : characters){
-            	%>
-				<div class="row bb">
+			<c:set var="user" scope="page" value = "${sessionScope.user.username}"/>
+			<c:set var="charDao" scope="page" value = "${JPACharacterDao()}"/>
+			
+			<c:forEach items="${charDao.findByUserId(sessionScope.user.id)}" var="c">
+            	<c:set var="btnText" scope="page" value = "${c.getTown() == null ? \"Join\" : \"Play\"}"/>
+            	<c:set var="btnClass" scope="page" value = "${c.getTown() == null ? \"btn-join\" : \"btn-play\"}"/>
+
+            	<div class="row bb">
 				<form action="${pageContext.request.contextPath}/character/check" method="POST">
-					<input type="hidden" name="charId" value="<%= c.getCharId() %>">
-					<div class="sub-5 text-bold"><a class="charLink" href="${pageContext.request.contextPath}/character/<%= c.getCharId() %>"><%= c.getName() %> [0]</a></div>
-					<div class="sub-5"><%= c.getClassification() %></div>
+					<input type="hidden" name="charId" value='<c:out value="${ c.charId }" />'>
+					<div class="sub-5 text-bold"><a class="charLink" href=''${pageContext.request.contextPath}/character/<c:out value="${ c.charId }" />''><c:out value="${ c.name }" /> [0]</a></div>
+					<div class="sub-5"><c:out value="${ c.classification }" /></div>
 					<div class="sub-2">
-						<input type="submit" value="Play" class="btn-play">
+						<input type="submit" value='<c:out value="${btnText}" />' class='<c:out value="${btnClass}" />'>
 					</div>
 				</form>
 				</div>
-            	<% } %>
+
+			</c:forEach>
               
             </div>
           </div>
@@ -123,68 +88,26 @@ pageEncoding="ISO-8859-1"%>
           <div class="card dash-bulletin">
             <div class="card-top">User Bulletin</div>
             <div class="card-content">
-              <div class="row bb">
-                <div class="sub-3">09/13 2019</div>
-                <div class="sub-9 bl">
-                  This is a test bulletin and it is medium in length
-                </div>
-              </div>
-              <div class="row bb">
-                <div class="sub-3">09/10 2019</div>
-                <div class="sub-9 bl">
-                  Short
-                </div>
-              </div>
-              <div class="row bb">
-                <div class="sub-3">09/05 2019</div>
-                <div class="sub-9 bl">
-                  This is a test bulletin and it is LONG in length. Alot to
-                  think about here regarding <yellow>yellow</yellow>
-                </div>
-              </div>
-              <div class="row bb">
-                <div class="sub-3">09/13 2019</div>
-                <div class="sub-9 bl">
-                  This is a test bulletin and it is medium in length
-                </div>
-              </div>
-              <div class="row bb">
-                <div class="sub-3">09/10 2019</div>
-                <div class="sub-9 bl">
-                  Short
-                </div>
-              </div>
-              <div class="row bb">
-                <div class="sub-3">09/05 2019</div>
-                <div class="sub-9 bl">
-                  This is a test bulletin and it is LONG in length. Alot to
-                  think about here regarding <yellow>yellow</yellow>
-                </div>
-              </div>
-              <div class="row bb">
-                <div class="sub-3">09/13 2019</div>
-                <div class="sub-9 bl">
-                  This is a test bulletin and it is medium in length
-                </div>
-              </div>
-              <div class="row bb">
-                <div class="sub-3">09/10 2019</div>
-                <div class="sub-9 bl">
-                  Short
-                </div>
-              </div>
-              <div class="row bb">
-                <div class="sub-3">09/05 2019</div>
-                <div class="sub-9 bl">
-                  This is a test bulletin and it is LONG in length. Alot to
-                  think about here regarding <yellow>yellow</yellow>
-                </div>
-              </div>
+            
+            
+            <c:forEach items="${ sessionScope.bulletins }" var="item">
+
+            	<div class="row bb">
+            		<%-- <div class="sub-3"><c:out value="${item.getPostedTime()}" /></div> --%>
+            		<div class="sub-3 br"><fmt:formatDate pattern="MMM dd, yyyy" value="${item.getPostedTime()}" /></div>
+            		
+            		<div class="sub-9">
+            			<c:out value="${item.getContent()}"/>
+            		</div>
+            	</div>
+            </c:forEach>
             </div>
           </div>
         </div>
       </div>
-    </div>
+	
+	</jsp:attribute>
+</t:generic>
 
     <div id="modal-container">
       <img src="${pageContext.request.contextPath}/resources/img/exit.png" alt="close modal" id="modal-exit" />

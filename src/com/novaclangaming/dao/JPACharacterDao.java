@@ -1,5 +1,6 @@
 package com.novaclangaming.dao;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -7,6 +8,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 
+import com.novaclangaming.model.Bulletin;
 import com.novaclangaming.model.Character;
 
 public class JPACharacterDao implements ICharacterDao{
@@ -15,6 +17,8 @@ public class JPACharacterDao implements ICharacterDao{
 		EntityManager em = JPAConnection.getInstance().createEntityManager();
 		em.getTransaction().begin();
 		em.persist(character);
+		Bulletin bulletin = new Bulletin(character.getName() + " ["+ character.getClassification() +"] has been created.", new Date(), character.getUser());
+		em.persist(bulletin);
 		em.getTransaction().commit();
 		em.close();
 	}

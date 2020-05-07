@@ -16,6 +16,7 @@ function setListeners() {
           charOptions.innerHTML = sections[0];
           charsSelected.innerHTML = sections[1];
           availableTowns.innerHTML = sections[2];
+          setupJoinButtons();
       }
     };
     xhttp.open("POST", "JoinTownAjax/add");
@@ -35,6 +36,10 @@ function setupJoinButtons(){
 			xhttp.onreadystatechange = function(){
 				if (this.status == 200 && this.readyState == 4){
 					console.log(this.responseText);
+					if(this.responseText.includes("fail")){
+						window.location.href= "../dashboard";
+						console.log("redirect");
+					}
 				}
 			}
 			xhttp.open("POST", "ajax/town/join");
@@ -59,6 +64,7 @@ function unselectChar(charId){
           charOptions.innerHTML = sections[0];
           charsSelected.innerHTML = sections[1];
           availableTowns.innerHTML = sections[2];
+          setupJoinButtons();
       }
     };
     xhttp.open("POST", "JoinTownAjax/remove");

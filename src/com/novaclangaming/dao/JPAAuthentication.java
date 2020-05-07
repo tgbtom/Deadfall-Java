@@ -5,6 +5,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Optional;
 
 import javax.persistence.EntityManager;
@@ -12,6 +13,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.novaclangaming.model.Password;
 import com.novaclangaming.model.User;
+import com.novaclangaming.model.Bulletin;
+import com.novaclangaming.model.Character;
 
 public class JPAAuthentication implements IAuthenticationDao{
 	
@@ -22,14 +25,25 @@ public class JPAAuthentication implements IAuthenticationDao{
 	}
 	
 	public User loggedUser(HttpServletRequest request) {
-		User user = (User) request.getSession().getAttribute("user"); 
-		return user;
+		User user = (User) request.getSession().getAttribute("user");
+		if(user != null) {
+			User freshUser = userDao.findById(user.getId());
+			return freshUser;
+		}
+		return user;	
+	}
+	
+	public Character activeCharacter(HttpServletRequest request) {
+		Character character = (Character) request.getSession().getAttribute("character");
+		return character;
 	}
 	
 	public void register(User user) {
 		EntityManager em = JPAConnection.getInstance().createEntityManager();
 		em.getTransaction().begin();
 		em.persist(user);
+		Bulletin bulletin = new Bulletin("Account has been created. Welcome to Deadfall", new Date(), user);
+		em.persist(bulletin);
 		em.getTransaction().commit();
 		em.close();
 	}

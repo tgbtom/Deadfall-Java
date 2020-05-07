@@ -43,11 +43,22 @@ body {
   cursor: pointer;
 }
 
+.btn-join:hover{
+  background-color: #0d740e;
+  cursor: pointer;
+}
+
 .btn-play {
   background-color: #e08e3c;
   border: none;
   border-radius: 2px;
-  height: 100%;
+  line-height: 28px;
+}
+
+.btn-join {
+  background-color: #2d862d;
+  border: none;
+  border-radius: 2px;
   line-height: 28px;
 }
 
@@ -55,7 +66,6 @@ body {
   background-color: #e03f3c;
   border: none;
   border-radius: 4px;
-  height: 100%;
   width: 100%;
   line-height: 28px;
 }
@@ -237,7 +247,6 @@ input[type="submit"] {
 [class*="sub-"] {
   float: left;
   display: block;
-  height: 100%;
   padding: 5px;
   margin: auto;
 }
