@@ -1,5 +1,6 @@
 package com.novaclangaming.model;
 
+import java.util.Comparator;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -56,6 +57,9 @@ public class Town {
 	@Column
 	@Enumerated(EnumType.STRING)
 	private TownStatus status;
+
+	@OneToMany(mappedBy = "town")
+	private List<TownBulletin> bulletins;
 	
 	public Town() {
 		super();
@@ -151,6 +155,23 @@ public class Town {
 
 	public void setStatus(TownStatus status) {
 		this.status = status;
+	}
+
+	public List<TownBulletin> getBulletins() {
+		return bulletins;
+	}
+	
+	public void addBulletin(TownBulletin bulletin) {
+		this.bulletins.add(bulletin);
+	}
+	
+	public List<TownBulletin> getOrderedBulletins(){
+		this.bulletins.sort(new Comparator<TownBulletin>() {
+			public int compare(TownBulletin o1, TownBulletin o2) {
+				return o2.getBulletinId() - o1.getBulletinId();
+			}
+		});
+		return this.bulletins;
 	}
 	
 }

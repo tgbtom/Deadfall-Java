@@ -1,10 +1,7 @@
 package com.novaclangaming.dao;
 
-import com.novaclangaming.model.Bulletin;
 import com.novaclangaming.model.User;
 
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Optional;
 
 import javax.persistence.EntityManager;

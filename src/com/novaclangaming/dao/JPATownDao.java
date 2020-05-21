@@ -12,6 +12,7 @@ import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import com.novaclangaming.model.Town;
+import com.novaclangaming.model.TownBulletin;
 
 public class JPATownDao implements ITownDao{
 
@@ -24,26 +25,26 @@ public class JPATownDao implements ITownDao{
 		
 		//Create 2 tables for town_map and town_map_items
 		Connection conn = JDBCConnection.openConnection();
-		String query = "CREATE TABLE df_town_\" + town.getTownId() + \"(" + 
+		String query = "CREATE TABLE df_town_" + town.getTownId() + "(" + 
 				"zone_id NUMBER NOT NULL PRIMARY KEY," + 
-				"x NUMBER NOT NULL," + 
-				"y NUMBER NOT NULL," + 
+				"x NUMBER," + 
+				"y NUMBER," + 
 				"lootability NUMBER DEFAULT 10," + 
 				"zeds NUMBER DEFAULT 0," + 
 				"special_zone VARCHAR2(50) DEFAULT NULL" + 
 				");";
 		
 		String query2 = "CREATE TABLE df_town_items_" + town.getTownId() + "(" + 
-				"zone_id NUMBER NOT NULL PRIMARY KEY," + 
-				"item_id NUMBER NOT NULL," + 
-				"CONSTRAINT fk_town_items FOREIGN KEY (item_id) REFERENCES df_items(item_id)" + 
+				"zone_id NUMBER," + 
+				"item_id NUMBER,"
+				+ "PRIMARY KEY(zone_id)" +
 				");";
 		
 		try {
 			PreparedStatement ps = conn.prepareStatement(query);
 			PreparedStatement ps2 = conn.prepareStatement(query2);
-			ps.executeUpdate();
-			ps2.executeUpdate();
+			ps.execute();
+			ps2.execute();
 			ps.close();
 			ps2.close();
 		} catch (SQLException e) { e.printStackTrace();}
@@ -58,8 +59,12 @@ public class JPATownDao implements ITownDao{
 	}
 
 	public Town update(Town town) {
-		// TODO Auto-generated method stub
-		return null;
+		EntityManager em = JPAConnection.getInstance().createEntityManager();
+		em.getTransaction().begin();
+		Town managedTown = em.merge(town);
+		em.getTransaction().commit();
+		em.close();
+		return managedTown;
 	}
 
 	public void delete(Town town) {
@@ -85,6 +90,14 @@ public class JPATownDao implements ITownDao{
 			result = query.getSingleResult();
 		} catch (NoResultException e) {}
 		return Optional.ofNullable(result);
+	}
+
+	public void addBulletin(TownBulletin tb) {
+		EntityManager em = JPAConnection.getInstance().createEntityManager();
+		em.getTransaction().begin();
+		em.persist(tb);
+		em.getTransaction().commit();
+		em.close();
 	}
 
 }

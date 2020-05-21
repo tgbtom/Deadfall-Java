@@ -7,24 +7,34 @@
 	<jsp:attribute name="mainContent">
 		<c:set var="user" scope="page" value="${ sessionScope.user }" />
 		
-		<div class="row">
-			<div class="subtitle"><c:out value="${ user.username }" /></div>
-		</div>
-	
-		<div class="row">
-			<div class="sub-6">Email:</div>
-			<div class="sub-6"><c:out value="${ user.email }" /></div>
-		</div>
-		<div class="row">
-			<div class="sub-6">Characters:</div>
-			<div class="sub-6"><c:out value="${ user.characters.size() }" />/20</div>
-		</div>
+		<div class="subtitle">Profile - <c:out value="${ user.username }" /></div>
 		
 		<div class="row">
-			Unlocked Skills will go here
+			<div class="card col-6">
+				<div class="card-top">Information</div>
+				<div class="card-content">
+					<div class="row">
+						<div class="sub-5 text-right"><strong>Email:</strong></div>
+						<div class="sub-7"><c:out value="${ user.email }" /></div>
+					</div>
+					<div class="row">
+						<div class="sub-5 text-right"><strong>Characters:</strong></div>
+						<div class="sub-7"><c:out value="${ user.characters.size() }" />/20</div>
+					</div>
+				</div>
+			</div>
+			<div class="card col-6">
+				<div class="card-top">Skills & Achievements</div>
+				<div class="card-content">
+					<div class="row">
+						Unlocked Skills will go here
+					</div>
+					<div class="row">
+						Achievements will go here
+					</div>
+				</div>
+			</div>
 		</div>
-		<div class="row">
-			Achievements will go here
-		</div>
+		
 	</jsp:attribute>
 </t:generic>

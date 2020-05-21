@@ -35,7 +35,7 @@ public class HomeController {
 	public String dashboard(HttpServletRequest request) {
 		JPAAuthentication authDao = new JPAAuthentication();
 		if(authDao.loggedUser(request) != null) {
-			request.getSession().setAttribute("bulletins", authDao.loggedUser(request).getOrderedBulletins());
+			request.getSession().setAttribute("bulletins", authDao.loggedUser(request).getOrderedUserBulletins());
 			return "dashboard";
 		}
 		else {

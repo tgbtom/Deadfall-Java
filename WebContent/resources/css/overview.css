@@ -1,5 +1,16 @@
-.main-btn{
+.btn-main{
 	border-radius: 5px;
-	padding: 4px;
-	background-color: #8f8f8f;
+	padding: 7px;
+}
+
+.bulletinChar{
+	color: #5a9c67;
+}
+
+.head-box{
+  background-color: #77778a;
+  border: 1px solid black;
+  border-radius: 5px;
+  padding: 7px;
+  box-shadow: #0e0f12 2px 2px;
 }

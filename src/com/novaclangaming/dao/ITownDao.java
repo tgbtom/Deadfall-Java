@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.novaclangaming.model.Town;
+import com.novaclangaming.model.TownBulletin;
 
 public interface ITownDao {
 
@@ -13,5 +14,6 @@ public interface ITownDao {
 	public List<Town> findAllOpenTowns();
 	public Town update(Town town);
 	public void delete(Town town);
+	public void addBulletin(TownBulletin tb);
 	
 }

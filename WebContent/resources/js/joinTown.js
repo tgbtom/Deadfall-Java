@@ -38,7 +38,9 @@ function setupJoinButtons(){
 					console.log(this.responseText);
 					if(this.responseText.includes("fail")){
 						window.location.href= "../dashboard";
-						console.log("redirect");
+					}
+					else{
+						window.location.href= "../town/home";
 					}
 				}
 			}

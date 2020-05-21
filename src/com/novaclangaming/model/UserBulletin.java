@@ -14,7 +14,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name="DF_USER_BULLETINS")
-public class Bulletin {
+public class UserBulletin {
 	
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_bull_seq")
 	@SequenceGenerator(name = "user_bull_seq", sequenceName = "df_user_bulletin_seq", allocationSize = 1)
@@ -32,19 +32,19 @@ public class Bulletin {
 	@JoinColumn(name = "USER_ID", referencedColumnName = "USER_ID")
 	private User user;
 
-	public Bulletin() {
+	public UserBulletin() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-	public Bulletin(String content, Date postedTime, User user) {
+	public UserBulletin(String content, Date postedTime, User user) {
 		super();
 		this.content = content;
 		this.postedTime = postedTime;
 		this.user = user;
 	}
 
-	public Bulletin(String content, Date postedTime) {
+	public UserBulletin(String content, Date postedTime) {
 		super();
 		this.content = content;
 		this.postedTime = postedTime;

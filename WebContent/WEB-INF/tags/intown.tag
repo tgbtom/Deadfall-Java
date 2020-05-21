@@ -2,13 +2,13 @@
 
 	<div class="row">
 		<div class="col-6">
-			<div class="sub-4 text-center"><button class="main-btn">Overview</button></div>
-			<div class="sub-4 text-center"><button class="main-btn">Structures</button></div>
-			<div class="sub-4 text-center"><button class="main-btn">Citizens</button></div>
+			<div class="sub-4 text-center"><a href="${pageContext.request.contextPath}/town/home"><button class="btn-main">Overview</button></a></div>
+			<div class="sub-4 text-center"><a href="${pageContext.request.contextPath}/town/construction"><button class="btn-main">Structures</button></a></div>
+			<div class="sub-4 text-center"><a href="${pageContext.request.contextPath}/town/citizens"><button class="btn-main">Citizens</button></a></div>
 		</div>
 		<div class="col-6">
-			<div class="sub-4 text-center"><button class="main-btn">Storage</button></div>
-			<div class="sub-4 text-center"><button class="main-btn">Special</button></div>
-			<div class="sub-4 text-center"><button class="main-btn">Outside</button></div>
+			<div class="sub-4 text-center"><a href="${pageContext.request.contextPath}/town/storage"><button class="btn-main">Storage</button></a></div>
+			<div class="sub-4 text-center"><a href="${pageContext.request.contextPath}/town/special"><button class="btn-main">Special</button></a></div>
+			<div class="sub-4 text-center"><a href="${pageContext.request.contextPath}/town/outside"><button class="btn-main">Outside</button></a></div>
 		</div>
 	</div>

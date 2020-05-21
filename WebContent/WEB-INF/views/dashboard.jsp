@@ -31,7 +31,7 @@ pageEncoding="ISO-8859-1"%>
             	<div class="row bb">
 				<form action="${pageContext.request.contextPath}/character/check" method="POST">
 					<input type="hidden" name="charId" value='<c:out value="${ c.charId }" />'>
-					<div class="sub-5 text-bold"><a class="charLink" href=''${pageContext.request.contextPath}/character/<c:out value="${ c.charId }" />''><c:out value="${ c.name }" /> [0]</a></div>
+					<div class="sub-5 text-bold"><a class="charLink" href='${pageContext.request.contextPath}/character/<c:out value="${ c.charId }" />'><c:out value="${ c.name }" /> [0]</a></div>
 					<div class="sub-5"><c:out value="${ c.classification }" /></div>
 					<div class="sub-2">
 						<input type="submit" value='<c:out value="${btnText}" />' class='<c:out value="${btnClass}" />'>

@@ -45,7 +45,7 @@ public class User {
 	private List<Character> characters;
 	
 	@OneToMany(mappedBy = "user")
-	private List<Bulletin> bulletins;
+	private List<UserBulletin> bulletins;
 
 	public User() {
 		super();
@@ -116,27 +116,22 @@ public class User {
 		this.characters = characters;
 	}
 
-	public List<Bulletin> getBulletins() {
+	public List<UserBulletin> getUserBulletins() {
 		return bulletins;
 	}
 	
-	public List<Bulletin> getOrderedBulletins(){
-		Collections.sort(this.bulletins, new Comparator<Bulletin>() {
-			public int compare(Bulletin o1, Bulletin o2) {
+	public List<UserBulletin> getOrderedUserBulletins(){
+		Collections.sort(this.bulletins, new Comparator<UserBulletin>() {
+			public int compare(UserBulletin o1, UserBulletin o2) {
 				return o2.getPostedTime().compareTo(o1.getPostedTime());
 			}
 		});
 		return this.bulletins;
 	}
-
-
-	public void setBulletins(List<Bulletin> bulletins) {
-		this.bulletins = bulletins;
-	}
 	
-	public void addBulletin(Bulletin bulletin) {
+	public void addUserBulletin(UserBulletin bulletin) {
 		if(this.bulletins == null || this.bulletins.isEmpty()) {
-			this.bulletins = new ArrayList<Bulletin>();
+			this.bulletins = new ArrayList<UserBulletin>();
 		}
 		this.bulletins.add(bulletin);
 	}

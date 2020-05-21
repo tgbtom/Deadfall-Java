@@ -50,4 +50,54 @@ public class TownController {
 		}
 		return "redirect: ../";
 	}
+	
+	@RequestMapping(value = "/town/citizens", method = RequestMethod.GET)
+	public String citizens(HttpServletRequest request) {
+		if(auth.loggedUser(request) != null) {
+			if(auth.activeCharacter(request) != null) {
+				return "town/citizens";
+			}
+		}
+		return "redirect: ../";
+	}
+	
+	@RequestMapping(value = "/town/construction", method = RequestMethod.GET)
+	public String construction(HttpServletRequest request) {
+		if(auth.loggedUser(request) != null) {
+			if(auth.activeCharacter(request) != null) {
+				return "town/construction";
+			}
+		}
+		return "redirect: ../";
+	}
+	
+	@RequestMapping(value = "/town/storage", method = RequestMethod.GET)
+	public String storage(HttpServletRequest request) {
+		if(auth.loggedUser(request) != null) {
+			if(auth.activeCharacter(request) != null) {
+				return "town/storage";
+			}
+		}
+		return "redirect: ../";
+	}
+	
+	@RequestMapping(value = "/town/special", method = RequestMethod.GET)
+	public String special(HttpServletRequest request) {
+		if(auth.loggedUser(request) != null) {
+			if(auth.activeCharacter(request) != null) {
+				return "town/special";
+			}
+		}
+		return "redirect: ../";
+	}
+	
+	@RequestMapping(value = "/town/outside", method = RequestMethod.GET)
+	public String outside(HttpServletRequest request) {
+		if(auth.loggedUser(request) != null) {
+			if(auth.activeCharacter(request) != null) {
+				return "town/outside";
+			}
+		}
+		return "redirect: ../";
+	}
 }

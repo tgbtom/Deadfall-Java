@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.novaclangaming.model.Password;
 import com.novaclangaming.model.User;
-import com.novaclangaming.model.Bulletin;
+import com.novaclangaming.model.UserBulletin;
 import com.novaclangaming.model.Character;
 
 public class JPAAuthentication implements IAuthenticationDao{
@@ -42,7 +42,7 @@ public class JPAAuthentication implements IAuthenticationDao{
 		EntityManager em = JPAConnection.getInstance().createEntityManager();
 		em.getTransaction().begin();
 		em.persist(user);
-		Bulletin bulletin = new Bulletin("Account has been created. Welcome to Deadfall", new Date(), user);
+		UserBulletin bulletin = new UserBulletin("Account has been created. Welcome to Deadfall", new Date(), user);
 		em.persist(bulletin);
 		em.getTransaction().commit();
 		em.close();

@@ -1,6 +1,7 @@
 package com.novaclangaming.controller;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -21,6 +22,7 @@ import com.novaclangaming.dao.JPATownDao;
 import com.novaclangaming.dao.JPAUserDao;
 import com.novaclangaming.model.CharacterClass;
 import com.novaclangaming.model.Town;
+import com.novaclangaming.model.TownBulletin;
 import com.novaclangaming.model.User;
 import com.novaclangaming.model.Character;
 
@@ -227,9 +229,16 @@ public class CharacterController {
 						return "fail";
 					}
 					else {
-						System.out.println(c.getName() + "Joined successfully");
+						System.out.println(c.getName() + " Joined successfully");
 						c.setTown(town);
 						charDao.update(c);
+						town = townDao.findById(townId);
+						request.getSession().setAttribute("character", charDao.findById(c.getCharId())); //get managed entity
+						TownBulletin tb = new TownBulletin("<span class='bulletinChar'>"+ c.getName() + "</span> [" 
+								+ "<img src=\""+ request.getContextPath() +"/resources/img/icons/"+c.getClassification()+".png\">" 
+								+ c.getClassification() +"] has joined the town! "
+								+ (town.getTownSize() - town.getCharacters().size()) +" spots remaining before the town can begin!", new Date(), town); 
+						townDao.addBulletin(tb);
 					}
 				}
 			}
