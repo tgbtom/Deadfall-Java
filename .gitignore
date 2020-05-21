@@ -1,0 +1,5 @@
+/build/
+/target/
+/src/META-INF/persistence.xml
+/lib/
+src/com/novaclangaming/dao/JPAConnection.java
