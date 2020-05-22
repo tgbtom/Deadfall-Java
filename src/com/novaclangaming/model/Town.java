@@ -1,5 +1,6 @@
 package com.novaclangaming.model;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -61,13 +62,16 @@ public class Town {
 	@OneToMany(mappedBy = "town")
 	private List<TownBulletin> bulletins;
 	
+	@OneToMany(mappedBy = "town")
+	private List<Zone> zones;
+	
 	public Town() {
 		super();
-		// TODO Auto-generated constructor stub
+		this.zones = new ArrayList<Zone>();
 	}
 
 	public Town(String name, int townSize, int hordeSize, int defence, int mapSize, String gameMode, TownStatus status) {
-		super();
+		this();
 		this.name = name;
 		this.townSize = townSize;
 		this.hordeSize = hordeSize;
@@ -172,6 +176,10 @@ public class Town {
 			}
 		});
 		return this.bulletins;
+	}
+
+	public void addZone(Zone zone) {
+		this.zones.add(zone);
 	}
 	
 }

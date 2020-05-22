@@ -1,5 +1,6 @@
 package com.novaclangaming.model;
 
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -36,6 +37,8 @@ public class Item {
 	@Enumerated(EnumType.STRING)
 	@Column
 	private ItemCategory category;
+	
+
 	
 	public Item() {
 		super();

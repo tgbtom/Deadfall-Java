@@ -1,55 +1,96 @@
 package com.novaclangaming.dao;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
-import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
+import com.novaclangaming.model.ItemStackZone;
 import com.novaclangaming.model.Town;
 import com.novaclangaming.model.TownBulletin;
+import com.novaclangaming.model.Zone;
 
-public class JPATownDao implements ITownDao{
+public class JPATownDao implements ITownDao {
 
 	public void create(Town town) {
 		EntityManager em = JPAConnection.getInstance().createEntityManager();
 		em.getTransaction().begin();
-		em.persist(town);
+		town = em.merge(town);
 		em.getTransaction().commit();
-		em.close();
+
+		// populate df_town_zones with all of the necessary rows for this town size
+		em.getTransaction().begin();
+		int x = 6, y = 5;
+		Zone zone;
+		for (int i = 0; i < town.getMapSize() * town.getMapSize(); i++) {
+			if (x > -5) {
+				x--;
+			} else {
+				x = 5;
+				y--;
+			}
+			zone = new Zone(x, y, 10, 0, "");
+			zone.setTown(town);
+			em.persist(zone);
+		}
+		em.getTransaction().commit();
+
+		// fill storage with starter items
+		Zone storage = this.findStorageZone(town.getTownId());
+		ItemStackZone stack;
+		IItemDao itemDao = new JPAItemDao();
+		IItemStackZoneDao stackDao = new JPAItemStackZoneDao();
 		
-		//Create 2 tables for town_map and town_map_items
-		Connection conn = JDBCConnection.openConnection();
-		String query = "CREATE TABLE df_town_" + town.getTownId() + "(" + 
-				"zone_id NUMBER NOT NULL PRIMARY KEY," + 
-				"x NUMBER," + 
-				"y NUMBER," + 
-				"lootability NUMBER DEFAULT 10," + 
-				"zeds NUMBER DEFAULT 0," + 
-				"special_zone VARCHAR2(50) DEFAULT NULL" + 
-				");";
-		
-		String query2 = "CREATE TABLE df_town_items_" + town.getTownId() + "(" + 
-				"zone_id NUMBER," + 
-				"item_id NUMBER,"
-				+ "PRIMARY KEY(zone_id)" +
-				");";
-		
-		try {
-			PreparedStatement ps = conn.prepareStatement(query);
-			PreparedStatement ps2 = conn.prepareStatement(query2);
-			ps.execute();
-			ps2.execute();
-			ps.close();
-			ps2.close();
-		} catch (SQLException e) { e.printStackTrace();}
+		 em.getTransaction().begin();
+		 
+		 Optional<ItemStackZone> storedLoc = stackDao.findByZoneItem(storage.getZoneId(), itemDao.findByName("Water Ration").getItemId());
+		 if(storedLoc.isPresent()) {
+			 storage.addItem(itemDao.findByName("Water Ration"), 30);
+			 stack = storedLoc.get();
+			 stack.addToStack(15);
+		 }
+		 else {
+			 stack = storage.addItem(itemDao.findByName("Water Ration"), 30);
+		 }
+		 em.merge(storage);
+		 em.merge(stack);
+
+		 storedLoc = stackDao.findByZoneItem(storage.getZoneId(), itemDao.findByName("Bits of Food").getItemId());
+		 if(storedLoc.isPresent()) {
+			 storage.addItem(itemDao.findByName("Bits of Food"), 15);
+			 stack = storedLoc.get();
+			 stack.addToStack(15);
+		 }
+		 else {
+			 stack = storage.addItem(itemDao.findByName("Bits of Food"), 15);
+		 }
+		 em.merge(storage);
+		 em.merge(stack);
+		 
+		 em.getTransaction().commit();
+		 em.close();
 	}
 
+	public Zone findStorageZone(int townId) {
+		EntityManager em = JPAConnection.getInstance().createEntityManager();
+		em.getTransaction().begin();
+		TypedQuery<Zone> query = em.createNamedQuery("Zone.findStorageByTownId", Zone.class);
+		query.setParameter("town", findById(townId));
+		Zone storage = query.getSingleResult();
+		em.close();
+		return storage;
+	}
+
+	public Zone findZoneById(int zoneId) {
+		EntityManager em = JPAConnection.getInstance().createEntityManager();
+		em.getTransaction().begin();
+		Zone zone = em.find(Zone.class, zoneId);
+		em.close();
+		return zone;
+	}
+	
 	public Town findById(int townId) {
 		EntityManager em = JPAConnection.getInstance().createEntityManager();
 		em.getTransaction().begin();
@@ -69,7 +110,7 @@ public class JPATownDao implements ITownDao{
 
 	public void delete(Town town) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	public List<Town> findAllOpenTowns() {
@@ -88,7 +129,8 @@ public class JPATownDao implements ITownDao{
 		Town result = null;
 		try {
 			result = query.getSingleResult();
-		} catch (NoResultException e) {}
+		} catch (NoResultException e) {
+		}
 		return Optional.ofNullable(result);
 	}
 
