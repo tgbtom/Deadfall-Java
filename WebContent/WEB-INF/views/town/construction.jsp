@@ -14,6 +14,7 @@
 	<t:intown></t:intown>
 	
 		<div class="subtitle">Structures</div>
+		<t:header></t:header>
 	
 	</jsp:attribute>
 </t:generic>

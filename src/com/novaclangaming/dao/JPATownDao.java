@@ -1,5 +1,6 @@
 package com.novaclangaming.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -7,12 +8,23 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 
+import com.novaclangaming.model.Item;
+import com.novaclangaming.model.ItemCategory;
 import com.novaclangaming.model.ItemStackZone;
 import com.novaclangaming.model.Town;
 import com.novaclangaming.model.TownBulletin;
 import com.novaclangaming.model.Zone;
 
 public class JPATownDao implements ITownDao {
+
+	private IItemDao itemDao;
+	private IItemStackZoneDao stackDao;
+	
+	public JPATownDao() {
+		super();
+		itemDao = new JPAItemDao();
+		stackDao = new JPAItemStackZoneDao(this);
+	}
 
 	public void create(Town town) {
 		EntityManager em = JPAConnection.getInstance().createEntityManager();
@@ -40,8 +52,6 @@ public class JPATownDao implements ITownDao {
 		// fill storage with starter items
 		Zone storage = this.findStorageZone(town.getTownId());
 		ItemStackZone stack;
-		IItemDao itemDao = new JPAItemDao();
-		IItemStackZoneDao stackDao = new JPAItemStackZoneDao();
 		
 		 em.getTransaction().begin();
 		 
@@ -140,6 +150,41 @@ public class JPATownDao implements ITownDao {
 		em.persist(tb);
 		em.getTransaction().commit();
 		em.close();
+	}
+	
+	public List<ItemStackZone> findItemsInStorage(int townId, ItemCategory category) {
+		Zone storage = findStorageZone(townId);
+		List<ItemStackZone> categoryStacks = new ArrayList<ItemStackZone>();
+		List<ItemStackZone> allStacks = storage.getItemStacks();
+		for (ItemStackZone stack : allStacks) {
+			if(stack.getItem().getCategory() == category) {
+				categoryStacks.add(stack);
+			}
+		}
+		return categoryStacks;
+	}
+
+	public void addItemToStorage(int townId, Item item, int qty) {
+		EntityManager em = JPAConnection.getInstance().createEntityManager();
+		
+		Zone storage = this.findStorageZone(townId);
+		ItemStackZone stack;
+		
+		 em.getTransaction().begin();
+		 
+		 Optional<ItemStackZone> storedLoc = stackDao.findByZoneItem(storage.getZoneId(), item.getItemId());
+		 if(storedLoc.isPresent()) {
+			 storage.addItem(itemDao.findById(item.getItemId()), qty);
+			 stack = storedLoc.get();
+			 stack.addToStack(qty);
+		 }
+		 else {
+			 stack = storage.addItem(itemDao.findById(item.getItemId()), qty);
+		 }
+		 em.merge(storage);
+		 em.merge(stack);
+		 
+		 em.getTransaction().commit();
 	}
 
 }

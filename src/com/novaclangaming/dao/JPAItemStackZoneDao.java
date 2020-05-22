@@ -12,10 +12,10 @@ public class JPAItemStackZoneDao implements IItemStackZoneDao{
 	private JPATownDao townDao;
 	private JPAItemDao itemDao;
 	
-	public JPAItemStackZoneDao() {
+	public JPAItemStackZoneDao(JPATownDao townDao) {
 		super();
-		townDao = new JPATownDao();
-		itemDao = new JPAItemDao();
+		this.townDao = townDao;
+		this.itemDao = new JPAItemDao();
 	}
 
 	public ItemStackZone findById(int id) {

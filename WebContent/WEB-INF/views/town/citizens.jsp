@@ -14,6 +14,7 @@
 	<t:intown></t:intown>
 	
 		<div class="subtitle">Citizens</div>
+		<t:header></t:header>
 	
 		<div class="card">
 			<div class="card-top">

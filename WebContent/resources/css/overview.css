@@ -14,3 +14,14 @@
   padding: 7px;
   box-shadow: #0e0f12 2px 2px;
 }
+
+.item-counter{
+	font-size: 0.65em;
+	position: relative;
+	left: -4px;
+	color: #d5c555;
+}
+
+.storage-item{
+	cursor: pointer;
+}

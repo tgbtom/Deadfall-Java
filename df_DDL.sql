@@ -7,6 +7,7 @@ DROP TABLE df_characters_skills;
 DROP TABLE df_characters_legacy;
 DROP TABLE df_characters_stats;
 DROP TABLE df_skills;
+DROP TABLE df_characters_items;
 DROP TABLE df_characters;
 DROP TABLE df_towns_structures;
 DROP TABLE df_towns;
@@ -202,6 +203,15 @@ item_id NUMBER NOT NULL,
 quantity NUMBER DEFAULT 1,
 PRIMARY KEY (stack_id),
 CONSTRAINT fk_town_items FOREIGN KEY (item_id) REFERENCES df_items(item_id)
+);
+
+CREATE TABLE df_characters_items(
+stack_id NUMBER,
+char_id NUMBER NOT NULL,
+item_id NUMBER NOT NULL,
+quantity NUMBER DEFAULT 1,
+PRIMARY KEY (stack_id),
+CONSTRAINT fk_char_items FOREIGN KEY (item_id) REFERENCES df_items(item_id)
 );
 
 ------------------------------

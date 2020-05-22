@@ -136,5 +136,10 @@ public class Zone {
 		itemStacks.add(result);
 		return result;
 	}
+
+	public List<ItemStackZone> getItemStacks() {
+		return itemStacks;
+	}
+	
 	
 }

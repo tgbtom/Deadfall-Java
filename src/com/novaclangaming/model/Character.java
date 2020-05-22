@@ -1,5 +1,8 @@
 package com.novaclangaming.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -11,6 +14,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.SecondaryTable;
 import javax.persistence.SecondaryTables;
 import javax.persistence.SequenceGenerator;
@@ -44,6 +48,9 @@ public class Character {
 	
 	@Column
 	private String name;
+	
+	@OneToMany(mappedBy = "character")
+	private List<ItemStackCharacter> itemStacks;
 	
 	@Column
 	@Enumerated(EnumType.STRING)
@@ -282,4 +289,27 @@ public class Character {
 	public int getTotalCamps() {
 		return curCamps + lifetimeCamps;
 	}
+
+	public List<ItemStackCharacter> getItemStacks() {
+		return itemStacks;
+	}
+	
+	public ItemStackCharacter addItem(Item item, int qty) {
+		if(this.itemStacks == null || this.itemStacks.isEmpty()) {
+			this.itemStacks = new ArrayList<ItemStackCharacter>();
+		}
+		ItemStackCharacter result;
+		for(int i = 0; i < itemStacks.size(); i++) {
+			if(itemStacks.get(i).getItem().getItemId() == item.getItemId()) {
+				itemStacks.get(i).addToStack(qty);
+				result = itemStacks.get(i);
+				return result;
+			}
+		}
+	
+		result = new ItemStackCharacter(item, qty, this);
+		itemStacks.add(result);
+		return result;
+	}
+	
 }

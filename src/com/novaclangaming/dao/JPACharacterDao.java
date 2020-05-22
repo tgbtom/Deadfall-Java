@@ -10,8 +10,19 @@ import javax.persistence.TypedQuery;
 
 import com.novaclangaming.model.UserBulletin;
 import com.novaclangaming.model.Character;
+import com.novaclangaming.model.Item;
+import com.novaclangaming.model.ItemStackCharacter;
 
 public class JPACharacterDao implements ICharacterDao{
+
+	private IItemStackCharacterDao stackDao;
+	private IItemDao itemDao;
+	
+	public JPACharacterDao() {
+		super();
+		stackDao = new JPAItemStackCharacterDao(this);
+		itemDao = new JPAItemDao();
+	}
 
 	public void create(Character character) {
 		EntityManager em = JPAConnection.getInstance().createEntityManager();
@@ -74,6 +85,29 @@ public class JPACharacterDao implements ICharacterDao{
 			character = query.getSingleResult();
 		} catch (NoResultException e) {}
 		return Optional.ofNullable(character);
+	}
+
+	public void addItem(int charId, Item item, int qty) {
+		EntityManager em = JPAConnection.getInstance().createEntityManager();
+		
+		Character character = this.findById(charId);
+		ItemStackCharacter stack;
+		
+		 em.getTransaction().begin();
+		 
+		 Optional<ItemStackCharacter> storedLoc = stackDao.findByCharItem(character.getCharId(), item.getItemId());
+		 if(storedLoc.isPresent()) {
+			 character.addItem(itemDao.findById(item.getItemId()), qty);
+			 stack = storedLoc.get();
+			 stack.addToStack(qty);
+		 }
+		 else {
+			 stack = character.addItem(itemDao.findById(item.getItemId()), qty);
+		 }
+		 em.merge(character);
+		 em.merge(stack);
+		 
+		 em.getTransaction().commit();
 	}
 
 }

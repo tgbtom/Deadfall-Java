@@ -1,5 +1,6 @@
 package com.novaclangaming.controller;
 
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -8,9 +9,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.novaclangaming.dao.ICharacterDao;
+import com.novaclangaming.dao.IItemDao;
 import com.novaclangaming.dao.ITownDao;
 import com.novaclangaming.dao.JPAAuthentication;
+import com.novaclangaming.dao.JPACharacterDao;
+import com.novaclangaming.dao.JPAItemDao;
 import com.novaclangaming.dao.JPATownDao;
+import com.novaclangaming.model.ItemCategory;
+import com.novaclangaming.model.ItemStackZone;
 import com.novaclangaming.model.Town;
 import com.novaclangaming.model.TownStatus;
 import com.novaclangaming.model.User;
@@ -20,6 +27,9 @@ public class TownController {
 	
 	JPAAuthentication auth = new JPAAuthentication();
 	ITownDao townDao = new JPATownDao();
+	ICharacterDao charDao = new JPACharacterDao();
+	IItemDao itemDao = new JPAItemDao();
+	
 	
 	@RequestMapping(value = "/town/create", method = RequestMethod.POST)
 	public String create(HttpServletRequest request, @RequestParam String townName, 
@@ -75,6 +85,16 @@ public class TownController {
 	public String storage(HttpServletRequest request) {
 		if(auth.loggedUser(request) != null) {
 			if(auth.activeCharacter(request) != null) {
+				//Assign page scope values for different storage categories
+				int townId = auth.activeCharacter(request).getTown().getTownId();
+				List<ItemStackZone> consumables = townDao.findItemsInStorage(townId, ItemCategory.Consumable);
+				List<ItemStackZone> resources = townDao.findItemsInStorage(townId, ItemCategory.Resource);
+				List<ItemStackZone> weapons = townDao.findItemsInStorage(townId, ItemCategory.Weapon);
+				List<ItemStackZone> ammo = townDao.findItemsInStorage(townId, ItemCategory.Ammo);
+				request.getSession().setAttribute("consumables", consumables);
+				request.getSession().setAttribute("resources", resources);
+				request.getSession().setAttribute("weapons", weapons);
+				request.getSession().setAttribute("ammo", ammo);
 				return "town/storage";
 			}
 		}
