@@ -32,6 +32,10 @@ window.onload = function() {
     exitModalListener();
   }
   
+  if (typeof storagePickUp == "function") {
+	    storagePickUp();
+	  }
+  
   var pageMessage = document.getElementById("page-message");
   var msgClose = document.getElementById("msg-close");
   

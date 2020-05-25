@@ -16,7 +16,22 @@
 			<div class="sub-6 head-box text-center"><strong>Status:</strong></div>
 		</div>
 		<div class="col-6">
-			<div class="sub-8 head-box text-center"><strong>Items: </strong></div>
+			<div class="sub-8 head-box text-center" id="current-char-items">
+			<!-- Items -->
+				<c:forEach items="${ sessionScope.character.itemStacks }"  var="stack">
+					<div class="item-group">
+						<img src="${pageContext.request.contextPath}/resources/img/items/<c:out value="${ stack.item.name }"/>.png" id="character-item-${ stack.item.itemId}" title="<c:out value="${ stack.item.name }"/>" alt="<c:out value="${ stack.item.name }"/>" class="character-item" />
+						<span class="character-item-counter" id="character-stack-${ stack.item.itemId}"><c:out value="${ stack.quantity }"/></span>
+					</div>
+				</c:forEach>
+				<c:if test="${ sessionScope.character.itemStacks.size() < 1}">
+					<div class="card-content">No Items</div>
+				</c:if>
+				<c:if test="${ sessionScope.character.itemStacks.size() > 0}">
+					XX/16
+				</c:if>
+				
+			</div>
 			<div class="sub-4 head-box text-center">16/16 ap</div>
 		</div>
 	</div>

@@ -185,6 +185,39 @@ public class JPATownDao implements ITownDao {
 		 em.merge(stack);
 		 
 		 em.getTransaction().commit();
+		 em.close();
+	}
+	
+	public boolean removeItemFromStorage(int townId, Item item, int qty) {
+		Zone storage = findStorageZone(townId);
+		ItemStackZone stack;
+
+		EntityManager em = JPAConnection.getInstance().createEntityManager();
+		em.getTransaction().begin();
+		
+		Optional<ItemStackZone> storedLoc = stackDao.findByZoneItem(storage.getZoneId(), item.getItemId());
+		if(storedLoc.isPresent()) {
+			storage.removeItem(itemDao.findById(item.getItemId()), qty);
+			stack = storedLoc.get();
+			stack.removeFromStack(qty);
+		}
+		else {
+			em.close();
+			return false;
+		}
+		
+		if(stack.getQuantity() > 0) {
+			em.merge(storage);
+			em.merge(stack);
+		}
+		else {
+			em.merge(storage);
+			em.remove(stack);
+		}
+		
+		em.getTransaction().commit();
+		em.close();
+		return true;
 	}
 
 }

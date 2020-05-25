@@ -136,6 +136,25 @@ public class Zone {
 		itemStacks.add(result);
 		return result;
 	}
+	
+	public ItemStackZone removeItem(Item item, int qty) {
+		if(this.itemStacks == null || this.itemStacks.isEmpty()) {
+			return null;
+		}
+		for(int i =0; i < itemStacks.size(); i++){
+			ItemStackZone current = itemStacks.get(i);
+			if(current.getItem().getItemId() == item.getItemId()) {
+				if(current.getQuantity() >= qty) {
+					current.removeFromStack(qty);
+					return current;
+				}
+				else {
+					return null;
+				}
+			}
+		}
+		return null;
+	}
 
 	public List<ItemStackZone> getItemStacks() {
 		return itemStacks;

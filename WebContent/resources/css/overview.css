@@ -15,7 +15,7 @@
   box-shadow: #0e0f12 2px 2px;
 }
 
-.item-counter{
+.item-counter, .character-item-counter{
 	font-size: 0.65em;
 	position: relative;
 	left: -4px;
@@ -24,4 +24,10 @@
 
 .storage-item{
 	cursor: pointer;
+}
+
+.item-group{
+	height: min-content;
+	float: left;
+	margin-right: 0px 3px;
 }

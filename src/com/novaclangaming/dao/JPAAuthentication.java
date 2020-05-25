@@ -19,6 +19,7 @@ import com.novaclangaming.model.Character;
 public class JPAAuthentication implements IAuthenticationDao{
 	
 	private IUserDao userDao = new JPAUserDao();
+	private ICharacterDao charDao = new JPACharacterDao();
 	
 	public JPAAuthentication() {
 		super();
@@ -35,7 +36,12 @@ public class JPAAuthentication implements IAuthenticationDao{
 	
 	public Character activeCharacter(HttpServletRequest request) {
 		Character character = (Character) request.getSession().getAttribute("character");
-		return character;
+		EntityManager em = JPAConnection.getInstance().createEntityManager();
+		em.getTransaction().begin();
+		Character result = charDao.findById(character.getCharId());
+		request.getSession().setAttribute("character", result); //refreshes the session variable to match db
+		em.close();
+		return result;
 	}
 	
 	public void register(User user) {

@@ -18,9 +18,12 @@ import com.novaclangaming.dao.ICharacterDao;
 import com.novaclangaming.dao.ITownDao;
 import com.novaclangaming.dao.JPAAuthentication;
 import com.novaclangaming.dao.JPACharacterDao;
+import com.novaclangaming.dao.JPAItemDao;
 import com.novaclangaming.dao.JPATownDao;
 import com.novaclangaming.dao.JPAUserDao;
 import com.novaclangaming.model.CharacterClass;
+import com.novaclangaming.model.Item;
+import com.novaclangaming.model.ItemStackCharacter;
 import com.novaclangaming.model.Town;
 import com.novaclangaming.model.TownBulletin;
 import com.novaclangaming.model.User;
@@ -32,6 +35,7 @@ public class CharacterController {
 	JPACharacterDao charDao = new JPACharacterDao();
 	JPAUserDao userDao = new JPAUserDao();
 	JPATownDao townDao = new JPATownDao();
+	JPAItemDao itemDao = new JPAItemDao();
 	JPAAuthentication auth = new JPAAuthentication();
 	
 	@RequestMapping(value = "/character/create", method = RequestMethod.POST)
@@ -254,6 +258,40 @@ public class CharacterController {
 	
 			return allSuccess;
 		}else {
+			return "fail";
+		}
+	}
+	
+	@RequestMapping(value = "character/ajax/pickitem", method = RequestMethod.POST)
+	@ResponseBody
+	public String storagePickUp(HttpServletRequest request, @RequestParam int itemId) {
+		User user = auth.loggedUser(request);
+		if(user != null) {
+			Character character = auth.activeCharacter(request);
+			if(character != null) {
+				Item item = itemDao.findById(itemId);
+				if(townDao.removeItemFromStorage(character.getTown().getTownId(), item, 1)) {
+					charDao.addItem(character.getCharId(), item, 1);
+				}
+				String result = "";
+				character = auth.activeCharacter(request); //refreshes with new item
+				for (ItemStackCharacter stack : character.getItemStacks()) {
+					result += "<div class=\"item-group\">\r\n" + 
+							"		<img src=\""+ request.getContextPath() +"/resources/img/items/"+ stack.getItem().getName() +".png\" id=\"character-item-"+ stack.getItem().getItemId() +"\" title=\""+ stack.getItem().getName() +"\" alt=\""+ stack.getItem().getName() +"\" class=\"character-item\" />\r\n" + 
+							"		<span class=\"character-item-counter\" id=\"character-stack-"+ stack.getItem().getItemId() +"\">"+ stack.getQuantity() +"</span>\r\n" + 
+							"	</div>";
+				}
+				if(character.getItemStacks().size() < 1) {
+					result = "<div class=\"card-content\">No Items</div>";
+				}
+				else {
+					result += "XX/16";
+				}
+				return result;
+			}
+			return "no active character";
+		}
+		else {
 			return "fail";
 		}
 	}
