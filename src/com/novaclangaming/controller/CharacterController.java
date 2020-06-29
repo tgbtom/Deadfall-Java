@@ -19,6 +19,7 @@ import com.novaclangaming.dao.ITownDao;
 import com.novaclangaming.dao.JPAAuthentication;
 import com.novaclangaming.dao.JPACharacterDao;
 import com.novaclangaming.dao.JPAItemDao;
+import com.novaclangaming.dao.JPAItemStackCharacterDao;
 import com.novaclangaming.dao.JPATownDao;
 import com.novaclangaming.dao.JPAUserDao;
 import com.novaclangaming.model.CharacterClass;
@@ -46,6 +47,14 @@ public class CharacterController {
 			if(characters.size() < 20 && charDao.findByCharName(user.getId(), charName).isEmpty() && charName.length() < 25) {
 				request.getSession().setAttribute("message", "Character: "+ charName +" was created successfully");
 				Character character = new Character(user, charName, charClass);
+				if(charClass == CharacterClass.Survivor) {
+					character.setCurrentAp(16);
+					character.setMaxAp(16);
+				}
+				else {
+					character.setCurrentAp(12);
+					character.setMaxAp(12);
+				}
 				charDao.create(character);
 			}
 			else if (charDao.findByCharName(user.getId(), charName).isPresent()) {
@@ -229,11 +238,11 @@ public class CharacterController {
 				for (int id : charIds) {
 					Character c = charDao.findById(id);
 					if(c.getTown() != null){
-						System.out.println("One or more selected characters is already in a town");
+						//One or more selected characters is already in a town
 						return "fail";
 					}
 					else {
-						System.out.println(c.getName() + " Joined successfully");
+						//Joined successfully
 						c.setTown(town);
 						charDao.update(c);
 						town = townDao.findById(townId);
@@ -270,14 +279,21 @@ public class CharacterController {
 			Character character = auth.activeCharacter(request);
 			if(character != null) {
 				Item item = itemDao.findById(itemId);
-				if(townDao.removeItemFromStorage(character.getTown().getTownId(), item, 1)) {
-					charDao.addItem(character.getCharId(), item, 1);
+				//check characters available capacity and compare against item being picked up.
+				if(character.getCapacity() >= item.getMass()) {
+					if(townDao.removeItemFromStorage(character.getTown().getTownId(), item, 1)) {
+						charDao.addItem(character.getCharId(), item, 1);
+					}
+				}
+				else {
+					return "fail";
 				}
 				String result = "";
 				character = auth.activeCharacter(request); //refreshes with new item
-				for (ItemStackCharacter stack : character.getItemStacks()) {
-					result += "<div class=\"item-group\">\r\n" + 
-							"		<img src=\""+ request.getContextPath() +"/resources/img/items/"+ stack.getItem().getName() +".png\" id=\"character-item-"+ stack.getItem().getItemId() +"\" title=\""+ stack.getItem().getName() +"\" alt=\""+ stack.getItem().getName() +"\" class=\"character-item\" />\r\n" + 
+				for (ItemStackCharacter stack : character.getItemStacks()) {				
+					result += "<div class=\"character-item-group\" id=\"character-item-"+ stack.getItem().getItemId() +"\" title=\""+ stack.getItem().getName() +"\">" +
+							"	<img src=\""+ request.getContextPath() +"/resources/img/items/rarity/"+ stack.getItem().getRarity() +".png\" class=\"item-rarity\" />" +
+							"		<img src=\""+ request.getContextPath() +"/resources/img/items/"+ stack.getItem().getName() +".png\" alt=\""+ stack.getItem().getName() +"\" class=\"character-item\" />\r\n" + 
 							"		<span class=\"character-item-counter\" id=\"character-stack-"+ stack.getItem().getItemId() +"\">"+ stack.getQuantity() +"</span>\r\n" + 
 							"	</div>";
 				}
@@ -285,13 +301,36 @@ public class CharacterController {
 					result = "<div class=\"card-content\">No Items</div>";
 				}
 				else {
-					result += "XX/16";
+					result += (20 - character.getCapacity()) + "/20";
 				}
 				return result;
 			}
 			return "no active character";
 		}
 		else {
+			return "fail";
+		}
+	}
+	
+	@RequestMapping(value = "/item/action/{action}", method = RequestMethod.POST)
+	@ResponseBody
+	public String performItemAction(HttpServletRequest request, @RequestParam int itemId, @PathVariable String action) {
+		User user = auth.loggedUser(request);
+		if(user != null) {
+			Character character = auth.activeCharacter(request);
+			JPAItemStackCharacterDao itemStackDao = new JPAItemStackCharacterDao(charDao);
+			if(itemStackDao.findByCharItem(character.getCharId(), itemId).isPresent()) {
+				if(action.equals("Drop")) {
+					charDao.dropItem(character.getCharId(), itemDao.findById(itemId), 1);
+				}
+				
+			}else {
+				//Character had none of the requested item
+			}
+			
+			
+			return "results";
+		}else {
 			return "fail";
 		}
 	}

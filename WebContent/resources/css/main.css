@@ -71,6 +71,20 @@ body {
   line-height: 28px;
 }
 
+.btn-act:hover{
+	background-color: #3973c9;
+	cursor: pointer;
+}
+
+.btn-act {
+  background-color: #487ECD;
+  border: none;
+  border-radius: 4px;
+  width: 100%;
+  line-height: 28px;
+  margin-bottom: 4px;
+}
+
 .dropdown-content {
   display: none;
   border: 1px solid black;

@@ -46,7 +46,7 @@
     </nav>
     
         <header id="banner">
-      <img src="${pageContext.request.contextPath}/resources/img/MainBanner.png" id="banner-img" alt="Deadfall Banner" />
+      <a href="${pageContext.request.contextPath}/town/home"><img src="${pageContext.request.contextPath}/resources/img/MainBanner.png" id="banner-img" alt="Deadfall Banner" /></a>
     </header>
     
     <div class="container">

@@ -41,6 +41,9 @@ CREATE TABLE df_characters(
 char_id NUMBER,
 user_id NUMBER NOT NULL,
 town_id NUMBER DEFAULT 0,
+current_ap NUMBER DEFAULT 16,
+max_ap NUMBER DEFAULT 16,
+zone_id NUMBER,
 name VARCHAR2(40) NOT NULL,
 classification VARCHAR2(20),
 PRIMARY KEY (char_id),
@@ -271,6 +274,10 @@ INCREMENT BY 1;
 ----------SEED DATA-----------
 ------------ITEMS-------------
 ------------------------------
+
+INSERT INTO df_users (user_id, username, password, salt, email)
+VALUES (0, 'UnitTestUser', 'Test', 'salt', 'email@email.com');
+
 INSERT INTO df_items (item_id, name, description, mass, rarity, category) 
 VALUES (df_item_id_seq.NEXTVAL, 'Water Ration', 
 'Water is essential to keeping your survivors hydrated and alive. Be sure to ration if you want to survive.',

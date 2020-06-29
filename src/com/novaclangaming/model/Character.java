@@ -20,6 +20,8 @@ import javax.persistence.SecondaryTables;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import com.novaclangaming.dao.JPATownDao;
+
 @NamedQueries({
 	@NamedQuery(name = "Character.findByUser", query = "SELECT c FROM character c WHERE user_id = :user"),
 	@NamedQuery(name = "Character.findByName", query = "SELECT c FROM character c WHERE user_id = :userId AND name = :charName")
@@ -45,6 +47,16 @@ public class Character {
 	@ManyToOne
 	@JoinColumn(name = "town_id", referencedColumnName = "town_id")
 	private Town town;
+	
+	@ManyToOne
+	@JoinColumn(name = "zone_id", referencedColumnName = "zone_id")
+	private Zone zone;
+	
+	@Column(name="CURRENT_AP")
+	private int currentAp;
+	
+	@Column(name="MAX_AP")
+	private int maxAp;
 	
 	@Column
 	private String name;
@@ -156,6 +168,8 @@ public class Character {
 
 	public void setTown(Town town) {
 		this.town = town;
+		JPATownDao townDao = new JPATownDao();
+		this.zone = townDao.findStorageZone(town.getTownId());
 	}
 
 	public int getCurConstructionCont() {
@@ -310,6 +324,38 @@ public class Character {
 		result = new ItemStackCharacter(item, qty, this);
 		itemStacks.add(result);
 		return result;
+	}
+	
+	public int getCapacity(){
+		int capacity = 20;
+		for (ItemStackCharacter stack : itemStacks) {
+			capacity -= stack.getItem().getMass() * stack.getQuantity();
+		}
+		return capacity;
+	}
+
+	public int getCurrentAp() {
+		return currentAp;
+	}
+
+	public void setCurrentAp(int currentAp) {
+		this.currentAp = currentAp;
+	}
+
+	public int getMaxAp() {
+		return maxAp;
+	}
+
+	public void setMaxAp(int maxAp) {
+		this.maxAp = maxAp;
+	}
+
+	public Zone getZone() {
+		return zone;
+	}
+
+	public void setZone(Zone zone) {
+		this.zone = zone;
 	}
 	
 }

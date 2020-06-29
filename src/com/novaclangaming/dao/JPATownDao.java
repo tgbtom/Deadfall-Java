@@ -92,6 +92,13 @@ public class JPATownDao implements ITownDao {
 		em.close();
 		return storage;
 	}
+	
+	public Zone findZoneByCoords(int townId, int x, int y) {
+		EntityManager em = JPAConnection.getInstance().createEntityManager();
+		em.getTransaction().begin();
+		em.close();
+		return null;
+	}
 
 	public Zone findZoneById(int zoneId) {
 		EntityManager em = JPAConnection.getInstance().createEntityManager();
@@ -162,6 +169,30 @@ public class JPATownDao implements ITownDao {
 			}
 		}
 		return categoryStacks;
+	}
+	
+	public void addItemToZone(int zoneId, int itemId, int qty) {
+		EntityManager em = JPAConnection.getInstance().createEntityManager();
+		em.getTransaction().begin();
+		
+		Zone zone = findZoneById(zoneId);
+		Item item = itemDao.findById(itemId);
+		Optional<ItemStackZone> foundZoneStack = stackDao.findByZoneItem(zoneId, itemId);
+		
+		ItemStackZone zoneStack;
+		if(foundZoneStack.isPresent()) {
+			zone.addItem(item, qty);
+			zoneStack = foundZoneStack.get();
+			zoneStack.addToStack(qty);
+		}else {
+			zoneStack = zone.addItem(item, qty);
+		}
+		
+		em.merge(zone);
+		em.merge(zoneStack);
+		
+		em.getTransaction().commit();
+		em.close();
 	}
 
 	public void addItemToStorage(int townId, Item item, int qty) {

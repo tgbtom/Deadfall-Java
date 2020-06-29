@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.support.SessionStatus;
 
@@ -59,6 +60,30 @@ public class HomeController {
 		Item item = jid.findByName(itemNames.get(random));
 		result += item.ajaxString();
 		
+		return result;
+	}
+	
+	@RequestMapping(value = "/item/ajax/details", method = RequestMethod.POST)
+	@ResponseBody
+	public String itemDetails(HttpServletRequest request, @RequestParam int itemId) {
+		IItemDao jid = new JPAItemDao();
+		Item item = jid.findById(itemId);
+		String result = "name:" + item.getName();
+		result += ";rarity:"+ item.getRarity();
+		result += ";mass:"+ item.getMass();
+		result += ";category:"+ item.getCategory();
+		result += ";id:"+ item.getItemId();
+		
+		String functions = "";
+		switch(item.getCategory().toString()) {
+		case "Consumable":
+			functions = "Consume,Drop";
+			break;
+		default:
+			break;
+		}
+		
+		result += ";functions:" + functions;
 		return result;
 	}
 }

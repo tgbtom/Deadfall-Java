@@ -9,19 +9,23 @@ import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 
 import com.novaclangaming.model.UserBulletin;
+import com.novaclangaming.model.Zone;
 import com.novaclangaming.model.Character;
 import com.novaclangaming.model.Item;
 import com.novaclangaming.model.ItemStackCharacter;
+import com.novaclangaming.model.ItemStackZone;
 
 public class JPACharacterDao implements ICharacterDao{
 
 	private IItemStackCharacterDao stackDao;
 	private IItemDao itemDao;
+	private ITownDao townDao;
 	
 	public JPACharacterDao() {
 		super();
 		stackDao = new JPAItemStackCharacterDao(this);
 		itemDao = new JPAItemDao();
+		townDao = new JPATownDao();
 	}
 
 	public void create(Character character) {
@@ -108,6 +112,35 @@ public class JPACharacterDao implements ICharacterDao{
 		 em.merge(stack);
 		 
 		 em.getTransaction().commit();
+		 em.close();
+	}
+	
+	public void dropItem(int charId, Item item, int qty) {
+		EntityManager em = JPAConnection.getInstance().createEntityManager();
+		em.getTransaction().begin();
+		
+		Character character = this.findById(charId);
+		Optional<ItemStackCharacter> stack = stackDao.findByCharItem(charId, item.getItemId());
+		
+		if(stack.isPresent() && stack.get().getQuantity() >= qty) {
+			ItemStackCharacter charStack = stack.get();
+			charStack.removeFromStack(qty);
+			Zone zone = character.getZone();
+			townDao.addItemToZone(zone.getZoneId(), item.getItemId(), qty);
+			
+			if(charStack.getQuantity() > 0 ) {
+				em.merge(zone);
+				em.merge(charStack);
+			}
+			else {
+				em.merge(zone);
+				em.remove(charStack);
+			}
+			
+		}
+		
+		em.getTransaction().commit();
+		em.close();
 	}
 
 }

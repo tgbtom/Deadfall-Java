@@ -16,6 +16,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import com.novaclangaming.model.Character;
+
 @NamedQueries({
 		@NamedQuery(name="Zone.findStorageByTownId", query="SELECT z FROM Zone z WHERE z.town = :town AND x = '0' AND y = '0'")})
 @Entity
@@ -45,6 +47,9 @@ public class Zone {
 	
 	@OneToMany(mappedBy = "zone")
 	private List<ItemStackZone> itemStacks;
+	
+	@OneToMany(mappedBy = "zone")
+	private List<Character> characters;
 	
 	@ManyToOne
 	@JoinColumn(name="TOWN_ID", referencedColumnName = "TOWN_ID")

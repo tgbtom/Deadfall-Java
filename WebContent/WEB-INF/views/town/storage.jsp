@@ -22,8 +22,11 @@
 			<div class="card col-6">
 				<div class="card-top">Resources</div>
 					<c:forEach items="${ sessionScope.resources }"  var="stack">
-						<img src="${pageContext.request.contextPath}/resources/img/items/<c:out value="${ stack.item.name }"/>.png" id="storage-${ stack.item.itemId}" title="<c:out value="${ stack.item.name }"/>" alt="<c:out value="${ stack.item.name }"/>" class="storage-item" />
-						<span class="item-counter" id="stack-${ stack.item.itemId}"><c:out value="${ stack.quantity }"/></span>
+						<div class="storage-item-group" id="storage-${stack.item.itemId}">
+							<img src="${pageContext.request.contextPath}/resources/img/items/rarity/<c:out value="${stack.item.rarity}" />.png" class="item-rarity" />
+							<img src="${pageContext.request.contextPath}/resources/img/items/<c:out value="${ stack.item.name }"/>.png" id="storage-${ stack.item.itemId}" title="<c:out value="${ stack.item.name }"/>" alt="<c:out value="${ stack.item.name }"/>" class="storage-item" />
+							<span class="item-counter" id="stack-${ stack.item.itemId}"><c:out value="${ stack.quantity }"/></span>
+						</div>
 					</c:forEach>
 					<c:if test="${ sessionScope.resources.size() < 1}">
 						<div class="card-content">Nothing was found</div>
@@ -33,8 +36,11 @@
 				<div class="card-top">Consumables</div>
 				<div class="card-content">
 					<c:forEach items="${ sessionScope.consumables }"  var="stack">
-						<img src="${pageContext.request.contextPath}/resources/img/items/<c:out value="${ stack.item.name }"/>.png" id="storage-${ stack.item.itemId}" title="<c:out value="${ stack.item.name }"/>" alt="<c:out value="${ stack.item.name }"/>" class="storage-item" />
-						<span class="item-counter" id="stack-${ stack.item.itemId}"><c:out value="${ stack.quantity }"/></span>
+						<div class="storage-item-group" id="storage-${stack.item.itemId}">
+							<img src="${pageContext.request.contextPath}/resources/img/items/rarity/<c:out value="${stack.item.rarity}" />.png" class="item-rarity" />
+							<img src="${pageContext.request.contextPath}/resources/img/items/<c:out value="${ stack.item.name }"/>.png" title="<c:out value="${ stack.item.name }"/>" alt="<c:out value="${ stack.item.name }"/>" class="storage-item" />
+							<span class="item-counter" id="stack-${ stack.item.itemId}"><c:out value="${ stack.quantity }"/></span>
+						</div>
 					</c:forEach>
 					<c:if test="${ sessionScope.consumables.size() < 1}">
 						<div class="card-content">Nothing was found</div>
@@ -47,8 +53,11 @@
 				<div class="card-top">Weapons</div>
 				<div class="card-content">
 					<c:forEach items="${ sessionScope.weapons }"  var="stack">
-						<img src="${pageContext.request.contextPath}/resources/img/items/<c:out value="${ stack.item.name }"/>.png" id="storage-${ stack.item.itemId}" title="<c:out value="${ stack.item.name }"/>" alt="<c:out value="${ stack.item.name }"/>" class="storage-item" />
-						<span class="item-counter" id="stack-${ stack.item.itemId}"><c:out value="${ stack.quantity }"/></span>
+						<div class="storage-item-group" id="storage-${stack.item.itemId}">
+							<img src="${pageContext.request.contextPath}/resources/img/items/rarity/<c:out value="${stack.item.rarity}" />.png" class="item-rarity" />
+							<img src="${pageContext.request.contextPath}/resources/img/items/<c:out value="${ stack.item.name }"/>.png" id="storage-${ stack.item.itemId}" title="<c:out value="${ stack.item.name }"/>" alt="<c:out value="${ stack.item.name }"/>" class="storage-item" />
+							<span class="item-counter" id="stack-${ stack.item.itemId}"><c:out value="${ stack.quantity }"/></span>
+						</div>
 					</c:forEach>
 					<c:if test="${ sessionScope.weapons.size() < 1}">
 						<div class="card-content">Nothing was found</div>
@@ -59,8 +68,11 @@
 				<div class="card-top">Ammo</div>
 				<div class="card-content">
 					<c:forEach items="${ sessionScope.ammo }"  var="stack">
-						<img src="${pageContext.request.contextPath}/resources/img/items/<c:out value="${ stack.item.name }"/>.png" id="storage-${ stack.item.itemId}" title="<c:out value="${ stack.item.name }"/>" alt="<c:out value="${ stack.item.name }"/>" class="storage-item" />
-						<span class="item-counter" id="stack-${ stack.item.itemId}"><c:out value="${ stack.quantity }"/></span>
+						<div class="storage-item-group" id="storage-${stack.item.itemId}">
+							<img src="${pageContext.request.contextPath}/resources/img/items/rarity/<c:out value="${stack.item.rarity}" />.png" class="item-rarity" />
+							<img src="${pageContext.request.contextPath}/resources/img/items/<c:out value="${ stack.item.name }"/>.png" id="storage-${ stack.item.itemId}" title="<c:out value="${ stack.item.name }"/>" alt="<c:out value="${ stack.item.name }"/>" class="storage-item" />
+							<span class="item-counter" id="stack-${ stack.item.itemId}"><c:out value="${ stack.quantity }"/></span>
+						</div>
 					</c:forEach>
 					<c:if test="${ sessionScope.ammo.size() < 1}">
 						<div class="card-content">Nothing was found</div>

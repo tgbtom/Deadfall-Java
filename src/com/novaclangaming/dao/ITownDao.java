@@ -22,5 +22,6 @@ public interface ITownDao {
 	public Zone findStorageZone(int townId);
 	public List<ItemStackZone> findItemsInStorage(int townId, ItemCategory category);
 	public void addItemToStorage(int townId, Item item, int qty);
+	public void addItemToZone(int zoneId, int itemId, int qty);
 	
 }
