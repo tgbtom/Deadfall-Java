@@ -17,7 +17,6 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.SecondaryTable;
 import javax.persistence.SecondaryTables;
-import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import com.novaclangaming.dao.JPATownDao;

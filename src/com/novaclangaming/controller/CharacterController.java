@@ -301,7 +301,16 @@ public class CharacterController {
 					result = "<div class=\"card-content\">No Items</div>";
 				}
 				else {
-					result += (20 - character.getCapacity()) + "/20";
+					if(20 - character.getCapacity() >= 18) {
+						result += "<span class=\"text-red\">";
+					}
+					else if(20 - character.getCapacity() >= 14) {
+						result += "<span class=\"text-yellow\">";
+					}
+					else {
+						result += "<span class=\"text-green\">";
+					}
+					result += (20 - character.getCapacity()) + "/20</span>";
 				}
 				return result;
 			}
@@ -321,6 +330,7 @@ public class CharacterController {
 			JPAItemStackCharacterDao itemStackDao = new JPAItemStackCharacterDao(charDao);
 			if(itemStackDao.findByCharItem(character.getCharId(), itemId).isPresent()) {
 				if(action.equals("Drop")) {
+					System.out.println("Dropped Item");
 					charDao.dropItem(character.getCharId(), itemDao.findById(itemId), 1);
 				}
 				
@@ -334,4 +344,5 @@ public class CharacterController {
 			return "fail";
 		}
 	}
+
 }

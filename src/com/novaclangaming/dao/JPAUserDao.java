@@ -23,6 +23,7 @@ public class JPAUserDao implements IUserDao{
 		try {
 			user = query.getSingleResult();
 		} catch (NoResultException e) {}
+		em.close();
 		return Optional.ofNullable(user);
 	}
 

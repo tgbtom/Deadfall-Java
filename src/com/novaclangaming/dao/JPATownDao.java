@@ -135,6 +135,7 @@ public class JPATownDao implements ITownDao {
 		em.getTransaction().begin();
 		TypedQuery<Town> query = em.createNamedQuery("Town.findOpen", Town.class);
 		List<Town> towns = query.getResultList();
+		em.close();
 		return towns;
 	}
 
@@ -148,6 +149,7 @@ public class JPATownDao implements ITownDao {
 			result = query.getSingleResult();
 		} catch (NoResultException e) {
 		}
+		em.close();
 		return Optional.ofNullable(result);
 	}
 

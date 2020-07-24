@@ -34,7 +34,22 @@
 					<div class="card-content">No Items</div>
 				</c:if>
 				<c:if test="${ sessionScope.character.itemStacks.size() > 0}">
-					<c:out value="${20 - sessionScope.character.getCapacity()}" />/20
+					<c:choose>
+					
+					<c:when test="${ 20 - sessionScope.character.getCapacity() >= 18 }">
+					<span class="text-red">
+					</c:when>
+					
+					<c:when test="${ 20 - sessionScope.character.getCapacity() >= 14 }">
+					<span class="text-yellow">
+					</c:when>
+					
+					<c:otherwise>
+					<span class="text-green">
+					</c:otherwise>
+					
+					</c:choose>
+					<c:out value="${20 - sessionScope.character.getCapacity()}" />/20</span>
 				</c:if>
 				
 			</div>

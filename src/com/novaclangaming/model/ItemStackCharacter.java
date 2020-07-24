@@ -9,7 +9,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 @NamedQueries(
@@ -46,6 +45,10 @@ public class ItemStackCharacter implements ItemStack{
 		this.item = item;
 		this.quantity = quantity;
 		this.character = character;
+	}
+	
+	public int getStackId() {
+		return stackId;
 	}
 
 	public Item getItem() {

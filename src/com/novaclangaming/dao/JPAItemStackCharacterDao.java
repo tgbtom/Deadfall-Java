@@ -19,8 +19,11 @@ public class JPAItemStackCharacterDao implements IItemStackCharacterDao{
 	}
 
 	public ItemStackCharacter findById(int id) {
-		// TODO Auto-generated method stub
-		return null;
+		EntityManager em = JPAConnection.getInstance().createEntityManager();
+		em.getTransaction().begin();
+		ItemStackCharacter stack = em.find(ItemStackCharacter.class, id);
+		em.close();
+		return stack;
 	}
 
 	public Optional<ItemStackCharacter> findByCharItem(int charId, int itemId) {

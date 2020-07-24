@@ -434,6 +434,19 @@ input[type="submit"] {
   background-color: #3a405a;
 }
 
+/* this is a custom tag so we can store the coloured element in bulletin strings */
 yellow {
   color: #ffcf4a;
+}
+
+.text-yellow{
+	color: #ffcf4a;
+}
+
+.text-red{
+	color: #AA2222;
+}
+
+.text-green{
+	color: #6EA53A;
 }

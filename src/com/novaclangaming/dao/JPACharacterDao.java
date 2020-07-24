@@ -51,6 +51,7 @@ public class JPACharacterDao implements ICharacterDao{
 		TypedQuery<Character> query = em.createNamedQuery("Character.findByUser", Character.class);
 		query.setParameter("user", id);
 		List<Character> characters = query.getResultList();
+		em.close();
 		return characters;
 	}
 
@@ -87,6 +88,7 @@ public class JPACharacterDao implements ICharacterDao{
 		try {
 			character = query.getSingleResult();
 		} catch (NoResultException e) {}
+		em.close();
 		return Optional.ofNullable(character);
 	}
 
@@ -133,7 +135,7 @@ public class JPACharacterDao implements ICharacterDao{
 			}
 			else {
 				em.merge(zone);
-				em.remove(charStack);
+				em.remove(em.merge(charStack));
 			}
 			
 		}

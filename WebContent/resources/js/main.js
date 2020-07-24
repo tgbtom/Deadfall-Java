@@ -132,8 +132,8 @@ function itemAction(action, itemId){
 	var xhttp = new XMLHttpRequest();
 	xhttp.onreadystatechange = function(){
 		if(this.readyState == 4 && this.status == 200){
-			console.log("successful action");
-			console.log(this.responseText);
+			//Refresh page when action completes
+			location.reload();
 		}
 	};
 	xhttp.open("POST", "../item/action/" + action);
