@@ -44,7 +44,7 @@ public class CharacterController {
 		User user = auth.loggedUser(request);
 		if(user != null) {
 			List<Character> characters = charDao.findByUserId(user.getId());
-			if(characters.size() < 20 && charDao.findByCharName(user.getId(), charName).isEmpty() && charName.length() < 25) {
+			if(characters.size() < 20 && !charDao.findByCharName(user.getId(), charName).isPresent() && charName.length() < 25) {
 				request.getSession().setAttribute("message", "Character: "+ charName +" was created successfully");
 				Character character = new Character(user, charName, charClass);
 				if(charClass == CharacterClass.Survivor) {

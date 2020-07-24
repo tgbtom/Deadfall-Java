@@ -36,7 +36,7 @@ public class TownController {
 			@RequestParam int townSize, @RequestParam int mapSize, @RequestParam String townMode) {
 		User user = auth.loggedUser(request);
 		if(user != null) {
-			if(townDao.findByName(townName).isEmpty()) {
+			if(!townDao.findByName(townName).isPresent()) {
 				Town town = new Town(townName, townSize, 300, 350, mapSize, townMode, TownStatus.New);
 				townDao.create(town);
 				request.getSession().setAttribute("message", "Town has been created");

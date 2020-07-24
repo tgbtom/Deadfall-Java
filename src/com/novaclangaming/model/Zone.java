@@ -16,16 +16,16 @@ import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
-import com.novaclangaming.model.Character;
 
 @NamedQueries({
-		@NamedQuery(name="Zone.findStorageByTownId", query="SELECT z FROM Zone z WHERE z.town = :town AND x = '0' AND y = '0'")})
+		@NamedQuery(name="Zone.findStorageByTownId", query="SELECT z FROM Zone z WHERE z.town = :town AND z.x LIKE '0' AND z.y LIKE '0'")})
 @Entity
 @Table(name="DF_TOWN_ZONES")
 public class Zone {
 
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "zone_seq")
-	@SequenceGenerator(name = "zone_seq", sequenceName="DF_ZONE_SEQ", allocationSize = 1)
+//	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "zone_seq")
+//	@SequenceGenerator(name = "zone_seq", sequenceName="DF_ZONE_SEQ", allocationSize = 1)
+	@GeneratedValue(strategy=GenerationType.AUTO)
 	@Id
 	@Column(name="ZONE_ID")
 	private int zoneId;

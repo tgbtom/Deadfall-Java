@@ -18,9 +18,10 @@ import javax.persistence.Table;
 @Table(name="DF_CHARACTERS_ITEMS")
 public class ItemStackCharacter implements ItemStack{
 
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "stack_seq")
-	@SequenceGenerator(name="stack_seq", sequenceName="DF_STACK_SEQ", allocationSize = 1)
+//	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "stack_seq_a")
+//	@SequenceGenerator(name="stack_seq_a", sequenceName="DF_STACK_SEQ", allocationSize = 1)
 	@Id
+	@GeneratedValue(strategy=GenerationType.AUTO)
 	@Column(name="STACK_ID")
 	private int stackId;
 	

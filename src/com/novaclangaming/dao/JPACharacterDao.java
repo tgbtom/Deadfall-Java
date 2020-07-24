@@ -13,7 +13,6 @@ import com.novaclangaming.model.Zone;
 import com.novaclangaming.model.Character;
 import com.novaclangaming.model.Item;
 import com.novaclangaming.model.ItemStackCharacter;
-import com.novaclangaming.model.ItemStackZone;
 
 public class JPACharacterDao implements ICharacterDao{
 

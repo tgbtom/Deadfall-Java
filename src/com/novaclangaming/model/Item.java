@@ -11,13 +11,14 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 @NamedQueries({
-	@NamedQuery(name = "Item.findByName", query = "SELECT i FROM item i WHERE name LIKE :name")
+	@NamedQuery(name = "Item.findByName", query = "SELECT i FROM item i WHERE i.name LIKE :name")
 })
 @Table(name = "df_items")
 @Entity(name = "item")
 public class Item {
 
 	@Id
+	
 	@Column(name="item_id")
 	private int itemId;
 	

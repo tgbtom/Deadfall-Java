@@ -18,16 +18,17 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 @NamedQueries({
-	@NamedQuery(name = "Town.findByName", query = "SELECT t FROM town t WHERE name = :name"),
-	@NamedQuery(name = "Town.findOpen", query = "SELECT t FROM town t WHERE status = 'New'")
+	@NamedQuery(name = "Town.findByName", query = "SELECT t FROM town t WHERE t.name = :name"),
+	@NamedQuery(name = "Town.findOpen", query = "SELECT t FROM town t WHERE t.status LIKE 'New'")
 })
 @Entity(name = "town")
 @Table(name = "df_towns")
 public class Town {
 	
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "town_seq")
-	@SequenceGenerator(name = "town_seq", sequenceName = "df_town_id_seq", allocationSize = 1)
+//	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "town_seq")
+//	@SequenceGenerator(name = "town_seq", sequenceName = "df_town_id_seq", allocationSize = 1)
 	@Id
+	@GeneratedValue(strategy=GenerationType.AUTO)
 	@Column(name = "town_id")
 	private int townId;
 	

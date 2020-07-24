@@ -23,8 +23,8 @@ import javax.persistence.Table;
 import com.novaclangaming.dao.JPATownDao;
 
 @NamedQueries({
-	@NamedQuery(name = "Character.findByUser", query = "SELECT c FROM character c WHERE user_id = :user"),
-	@NamedQuery(name = "Character.findByName", query = "SELECT c FROM character c WHERE user_id = :userId AND name = :charName")
+	@NamedQuery(name = "Character.findByUser", query = "SELECT c FROM character c WHERE c.user.id = :user"),
+	@NamedQuery(name = "Character.findByName", query = "SELECT c FROM character c WHERE c.user.id = :userId AND c.name = :charName")
 })
 @Entity(name = "character")
 @Table(name = "df_characters")
@@ -34,9 +34,10 @@ import com.novaclangaming.dao.JPATownDao;
 })
 public class Character {
 	
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "char_seq_gen")
-	@SequenceGenerator(name = "char_seq_gen", sequenceName = "df_char_id_seq", allocationSize = 1)
+//	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "char_seq_gen")
+//	@SequenceGenerator(name = "char_seq_gen", sequenceName = "df_char_id_seq", allocationSize = 1)
 	@Id
+	@GeneratedValue(strategy=GenerationType.AUTO)
 	@Column(name = "char_id")
 	private int charId;
 	

@@ -13,14 +13,18 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 @NamedQueries(
-		@NamedQuery(name="ItemStackZone.findByZoneItem", query="SELECT i FROM ItemStackZone i WHERE zone = :zone AND item = :item"))
+		@NamedQuery(name="ItemStackZone.findByZoneItem", query="SELECT i FROM ItemStackZone i WHERE i.zone = :zone AND item = :item"))
 @Entity
 @Table(name = "DF_TOWN_ZONE_ITEMS")
 public class ItemStackZone implements ItemStack {
-	
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator="stack_seq")
-	@SequenceGenerator(name="stack_seq", sequenceName="DF_STACK_SEQ", allocationSize = 1)
+	/*
+	 * @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="stack_seq")
+	 * 
+	 * @SequenceGenerator(name="stack_seq", sequenceName="DF_STACK_SEQ",
+	 * allocationSize = 1)
+	 */
 	@Id
+	@GeneratedValue(strategy=GenerationType.AUTO)
 	@Column(name = "STACK_ID")
 	private int stackId;
 	

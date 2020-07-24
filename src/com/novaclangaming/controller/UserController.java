@@ -32,7 +32,7 @@ public class UserController {
 		IUserDao userDao = new JPAUserDao();
 		IAuthenticationDao authDao = new JPAAuthentication();
 		Optional<User> user = userDao.findByName(username);
-		if(user.isEmpty()) {
+		if(!user.isPresent()) {
 			if(password.equals(passwordRpt)) {
 				Password convertedPass = authDao.hashPassword(password);
 				String hashedPass = convertedPass.getHashedPass();

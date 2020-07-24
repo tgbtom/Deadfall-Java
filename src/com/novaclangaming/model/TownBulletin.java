@@ -16,8 +16,9 @@ import javax.persistence.Table;
 @Table(name="DF_TOWN_BULLETINS")
 public class TownBulletin {
 
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "town_bul_seq")
-	@SequenceGenerator(name = "town_bul_seq", sequenceName = "DF_TOWN_BULLETIN_SEQ", allocationSize = 1)
+//	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "town_bul_seq")
+//	@SequenceGenerator(name = "town_bul_seq", sequenceName = "DF_TOWN_BULLETIN_SEQ", allocationSize = 1)
+	@GeneratedValue(strategy=GenerationType.AUTO)
 	@Id
 	@Column(name="BULLETIN_ID")
 	private int bulletinId;

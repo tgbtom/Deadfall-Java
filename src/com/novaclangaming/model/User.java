@@ -13,19 +13,19 @@ import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
-import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 @NamedQueries({
-	@NamedQuery(name = "User.findByName", query = "SELECT u FROM user u WHERE username = :name")
+	@NamedQuery(name = "User.findByName", query = "SELECT u FROM user u WHERE u.username = :name")
 })
 @Entity(name = "user")
 @Table(name = "df_users")
 public class User {
 	
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "df_user_seq")
-	@SequenceGenerator(name = "df_user_seq", sequenceName = "df_user_id_seq", allocationSize = 1)
+//	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "df_user_seq")
+//	@SequenceGenerator(name = "df_user_seq", sequenceName = "df_user_id_seq", allocationSize = 1)
 	@Id
+	@GeneratedValue(strategy=GenerationType.AUTO)
 	@Column(name = "user_id")
 	private int id;
 	
