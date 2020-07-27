@@ -94,6 +94,7 @@ health_gain INTEGER DEFAULT 0
 CREATE TABLE df_structures(
 structure_id INTEGER AUTO_INCREMENT PRIMARY KEY,
 name VARCHAR(100),
+category VARCHAR(40),
 description VARCHAR(4000),
 defence INTEGER DEFAULT 0,
 ap_cost INTEGER DEFAULT 10,
@@ -311,3 +312,51 @@ VALUES ('Carrot',
 
 INSERT INTO df_consumables(item_id, ap_gain, consume_type, health_gain)
 VALUES (24, 100, 'Eat', 0);
+
+INSERT INTO df_structures(name, category, description, defence, ap_cost, levels)
+VALUES ('Perimeter Fence', 'Defence', 'Build a fence establishing a perimeter for the settlement. Will Keep some zeds out.', 
+50, 45, 5);
+
+INSERT INTO df_structures(name, category, description, defence, ap_cost, levels)
+VALUES ('Wooden Wall', 'Defence', 'Improve the perimeter around the settlement with a large wooden wall.', 
+100, 80, 10);
+
+INSERT INTO df_structures(name, category, description, defence, ap_cost, levels)
+VALUES ('Inner Wall', 'Defence', 'Create a secondary wall, just in case there is a breach in the main wall.', 
+75, 90, 10);
+
+INSERT INTO df_structures(name, category, description, defence, ap_cost, levels)
+VALUES ('Trenches', 'Defence', 'Dig out trenches between the outer and inner wall. Great place to set traps.', 
+40, 100, 15);
+
+INSERT INTO df_structures(name, category, description, defence, ap_cost, levels)
+VALUES ('Spike Pits', 'Defence', 'Set up sharp spikes in some areas of the trenches to impale falling zeds.', 
+65, 35, 5);
+
+INSERT INTO df_structures(name, category, description, defence, ap_cost, levels)
+VALUES ('Wooden Support', 'Defence', 'Add structural support the walls.', 
+30, 40, 5);
+
+INSERT INTO df_structures(name, category, description, defence, ap_cost, levels)
+VALUES ('Metal Patching', 'Defence', 'Reinforce the outer wall with metal.', 
+115, 85, 5);
+
+INSERT INTO df_structures(name, category, description, defence, ap_cost, levels)
+VALUES ('Sentry Tower', 'Defence', 'Each level will build a sentry tower on a different section of the wall. Used as a lookout.', 
+85, 120, 4);
+
+INSERT INTO df_structures(name, category, description, defence, ap_cost, levels)
+VALUES ('MG Nest', 'Defence', 'Set up machine gun nests near the perimeter.', 
+250, 50, 2);
+
+INSERT INTO df_structures(name, category, description, defence, ap_cost, levels)
+VALUES ('Water Reserve', 'Supply', 'Establish a holding area for all clean water reserves in the settlement. Once built; provides 2-4 water rations per day.', 
+0, 50, 1);
+
+INSERT INTO df_structures(name, category, description, defence, ap_cost, levels)
+VALUES ('Vegetable Garden', 'Supply', 'A small plot to grow vegetables. Generates food overnight. Grows 1-4 food per night.', 
+0, 85, 1);
+
+INSERT INTO df_structures(name, category, description, defence, ap_cost, levels)
+VALUES ('Fabrikator Workshop', 'Production', 'Allows the conversion of basic resources at a 3:1 Ratio.', 
+0, 45, 1);

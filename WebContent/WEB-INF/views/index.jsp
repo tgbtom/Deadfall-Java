@@ -34,8 +34,8 @@ pageEncoding="ISO-8859-1"%>
         <img src="${pageContext.request.contextPath}/resources/img/hamburger-menu.png" alt="Menu" />
         <div class="dropdown-content">
           <div class="dropdown-link">Homepage</div>
-          <div class="dropdown-link">Login</div>
-          <div class="dropdown-link">Register</div>
+          <div class="dropdown-link" id="login-btn-mobile">Login</div>
+          <div class="dropdown-link" id="register-btn-mobile">Register</div>
         </div>
       </button>
     </nav>

@@ -1,6 +1,8 @@
 function setModalListeners() {
   var loginButton = document.getElementById("login-btn");
+  var loginButtonMobile = document.getElementById("login-btn-mobile");
   var registerButton = document.getElementById("register-btn");
+  var registerButtonMobile = document.getElementById("register-btn-mobile");
   var loginModal = document.getElementById("modal-login");
   var registerModal = document.getElementById("modal-register");
   var featuredButton = document.getElementById("featured-item");
@@ -11,12 +13,24 @@ function setModalListeners() {
     loginModal.style.display = "block";
     showModalContainer();
   });
+  
+  loginButtonMobile.addEventListener("click", function() {
+	    hideModals();
+	    loginModal.style.display = "block";
+	    showModalContainer();
+	  });
 
   registerButton.addEventListener("click", function() {
     hideModals();
     registerModal.style.display = "block";
     showModalContainer();
   });
+  
+  registerButtonMobile.addEventListener("click", function() {
+	    hideModals();
+	    registerModal.style.display = "block";
+	    showModalContainer();
+	  });
   
   featuredButton.addEventListener("click", function(){
 	  hideModals();

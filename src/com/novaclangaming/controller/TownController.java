@@ -15,9 +15,11 @@ import com.novaclangaming.dao.ITownDao;
 import com.novaclangaming.dao.JPAAuthentication;
 import com.novaclangaming.dao.JPACharacterDao;
 import com.novaclangaming.dao.JPAItemDao;
+import com.novaclangaming.dao.JPAStructureDao;
 import com.novaclangaming.dao.JPATownDao;
 import com.novaclangaming.model.ItemCategory;
 import com.novaclangaming.model.ItemStackZone;
+import com.novaclangaming.model.Structure;
 import com.novaclangaming.model.Town;
 import com.novaclangaming.model.TownStatus;
 import com.novaclangaming.model.User;
@@ -75,6 +77,14 @@ public class TownController {
 	public String construction(HttpServletRequest request) {
 		if(auth.loggedUser(request) != null) {
 			if(auth.activeCharacter(request) != null) {
+				//find all structures that are unlocked/started/completed
+				int townId = auth.activeCharacter(request).getTown().getTownId();
+				List<Structure> defenceStructures = JPAStructureDao.findAllDefence();
+				List<Structure> supplyStructures = JPAStructureDao.findAllSupply();
+				List<Structure> productionStructures = JPAStructureDao.findAllProduction();
+				request.getSession().setAttribute("defenceStructures", defenceStructures);
+				request.getSession().setAttribute("supplyStructures", supplyStructures);
+				request.getSession().setAttribute("productionStructures", productionStructures);
 				return "town/construction";
 			}
 		}

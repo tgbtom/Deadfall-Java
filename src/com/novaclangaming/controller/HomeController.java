@@ -73,6 +73,7 @@ public class HomeController {
 		result += ";mass:"+ item.getMass();
 		result += ";category:"+ item.getCategory();
 		result += ";id:"+ item.getItemId();
+		System.out.println(String.valueOf(item));
 		
 		String functions = "";
 		switch(item.getCategory().toString()) {

@@ -28,7 +28,7 @@
 	  	<button class="btn-nav left" id="login-btn">Dashboard</button>
 	  </a>
 	  <a href="${pageContext.request.contextPath}/logout">
-	  	<button class="btn-nav right" id="login-btn">Logout</button>
+	  	<button class="btn-nav right">Logout</button>
 	  </a>
 	  <a href="${pageContext.request.contextPath}/user/profile">
 	  	<button class="btn-nav right" id="login-btn">Profile</button>
@@ -40,7 +40,9 @@
         <img src="${pageContext.request.contextPath}/resources/img/hamburger-menu.png" alt="Menu" />
         <div class="dropdown-content">
           <div class="dropdown-link">Homepage</div>
-          <div class="dropdown-link">Logout</div>
+          <a href="${pageContext.request.contextPath}/logout">
+          	<div class="dropdown-link" >Logout</div>
+          </a>
         </div>
       </button>
     </nav>
