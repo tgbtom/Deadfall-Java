@@ -25,5 +25,46 @@ public class StructureRequirements {
 	
 	@Column(name="REQUIRED_LEVEL")
 	private int requiredLevel;
+
+	public StructureRequirements() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	public StructureRequirements(long id, Structure structure, Structure requiredStructure, int requiredLevel) {
+		super();
+		this.id = id;
+		this.structure = structure;
+		this.requiredStructure = requiredStructure;
+		this.requiredLevel = requiredLevel;
+	}
+
+	public Structure getStructure() {
+		return structure;
+	}
+
+	public void setStructure(Structure structure) {
+		this.structure = structure;
+	}
+
+	public Structure getRequiredStructure() {
+		return requiredStructure;
+	}
+
+	public void setRequiredStructure(Structure requiredStructure) {
+		this.requiredStructure = requiredStructure;
+	}
+
+	public int getRequiredLevel() {
+		return requiredLevel;
+	}
+
+	public void setRequiredLevel(int requiredLevel) {
+		this.requiredLevel = requiredLevel;
+	}
+
+	public long getId() {
+		return id;
+	}
 	
 }

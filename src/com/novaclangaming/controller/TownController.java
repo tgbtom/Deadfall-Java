@@ -1,6 +1,10 @@
 package com.novaclangaming.controller;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -20,6 +24,7 @@ import com.novaclangaming.dao.JPATownDao;
 import com.novaclangaming.model.ItemCategory;
 import com.novaclangaming.model.ItemStackZone;
 import com.novaclangaming.model.Structure;
+import com.novaclangaming.model.StructureProgress;
 import com.novaclangaming.model.Town;
 import com.novaclangaming.model.TownStatus;
 import com.novaclangaming.model.User;
@@ -78,13 +83,23 @@ public class TownController {
 		if(auth.loggedUser(request) != null) {
 			if(auth.activeCharacter(request) != null) {
 				//find all structures that are unlocked/started/completed
-				int townId = auth.activeCharacter(request).getTown().getTownId();
-				List<Structure> defenceStructures = JPAStructureDao.findAllDefence();
-				List<Structure> supplyStructures = JPAStructureDao.findAllSupply();
-				List<Structure> productionStructures = JPAStructureDao.findAllProduction();
-				request.getSession().setAttribute("defenceStructures", defenceStructures);
-				request.getSession().setAttribute("supplyStructures", supplyStructures);
-				request.getSession().setAttribute("productionStructures", productionStructures);
+				Town town = auth.activeCharacter(request).getTown();
+				List<Structure> unlockedStructures = JPAStructureDao.findUnlockedStructures(town);
+				Map<Structure, StructureProgress> progressOfStructures = new HashMap<Structure, StructureProgress>();
+				for(Structure base : unlockedStructures) {
+					//Check if it exists in town (meaning it was started)
+					Optional<StructureProgress> progress = JPAStructureDao.findProgress(town, base);
+					if(progress.isPresent()) {
+						progressOfStructures.put(base, progress.get());
+					}
+					else {
+						StructureProgress filler = new StructureProgress(town, base, 0, 0);
+						progressOfStructures.put(base, filler);
+					}
+				}
+				request.getSession().setAttribute("unlockedDefence", progressOfStructures);
+				request.getSession().setAttribute("townId", town.getTownId());
+				request.getSession().setAttribute("structureDao", new JPAStructureDao());
 				return "town/construction";
 			}
 		}

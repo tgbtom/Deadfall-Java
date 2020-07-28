@@ -35,3 +35,19 @@
 .clickable-structure:hover {
 	cursor: pointer;
 }
+
+.ma{
+	margin: auto;
+}
+
+.red-row{
+	background-color: rgba(240, 100, 120, 0.2);
+}
+
+.yellow-row{
+	background-color: rgba(240, 240, 0, 0.2);
+}
+
+.green-row{
+	background-color: rgba(50, 280, 50, 0.2);
+}

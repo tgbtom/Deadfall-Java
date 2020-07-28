@@ -13,11 +13,15 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
+
 @NamedQueries({
 		@NamedQuery(name = "Structure.findAll", query = "SELECT s FROM Structure s"),
 		@NamedQuery(name = "Structure.findAllDefence", query = "SELECT s FROM Structure s WHERE s.Category LIKE 'Defence'"),
 		@NamedQuery(name = "Structure.findAllSupply", query = "SELECT s FROM Structure s WHERE s.Category LIKE 'Supply'"),
-		@NamedQuery(name = "Structure.findAllProduction", query = "SELECT s FROM Structure s WHERE s.Category LIKE 'Production'")
+		@NamedQuery(name = "Structure.findAllProduction", query = "SELECT s FROM Structure s WHERE s.Category LIKE 'Production'"),
+		@NamedQuery(name = "Structure.findWithNoRequirements", query = "SELECT s FROM Structure s WHERE size(s.requirements) LIKE 0")
 		})
 @Entity
 @Table(name="DF_STRUCTURES")
@@ -49,8 +53,12 @@ public class Structure {
 	@OneToMany(fetch = FetchType.EAGER, mappedBy = "structure")
 	private List<StructureCost> costs;
 	
-	@OneToMany
+	@LazyCollection(LazyCollectionOption.FALSE)
+	@OneToMany(mappedBy = "structure")
 	private List<StructureRequirements> requirements;
+	
+	@OneToMany(mappedBy = "structure")
+	private List<StructureProgress> inProgress;
 
 	public Structure() {
 		super();

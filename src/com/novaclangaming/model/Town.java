@@ -65,6 +65,9 @@ public class Town {
 	@OneToMany(mappedBy = "town")
 	private List<Zone> zones;
 	
+	@OneToMany(mappedBy = "town")
+	private List<StructureProgress> structuresInProgress;
+	
 	public Town() {
 		super();
 		this.zones = new ArrayList<Zone>();
@@ -181,5 +184,15 @@ public class Town {
 	public void addZone(Zone zone) {
 		this.zones.add(zone);
 	}
+
+	public List<StructureProgress> getStructuresInProgress() {
+		return structuresInProgress;
+	}
+
+	public void setStructuresInProgress(List<StructureProgress> structuresInProgress) {
+		this.structuresInProgress = structuresInProgress;
+	}
+	
+	
 	
 }

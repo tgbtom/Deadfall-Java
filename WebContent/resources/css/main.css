@@ -422,6 +422,10 @@ input[type="submit"] {
 	margin-bottom: 3px;
 }
 
+.mr-3{
+	margin-right: 3px;
+}
+
 .bb {
   border-bottom: 1px solid black;
 }
@@ -462,3 +466,4 @@ yellow {
 	margin-left: 5px;
 	background-color: #75a60c;
 }
+
