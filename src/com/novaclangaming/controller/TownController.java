@@ -5,10 +5,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,8 +21,10 @@ import com.novaclangaming.dao.ITownDao;
 import com.novaclangaming.dao.JPAAuthentication;
 import com.novaclangaming.dao.JPACharacterDao;
 import com.novaclangaming.dao.JPAItemDao;
+import com.novaclangaming.dao.JPAItemStackZoneDao;
 import com.novaclangaming.dao.JPAStructureDao;
 import com.novaclangaming.dao.JPATownDao;
+import com.novaclangaming.model.Character;
 import com.novaclangaming.model.ItemCategory;
 import com.novaclangaming.model.ItemStackZone;
 import com.novaclangaming.model.Structure;
@@ -33,9 +37,10 @@ import com.novaclangaming.model.User;
 public class TownController {
 	
 	JPAAuthentication auth = new JPAAuthentication();
-	ITownDao townDao = new JPATownDao();
+	JPATownDao townDao = new JPATownDao();
 	ICharacterDao charDao = new JPACharacterDao();
 	IItemDao itemDao = new JPAItemDao();
+	JPAStructureDao structureDao = new JPAStructureDao();
 	
 	
 	@RequestMapping(value = "/town/create", method = RequestMethod.POST)
@@ -85,7 +90,7 @@ public class TownController {
 				//find all structures that are unlocked/started/completed
 				Town town = auth.activeCharacter(request).getTown();
 				List<Structure> unlockedStructures = JPAStructureDao.findUnlockedStructures(town);
-				Map<Structure, StructureProgress> progressOfStructures = new HashMap<Structure, StructureProgress>();
+				Map<Structure, StructureProgress> progressOfStructures = new TreeMap<Structure, StructureProgress>();
 				for(Structure base : unlockedStructures) {
 					//Check if it exists in town (meaning it was started)
 					Optional<StructureProgress> progress = JPAStructureDao.findProgress(town, base);
@@ -99,7 +104,9 @@ public class TownController {
 				}
 				request.getSession().setAttribute("unlockedDefence", progressOfStructures);
 				request.getSession().setAttribute("townId", town.getTownId());
+				request.getSession().setAttribute("storageId", this.townDao.findStorageZone(town.getTownId()).getZoneId());
 				request.getSession().setAttribute("structureDao", new JPAStructureDao());
+				request.getSession().setAttribute("stackZoneDao", new JPAItemStackZoneDao(this.townDao));
 				return "town/construction";
 			}
 		}
@@ -142,6 +149,33 @@ public class TownController {
 			if(auth.activeCharacter(request) != null) {
 				return "town/outside";
 			}
+		}
+		return "redirect: ../";
+	}
+	
+	@RequestMapping(value = "/town/construct/{structureId}/{apToAssign}", method = RequestMethod.GET)
+	public String assignAp(HttpServletRequest request, @PathVariable int structureId, @PathVariable int apToAssign) {
+		//1, check the user is logged in, then check if the current char has enough AP
+		//2a, ensure that the structure requirements ARE indeed met IF structure has not began
+		//2b, see if we need to remove resources to start construction, if so, clarify we have enough
+		//3, remove required resources and assign AP. If AP exceeds the required amount, reduce the consumed AP accordingly. (BUILDER IS 2X)
+		//4, if AP >= requirement, update the structure level for the current town, and grant defence accordingly
+		//5, Update the character stats for construction contributed
+		//6, Set message to display before redirecting to structures page
+		
+		if(auth.loggedUser(request) != null) {
+			Character character = auth.activeCharacter(request);
+			if(character.getCurrentAp() >= apToAssign) {
+				//has the structure began yet?
+				Optional<StructureProgress> progress = JPAStructureDao.findProgress(character.getTown(), structureDao.findById(structureId));
+				if(progress.isPresent() ? progress.get().getAp() > 0 : false) {
+						//Only need to worry about AP
+				}
+				else {
+						//Need to worry about construction costs too
+				}
+			}
+			return "redirect: /Deadfall/town/construction";
 		}
 		return "redirect: ../";
 	}

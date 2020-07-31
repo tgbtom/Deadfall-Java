@@ -1,6 +1,8 @@
 package com.novaclangaming.dao;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,6 +66,12 @@ public class JPAStructureDao {
 	
 	public static List<Structure> findUnlockedStructures(Town town){
 		List<Structure> structures = getStructuresWithMetRequirements(town);
+		Collections.sort(structures, new Comparator<Structure>() {
+			@Override
+			public int compare(Structure o1, Structure o2) {
+				return o1.getName().compareToIgnoreCase(o2.getName());
+			}
+		});
 		return structures;
 	}
 	

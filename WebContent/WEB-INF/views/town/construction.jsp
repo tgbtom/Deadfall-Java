@@ -46,7 +46,7 @@
 									<c:set var="concatenatedAddItem" value="${costString},${currentCostConcat}"/>
 									<c:set var="costString" value="${ costString == 't' ?  currentCostConcat :  concatenatedAddItem  }" />
 								</c:forEach>
-								<c:set var="func" scope="page" value="showStructureModal(${ c.key.structureId }, \'${ c.key.name }\', \'${ c.key.description }\', \'${ costString }\', ${ c.key.apCost - c.value.ap })" />
+								<c:set var="func" scope="page" value="showStructureModal(${ c.key.structureId }, \'${ c.key.name }\', \'${ c.key.description }\', \'${ costString }\', ${ c.key.apCost - c.value.ap }, ${ c.key.defence }, ${ c.value.level }, ${ c.key.levels })" />
 								
 								<c:choose>
 									<c:when test="${ c.value.ap > 0 }">
@@ -70,7 +70,23 @@
 										<div class="citizens-item-group" title="<c:out value="${ cost.item.name }"/>">								
 											<img src="${pageContext.request.contextPath}/resources/img/items/rarity/<c:out value="${ cost.item.rarity }"/>.png" class="item-rarity" />
 											<img src="${pageContext.request.contextPath}/resources/img/items/<c:out value="${ cost.item.name }"/>.png" alt="<c:out value="${ cost.item.name }"/>" class="citizens-item" />	
-											<span class="citizens-item-counter"><c:out value="${ cost.quantity }"/></span>
+											
+												<c:set var="storageStack" value="${ sessionScope.stackZoneDao.findByZoneItem(sessionScope.storageId, cost.item.itemId) }"/>
+												
+												<c:choose>
+													<c:when test="${ storageStack.isPresent() }">
+														<c:choose>
+															<c:when test="${ storageStack.get().getQuantity() >= cost.quantity }">
+																<span class="citizens-item-counter text-bright-green"><c:out value="${ cost.quantity }"/></span>
+															</c:when>
+															<c:otherwise><span class="citizens-item-counter text-yellow"><c:out value="${ cost.quantity }"/></span></c:otherwise>
+														</c:choose>
+													</c:when>
+													<c:otherwise>
+														<span class="citizens-item-counter text-yellow"><c:out value="${ cost.quantity }"/></span>
+													</c:otherwise>
+												</c:choose>
+												
 										</div>
 										</c:forEach>
 									</c:if>								
@@ -115,7 +131,7 @@
 									<c:set var="concatenatedAddItem" value="${costString},${currentCostConcat}"/>
 									<c:set var="costString" value="${ costString == 't' ?  currentCostConcat :  concatenatedAddItem  }" />
 								</c:forEach>
-								<c:set var="func" scope="page" value="showStructureModal(${ c.key.structureId }, \'${ c.key.name }\', \'${ c.key.description }\', \'${ costString }\', ${ c.key.apCost - c.value.ap })" />
+								<c:set var="func" scope="page" value="showStructureModal(${ c.key.structureId }, \'${ c.key.name }\', \'${ c.key.description }\', \'${ costString }\', ${ c.key.apCost - c.value.ap }, ${ c.key.defence }, ${ c.value.level }, ${ c.key.levels })" />
 									
 									
 									<c:choose>
@@ -140,7 +156,22 @@
 											<div class="citizens-item-group" title="<c:out value="${ cost.item.name }"/>">								
 												<img src="${pageContext.request.contextPath}/resources/img/items/rarity/<c:out value="${ cost.item.rarity }"/>.png" class="item-rarity" />
 												<img src="${pageContext.request.contextPath}/resources/img/items/<c:out value="${ cost.item.name }"/>.png" alt="<c:out value="${ cost.item.name }"/>" class="citizens-item" />	
-												<span class="citizens-item-counter"><c:out value="${ cost.quantity }"/></span>
+												
+												<c:set var="storageStack" value="${ sessionScope.stackZoneDao.findByZoneItem(sessionScope.storageId, cost.item.itemId) }"/>
+												
+												<c:choose>
+													<c:when test="${ storageStack.isPresent() }">
+														<c:choose>
+															<c:when test="${ storageStack.get().getQuantity() >= cost.quantity }">
+																<span class="citizens-item-counter text-bright-green"><c:out value="${ cost.quantity }"/></span>
+															</c:when>
+															<c:otherwise><span class="citizens-item-counter text-yellow"><c:out value="${ cost.quantity }"/></span></c:otherwise>
+														</c:choose>
+													</c:when>
+													<c:otherwise>
+														<span class="citizens-item-counter text-yellow"><c:out value="${ cost.quantity }"/></span>
+													</c:otherwise>
+												</c:choose>
 											</div>
 										</c:forEach>
 									</c:if>
@@ -184,7 +215,7 @@
 									<c:set var="concatenatedAddItem" value="${costString},${currentCostConcat}"/>
 									<c:set var="costString" value="${ costString == 't' ?  currentCostConcat :  concatenatedAddItem  }" />
 								</c:forEach>
-								<c:set var="func" scope="page" value="showStructureModal(${ c.key.structureId }, \'${ c.key.name }\', \'${ c.key.description }\', \'${ costString }\', ${ c.key.apCost - c.value.ap })" />
+								<c:set var="func" scope="page" value="showStructureModal(${ c.key.structureId }, \'${ c.key.name }\', \'${ c.key.description }\', \'${ costString }\', ${ c.key.apCost - c.value.ap }, ${ c.key.defence }, ${ c.value.level }, ${ c.key.levels })" />
 								
 									<c:choose>
 										<c:when test="${ c.value.ap > 0 }">
@@ -207,7 +238,23 @@
 											<div class="citizens-item-group" title="<c:out value="${ cost.item.name }"/>">								
 												<img src="${pageContext.request.contextPath}/resources/img/items/rarity/<c:out value="${ cost.item.rarity }"/>.png" class="item-rarity" />
 												<img src="${pageContext.request.contextPath}/resources/img/items/<c:out value="${ cost.item.name }"/>.png" alt="<c:out value="${ cost.item.name }"/>" class="citizens-item" />	
-												<span class="citizens-item-counter"><c:out value="${ cost.quantity }"/></span>
+												
+												<c:set var="storageStack" value="${ sessionScope.stackZoneDao.findByZoneItem(sessionScope.storageId, cost.item.itemId) }"/>
+												
+												<c:choose>
+													<c:when test="${ storageStack.isPresent() }">
+														<c:choose>
+															<c:when test="${ storageStack.get().getQuantity() >= cost.quantity }">
+																<span class="citizens-item-counter text-bright-green"><c:out value="${ cost.quantity }"/></span>
+															</c:when>
+															<c:otherwise><span class="citizens-item-counter text-yellow"><c:out value="${ cost.quantity }"/></span></c:otherwise>
+														</c:choose>
+													</c:when>
+													<c:otherwise>
+														<span class="citizens-item-counter text-yellow"><c:out value="${ cost.quantity }"/></span>
+													</c:otherwise>
+												</c:choose>
+											
 											</div>
 										</c:forEach>
 										</c:if>
@@ -232,9 +279,9 @@
 			<div class="modal" id="modal-structure">
 				<div class="card">
 					<div class="card-top">
-						[0/5]
+						[<span id="modal-structure-level"></span>/<span id="modal-structure-max-level"></span>]
 						<span id="modal-structure-title"><!-- Selected structure name goes here --></span>
-						<img src="${pageContext.request.contextPath}/resources/img/icons/Shield.png" class="Defence Granted" />50
+						<img src="${pageContext.request.contextPath}/resources/img/icons/Shield.png" class="Defence Granted" /><span id="modal-structure-defence"></span>
 					</div>
 					<div class="card-content">
 						<div class="row">
@@ -248,7 +295,7 @@
 								<span id="modal-structure-costs"><!-- Selected structure costs goes here --></span>
 								</div>
 								<div class="sub-3"><span id="modal-structure-ap-cost"><!-- Selected Structure ap cost goes here --></span><img src="${pageContext.request.contextPath}/resources/img/icons/ap.png" class="AP" /></div>
-								<div class="sub-3"><button type="button" class="btn-play">Build</button></div>
+								<div class="sub-3"><button type="button" class="btn-play" onclick="promptAp(${ sessionScope.character.currentAp })">Build</button></div>
 							</div>
 						</div>
 						

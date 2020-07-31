@@ -80,7 +80,6 @@ function inventoryPopups() {
   var itemStacks = document.getElementsByClassName("character-item-group");
   for (let i = 0; i < itemStacks.length; i++) {
     var stack = itemStacks[i];
-    console.log("item:" + stack.id.split("-")[2]);
     let node = document.createElement("span");
     node.id = "item-popup-" + stack.id.split("-")[2];
     node.className += "popup-text";
@@ -115,13 +114,12 @@ function inventoryPopups() {
     	else{
     		hideAllItemPopups();
     		popup.style.display = "block";
-    		console.log((-1 * popup.clientHeight));
     		popup.style.left = this.offsetLeft - 49;
     		popup.style.top = (this.offsetTop + (-1 * popup.clientHeight -8));
     	}
     });
     
-    xhttp.open("POST", "../item/ajax/details");
+    xhttp.open("POST", "/Deadfall/item/ajax/details");
     xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
     xhttp.send("itemId=" + stack.id.split("-")[2]);
 

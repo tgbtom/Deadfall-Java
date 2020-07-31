@@ -25,7 +25,7 @@ import org.hibernate.annotations.LazyCollectionOption;
 		})
 @Entity
 @Table(name="DF_STRUCTURES")
-public class Structure {
+public class Structure implements Comparable<Structure>{
 
 	@Id
 	@Column(name="STRUCTURE_ID")
@@ -145,5 +145,11 @@ public class Structure {
 	public int getStructureId() {
 		return structureId;
 	}
+
+	@Override
+	public int compareTo(Structure o) {
+		return this.name.compareTo(o.getName());
+	}
+
 	
 }
