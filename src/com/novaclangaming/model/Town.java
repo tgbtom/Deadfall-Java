@@ -193,6 +193,8 @@ public class Town {
 		this.structuresInProgress = structuresInProgress;
 	}
 	
-	
+	public void addDefence(int amount) {
+		this.defence += amount;
+	}
 	
 }

@@ -1,0 +1,8 @@
+[class*="grid-"]{
+	stroke: black;
+	stroke-width: 1;
+}
+
+.grid-green{
+	fill: green;
+}

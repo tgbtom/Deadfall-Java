@@ -17,7 +17,7 @@
 			<div class="sub-3 head-box text-center">0, 0 </div>
 		</div>
 		<div class="col-6">
-			<div class="sub-6 head-box text-center"> 296 <img src="${pageContext.request.contextPath}/resources/img/icons/Sword.png"> | <img src="${pageContext.request.contextPath}/resources/img/icons/Shield.png"> 375</div>
+			<div class="sub-6 head-box text-center"> 296 <img src="${pageContext.request.contextPath}/resources/img/icons/Sword.png"> | <img src="${pageContext.request.contextPath}/resources/img/icons/Shield.png"> <c:out value="${sessionScope.character.town.defence}" /></div>
 			<div class="sub-6 head-box text-center"><strong>Status:</strong></div>
 		</div>
 		<div class="col-6">

@@ -25,9 +25,11 @@ import com.novaclangaming.dao.JPAItemStackZoneDao;
 import com.novaclangaming.dao.JPAStructureDao;
 import com.novaclangaming.dao.JPATownDao;
 import com.novaclangaming.model.Character;
+import com.novaclangaming.model.CharacterClass;
 import com.novaclangaming.model.ItemCategory;
 import com.novaclangaming.model.ItemStackZone;
 import com.novaclangaming.model.Structure;
+import com.novaclangaming.model.StructureCost;
 import com.novaclangaming.model.StructureProgress;
 import com.novaclangaming.model.Town;
 import com.novaclangaming.model.TownStatus;
@@ -147,6 +149,7 @@ public class TownController {
 	public String outside(HttpServletRequest request) {
 		if(auth.loggedUser(request) != null) {
 			if(auth.activeCharacter(request) != null) {
+				request.getSession().setAttribute("townDao", townDao);
 				return "town/outside";
 			}
 		}
@@ -161,18 +164,60 @@ public class TownController {
 		//3, remove required resources and assign AP. If AP exceeds the required amount, reduce the consumed AP accordingly. (BUILDER IS 2X)
 		//4, if AP >= requirement, update the structure level for the current town, and grant defence accordingly
 		//5, Update the character stats for construction contributed
-		//6, Set message to display before redirecting to structures page
+		//6, TODO Set message to display before redirecting to structures page
 		
 		if(auth.loggedUser(request) != null) {
 			Character character = auth.activeCharacter(request);
-			if(character.getCurrentAp() >= apToAssign) {
+			Structure structure = structureDao.findById(structureId);
+			Optional<StructureProgress> progress = JPAStructureDao.findProgress(character.getTown(), structure);
+			//if character has enough ap AND the building is not already max level
+			if(character.getCurrentAp() >= apToAssign && progress.isPresent() ? progress.get().getLevel() < structure.getLevels() : false) {
 				//has the structure began yet?
-				Optional<StructureProgress> progress = JPAStructureDao.findProgress(character.getTown(), structureDao.findById(structureId));
+				boolean transferAp = false;
 				if(progress.isPresent() ? progress.get().getAp() > 0 : false) {
 						//Only need to worry about AP
+						transferAp = true;
 				}
 				else {
-						//Need to worry about construction costs too
+					//Need to worry about construction costs too
+					if(structureDao.isStructureAffordable(character.getTown().getTownId(), structureId)) {
+						//remove the costs, if successfull removeAp = true
+						transferAp = true;
+						List<StructureCost> costs = structure.getCosts();
+						for (StructureCost cost : costs) {
+							if(!townDao.removeItemFromStorage(character.getTown().getTownId(), cost.getItem(), cost.getQuantity())) {
+								transferAp = false;
+							}
+						}
+					}
+				}
+				
+				if(transferAp) {
+					StructureProgress currentProgress = progress.isPresent() ? progress.get() : new StructureProgress(character.getTown(), structure, 0, 0);
+					
+					//If character is Builder, double the assigned amount
+					int apToRemove = apToAssign;
+					if (character.getClassification() == CharacterClass.Builder) {
+						apToAssign *= 2;
+					}
+					if(apToAssign >= structure.getApCost() - currentProgress.getAp()) {
+						apToAssign = structure.getApCost() - currentProgress.getAp();
+						apToRemove = character.getClassification() == CharacterClass.Builder ? (int) Math.ceil(apToAssign / 2) : apToAssign;
+						currentProgress.setLevel(currentProgress.getLevel() + 1);
+						currentProgress.setAp(0);
+						
+						//STRUCTURE LEVELS UP
+						structureDao.structureLevelUp(character.getTown(), structure, currentProgress.getLevel());
+						request.getSession().setAttribute("message", "You have successfully levelled up " + structure.getName() + " to level " + currentProgress.getLevel() + ".");
+					}
+					else {
+						currentProgress.setAp(currentProgress.getAp() + apToAssign);
+						request.getSession().setAttribute("message", "You have successfully assigned " + apToAssign + " AP to " + structure.getName() + ".");
+					}
+					structureDao.updateProgress(currentProgress);
+					character.setCurrentAp(character.getCurrentAp() - apToRemove);
+					character.setCurConstructionCont(character.getCurConstructionCont() + apToAssign);
+					charDao.update(character);
 				}
 			}
 			return "redirect: /Deadfall/town/construction";

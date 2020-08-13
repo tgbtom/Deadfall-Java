@@ -6,6 +6,7 @@ function showStructureModal(structureId, name, description, costs, apCost, defen
 	var modalLevel = document.getElementById("modal-structure-level");
 	var modalMaxLevel = document.getElementById("modal-structure-max-level");
 	var modalCosts = document.getElementById("modal-structure-costs");
+	var modalId = document.getElementById("modal-structure-id");
 	var modalApCost = document.getElementById("modal-structure-ap-cost");
 	showModalContainer();
 	
@@ -22,6 +23,7 @@ function showStructureModal(structureId, name, description, costs, apCost, defen
 		"</div>";
 	}
 	
+	modalId.value = structureId;
 	title.innerHTML = name;
 	desc.innerHTML = description;
 	defenceGiven.innerHTML = defence;
@@ -34,6 +36,7 @@ function showStructureModal(structureId, name, description, costs, apCost, defen
 
 function promptAp(currentAp){
 	var amount = window.prompt("How much AP would you like to assign? Maximum: " + currentAp, 0);
+	var structureId = document.getElementById("modal-structure-id").value;
 	//Redirect user to a route that will process assigning the ap then return the contruction view
-	window.location.href = "/Deadfall/town/construct/10/1";
+	window.location.href = "/Deadfall/town/construct/"+ structureId +"/" + amount;
 }

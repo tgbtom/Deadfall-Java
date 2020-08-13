@@ -3,6 +3,7 @@ package com.novaclangaming.dao;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -43,7 +44,7 @@ public class JPATownDao implements ITownDao {
 				x = 5;
 				y--;
 			}
-			zone = new Zone(x, y, 10, 0, "");
+			zone = new Zone(x, y, 10, this.getRandomZeds(Math.abs(x) + Math.abs(y)), "");
 			zone.setTown(town);
 			em.persist(zone);
 		}
@@ -83,6 +84,27 @@ public class JPATownDao implements ITownDao {
 		 em.close();
 	}
 
+	private int getRandomZeds(int distance) {
+		switch (distance) {
+		case 1:
+			return 0;
+		case 2:
+			return new Random().nextInt(2); //0-1
+		case 3:
+		case 4:
+		case 5:
+			return new Random().nextInt(4); //0-3
+		case 6:
+		case 7:
+			return new Random().nextInt(5) + 1; //1-5
+		case 8:
+		case 9:
+			return new Random().nextInt(4) + 3; //3-6
+		default:
+			return new Random().nextInt(6) + 5; //5-10
+		}
+	}
+	
 	public Zone findStorageZone(int townId) {
 		EntityManager em = JPAConnection.getInstance().createEntityManager();
 		em.getTransaction().begin();
@@ -96,8 +118,13 @@ public class JPATownDao implements ITownDao {
 	public Zone findZoneByCoords(int townId, int x, int y) {
 		EntityManager em = JPAConnection.getInstance().createEntityManager();
 		em.getTransaction().begin();
+		TypedQuery<Zone> query = em.createNamedQuery("Zone.findZoneByCoords", Zone.class);
+		query.setParameter("town", findById(townId));
+		query.setParameter("x", x);
+		query.setParameter("y", y);
+		Zone result = query.getSingleResult();
 		em.close();
-		return null;
+		return result;
 	}
 
 	public Zone findZoneById(int zoneId) {
@@ -245,6 +272,7 @@ public class JPATownDao implements ITownDao {
 		}
 		else {
 			em.merge(storage);
+			stack = em.merge(stack);
 			em.remove(stack);
 		}
 		

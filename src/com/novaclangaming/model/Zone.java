@@ -17,7 +17,9 @@ import javax.persistence.Table;
 
 
 @NamedQueries({
-		@NamedQuery(name="Zone.findStorageByTownId", query="SELECT z FROM Zone z WHERE z.town = :town AND z.x LIKE '0' AND z.y LIKE '0'")})
+		@NamedQuery(name="Zone.findStorageByTownId", query="SELECT z FROM Zone z WHERE z.town = :town AND z.x LIKE '0' AND z.y LIKE '0'"),
+		@NamedQuery(name="Zone.findZoneByCoords", query="SELECT z FROM Zone z WHERE z.town = :town AND z.x LIKE :x AND z.y LIKE :y")
+})
 @Entity
 @Table(name="DF_TOWN_ZONES")
 public class Zone {

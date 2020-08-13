@@ -55,6 +55,9 @@
 									<c:when test="${ sessionScope.structureDao.isStructureAffordable(sessionScope.townId, c.key.structureId) }">
 										<tr class="clickable-structure yellow-row" onclick="${ func }">
 									</c:when>
+									<c:when test="${ c.value.level >= c.key.levels }">
+										<tr class="blue-row">
+									</c:when>
 									<c:otherwise>
 										<tr class="red-row">
 									</c:otherwise>
@@ -62,10 +65,10 @@
 
 								
 									<td><c:out value="${ c.value.level }"/>/<c:out value="${ c.key.levels }"/></td>
-									<td class="bb"><c:out value="${ c.key.name }"/> <img src="${pageContext.request.contextPath}/resources/img/icons/Shield.png" class="Defence Granted" /><small><c:out value="${ c.key.defence }"/></small> </td>
+									<td class="bb"><span title='<c:out value="${ c.key.description }"/>'><c:out value="${ c.key.name }"/></span> <img src="${pageContext.request.contextPath}/resources/img/icons/Shield.png" class="Defence Granted" /><small><c:out value="${ c.key.defence }"/></small> </td>
 									<td class="bb">	
 									
-									<c:if test="${ c.value.ap == 0 }">
+									<c:if test="${ c.value.ap == 0 && c.value.level < c.key.levels}">
 										<c:forEach items="${ c.key.costs }" var="cost">
 										<div class="citizens-item-group" title="<c:out value="${ cost.item.name }"/>">								
 											<img src="${pageContext.request.contextPath}/resources/img/items/rarity/<c:out value="${ cost.item.rarity }"/>.png" class="item-rarity" />
@@ -94,7 +97,12 @@
 
 									</td>
 									<td class="bb">
-										<c:out value="${ c.value.ap }"/>/<c:out value="${ c.key.apCost }"/><img src="${pageContext.request.contextPath}/resources/img/icons/ap.png" class="AP" />
+										<c:choose>
+											<c:when test="${ c.value.level < c.key.levels }">
+												<c:out value="${ c.value.ap }"/>/<c:out value="${ c.key.apCost }"/><img src="${pageContext.request.contextPath}/resources/img/icons/ap.png" class="AP" />
+											</c:when>
+											<c:otherwise><b>Completed</b></c:otherwise>
+										</c:choose>
 									</td>
 								</tr>
 							</c:if>
@@ -141,6 +149,9 @@
 										<c:when test="${ sessionScope.structureDao.isStructureAffordable(sessionScope.townId, c.key.structureId) }">
 											<tr class="clickable-structure yellow-row" onclick="${ func }">
 										</c:when>
+										<c:when test="${ c.value.level >= c.key.levels }">
+											<tr class="blue-row">
+										</c:when>
 										<c:otherwise>
 											<tr class="red-row">
 										</c:otherwise>
@@ -151,7 +162,7 @@
 									<td class="bb"><c:out value="${ c.key.name }"/></td>
 									<td class="bb">	
 									
-									<c:if test="${ c.value.ap == 0 }">
+									<c:if test="${ c.value.ap == 0 && c.value.level < c.key.levels }">
 										<c:forEach items="${ c.key.costs }" var="cost">	
 											<div class="citizens-item-group" title="<c:out value="${ cost.item.name }"/>">								
 												<img src="${pageContext.request.contextPath}/resources/img/items/rarity/<c:out value="${ cost.item.rarity }"/>.png" class="item-rarity" />
@@ -178,7 +189,12 @@
 
 									</td>
 									<td class="bb">
-										<c:out value="${ c.value.ap }"/>/<c:out value="${ c.key.apCost }"/><img src="${pageContext.request.contextPath}/resources/img/icons/ap.png" class="AP" />
+										<c:choose>
+											<c:when test="${ c.value.level < c.key.levels }">
+												<c:out value="${ c.value.ap }"/>/<c:out value="${ c.key.apCost }"/><img src="${pageContext.request.contextPath}/resources/img/icons/ap.png" class="AP" />
+											</c:when>
+											<c:otherwise><b>Completed</b></c:otherwise>
+										</c:choose>
 									</td>
 								</tr>
 							</c:if>
@@ -224,6 +240,9 @@
 										<c:when test="${ sessionScope.structureDao.isStructureAffordable(sessionScope.townId, c.key.structureId) }">
 											<tr class="clickable-structure yellow-row" onclick="${ func }">
 										</c:when>
+										<c:when test="${ c.value.level >= c.key.levels }">
+											<tr class="blue-row">
+										</c:when>
 										<c:otherwise>
 											<tr class="red-row">
 										</c:otherwise>
@@ -233,7 +252,7 @@
 									<td><c:out value="${ c.value.level }"/>/<c:out value="${ c.key.levels }"/></td>
 									<td class="bb"><c:out value="${ c.key.name }"/></td>
 									<td class="bb">	
-									<c:if test="${ c.value.ap == 0 }">
+									<c:if test="${ c.value.ap == 0 && c.value.level < c.key.levels }">
 										<c:forEach items="${ c.key.costs }" var="cost">
 											<div class="citizens-item-group" title="<c:out value="${ cost.item.name }"/>">								
 												<img src="${pageContext.request.contextPath}/resources/img/items/rarity/<c:out value="${ cost.item.rarity }"/>.png" class="item-rarity" />
@@ -261,7 +280,12 @@
 
 									</td>
 									<td class="bb">
-										<c:out value="${ c.value.ap }"/>/<c:out value="${ c.key.apCost }"/><img src="${pageContext.request.contextPath}/resources/img/icons/ap.png" class="AP" />
+										<c:choose>
+											<c:when test="${ c.value.level < c.key.levels }">
+												<c:out value="${ c.value.ap }"/>/<c:out value="${ c.key.apCost }"/><img src="${pageContext.request.contextPath}/resources/img/icons/ap.png" class="AP" />
+											</c:when>
+											<c:otherwise><b>Completed</b></c:otherwise>
+										</c:choose>
 									</td>
 								</tr>
 							</c:if>
@@ -295,6 +319,7 @@
 								<span id="modal-structure-costs"><!-- Selected structure costs goes here --></span>
 								</div>
 								<div class="sub-3"><span id="modal-structure-ap-cost"><!-- Selected Structure ap cost goes here --></span><img src="${pageContext.request.contextPath}/resources/img/icons/ap.png" class="AP" /></div>
+								<input type="hidden" id="modal-structure-id" value="" />
 								<div class="sub-3"><button type="button" class="btn-play" onclick="promptAp(${ sessionScope.character.currentAp })">Build</button></div>
 							</div>
 						</div>

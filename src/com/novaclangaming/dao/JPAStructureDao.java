@@ -88,6 +88,14 @@ public class JPAStructureDao {
 		return result;
 	}
 	
+	public void updateProgress(StructureProgress progress) {
+		EntityManager em = JPAConnection.getInstance().createEntityManager();
+		em.getTransaction().begin();
+		em.merge(progress);
+		em.getTransaction().commit();
+		em.close();
+	}
+	
 	private static List<Structure> getStructuresWithMetRequirements(Town town){
 		List<Structure> structures = findAll();
 		List<Structure> metRequires = new ArrayList<Structure>();
@@ -151,6 +159,19 @@ public class JPAStructureDao {
 			return false;
 		}
 		return true;
+	}
+	
+	/*This function is called to determine what actions occur now that a structure has been leveled up, 
+	 * the level change is persisted to the database separately*/
+	public void structureLevelUp(Town town, Structure structure, int newLevel) {
+		//Is defence granted?
+		if(this.townDao == null) {
+			this.townDao = new JPATownDao();
+		}
+		if(structure.getDefence() > 0) {
+			town.addDefence(structure.getDefence());
+			townDao.update(town);
+		}
 	}
 	
 }
