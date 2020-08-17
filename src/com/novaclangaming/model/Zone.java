@@ -165,6 +165,18 @@ public class Zone {
 	public List<ItemStackZone> getItemStacks() {
 		return itemStacks;
 	}
+
+	public List<Character> getCharacters() {
+		return characters;
+	}
+
 	
+	public String getCharacterNames() {
+		String result = "";
+		for(Character character : this.characters) {
+			result += result != "" ? ", " + character.getName() : character.getName();
+		}
+		return result;
+	}
 	
 }

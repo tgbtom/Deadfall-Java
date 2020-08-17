@@ -3,6 +3,46 @@
 	stroke-width: 1;
 }
 
+.grid-light-green{
+	fill: rgb(2,148,23);
+}
+
 .grid-green{
-	fill: green;
+	fill: rgb(2,122,19);
+}
+
+.grid-dark-green{
+	fill: rgb(2,97,15);
+}
+
+.grid-yellow{
+	fill: rgb(168,159,24);
+}
+
+.grid-orange{
+	fill: rgb(252,150,23);
+}
+
+.grid-red{
+	fill: rgb(252,26,23);
+}
+
+.grid-purple{
+	fill: rgb(179,18,168);
+}
+
+.grid-black{
+	fill: rgb(64,64,64);
+}
+
+.grid-brown{
+	fill: rgb(98,74,46);
+}
+
+.rect-white{
+	fill: rgb(252,252,252);
+}
+
+.circle-blue{
+	fill: rgb(135, 236, 235);
 }

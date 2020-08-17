@@ -44,12 +44,52 @@
 							
 							<c:set var="zone" value="${sessionScope.townDao.findZoneByCoords(sessionScope.character.town.townId , x, y)}"/>
 							<c:choose>
-								<c:when test="${zone.zeds > 0 && zone.zeds <= 2}">
-									<rect x="${left}" y="${top}" height="15" width="15" class="grid-green">
-										<title><c:out value="${x}, ${y}"/></title>
-									</rect>
+								<c:when test="${ zone.x == 0 && zone.y == 0 }">
+									<rect x="${left}" y="${top}" height="15" width="15" class="grid-brown">
 								</c:when>
+								<c:when test="${zone.zeds == 0}">
+									<rect x="${left}" y="${top}" height="15" width="15" class="grid-light-green">
+								</c:when>
+								<c:when test="${zone.zeds == 1}">
+									<rect x="${left}" y="${top}" height="15" width="15" class="grid-green">
+								</c:when>
+								<c:when test="${zone.zeds == 2 || zone.zeds == 3}">
+									<rect x="${left}" y="${top}" height="15" width="15" class="grid-dark-green">
+								</c:when>
+								<c:when test="${zone.zeds >= 4 && zone.zeds <= 6}">
+									<rect x="${left}" y="${top}" height="15" width="15" class="grid-yellow">
+								</c:when>
+								<c:when test="${zone.zeds >= 7 && zone.zeds <= 12}">
+									<rect x="${left}" y="${top}" height="15" width="15" class="grid-orange">
+								</c:when>
+								<c:when test="${zone.zeds >= 13 && zone.zeds <= 25}">
+									<rect x="${left}" y="${top}" height="15" width="15" class="grid-red">
+								</c:when>
+								<c:when test="${zone.zeds >= 26 && zone.zeds <= 40}">
+									<rect x="${left}" y="${top}" height="15" width="15" class="grid-purple">
+								</c:when>
+								<c:otherwise>
+									<rect x="${left}" y="${top}" height="15" width="15" class="grid-black">
+								</c:otherwise>
 							</c:choose>
+									<title><c:out value="${ zone.getCharacterNames() }"/></title>
+								</rect>
+								
+							<c:if test="${ zone.characters.size() > 0 }">
+								<c:choose>
+									<c:when test="${ sessionScope.character.zone.zoneId ==  zone.zoneId}">
+										<rect x="${ left + 6 }" y="${ top + 6 }" width="4" height="4" class="rect-white">
+											<title><c:out value="${ zone.getCharacterNames() }"/></title>
+										</rect>
+									</c:when>
+									<c:otherwise>
+										<circle cx="${ left + 8 }" cy="${ top + 8 }" r="2" class="circle-blue">
+											<title><c:out value="${ zone.getCharacterNames() }"/></title>
+										</circle>
+									</c:otherwise>
+								</c:choose>
+								
+							</c:if>
 							
 						
 						</c:forEach>
@@ -68,6 +108,16 @@
 		<div class="col-4">
 		
 			items
+			<div class="card">
+				<div class="card-top">
+					Regular Zone <br />
+					0, 0 | 
+					<img src="${pageContext.request.contextPath}/resources/img/icons/lootability.png" /> 10 | 
+					<img src="${pageContext.request.contextPath}/resources/img/icons/zombie.png"/> 0 | 
+					<img src="${pageContext.request.contextPath}/resources/img/icons/blocked.png" alt="danger"/> 0
+				</div>
+				<div class="card-body">BODY</div>
+			</div>
 		
 		</div>
 		<div class="col-4">

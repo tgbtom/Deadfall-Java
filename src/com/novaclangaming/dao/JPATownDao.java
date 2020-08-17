@@ -86,6 +86,7 @@ public class JPATownDao implements ITownDao {
 
 	private int getRandomZeds(int distance) {
 		switch (distance) {
+		case 0:
 		case 1:
 			return 0;
 		case 2:
