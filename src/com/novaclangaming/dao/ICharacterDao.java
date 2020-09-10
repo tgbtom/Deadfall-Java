@@ -4,7 +4,9 @@ import java.util.List;
 import java.util.Optional;
 
 import com.novaclangaming.model.Character;
+import com.novaclangaming.model.CharacterStatus;
 import com.novaclangaming.model.Item;
+import com.novaclangaming.model.Status;
 
 public interface ICharacterDao {
 	public void create(Character character);
@@ -15,4 +17,8 @@ public interface ICharacterDao {
 	public Character update(Character character);
 	public void delete(Character character);
 	public void addItem(int characterId, Item item, int qty);
+	public Status findStatusById(int statusId);
+	public void addStatus(CharacterStatus charStatus);
+	public CharacterStatus removeStatus(CharacterStatus charStatus);
+	public Character clearStatus(Character character);
 }

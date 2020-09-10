@@ -4,6 +4,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
 import com.novaclangaming.model.Item;
+import com.novaclangaming.model.Weapon;
 
 public class JPAItemDao implements IItemDao {
 
@@ -25,4 +26,12 @@ public class JPAItemDao implements IItemDao {
 		return item;
 		}
 
+	public Weapon findWeaponById(Item item) {
+		EntityManager em = JPAConnection.getInstance().createEntityManager();
+		em.getTransaction().begin();
+		Weapon weapon = em.find(Weapon.class, item);
+		em.close();
+		return weapon;
+	}
+	
 }

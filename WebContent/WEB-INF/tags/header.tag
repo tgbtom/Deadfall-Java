@@ -14,11 +14,20 @@
 				<img src="${pageContext.request.contextPath}/resources/img/icons/rightArrow.png" class="header-arrow" title="Next Character">
 			</div>
 			
-			<div class="sub-3 head-box text-center">0, 0 </div>
+			<div class="sub-3 head-box text-center"><c:out value="${sessionScope.character.zone.x}" />, <c:out value="${sessionScope.character.zone.y}" /> </div>
 		</div>
 		<div class="col-6">
-			<div class="sub-6 head-box text-center"> 296 <img src="${pageContext.request.contextPath}/resources/img/icons/Sword.png"> | <img src="${pageContext.request.contextPath}/resources/img/icons/Shield.png"> <c:out value="${sessionScope.character.town.defence}" /></div>
-			<div class="sub-6 head-box text-center"><strong>Status:</strong></div>
+			<div class="sub-6 head-box text-center"> <c:out value="${sessionScope.character.town.hordeSize}" /> <img src="${pageContext.request.contextPath}/resources/img/icons/Sword.png"> | <img src="${pageContext.request.contextPath}/resources/img/icons/Shield.png"> <c:out value="${sessionScope.character.town.defence}" /></div>
+			<div class="sub-6 head-box text-center">
+				
+ 				<c:forEach items="${sessionScope.character.status}" var="charStatus">
+					<img src="${pageContext.request.contextPath}/resources/img/status/<c:out value="${charStatus.status.getName()}" />.png" title="<c:out value="${charStatus.status.getName()}" />"/>
+				</c:forEach>
+				<c:if test="${ sessionScope.character.status.size() < 1}">
+					<div class="card-content">No Status</div>
+				</c:if>
+				
+			</div>
 		</div>
 		<div class="col-6">
 			<div class="sub-8 head-box text-center" id="current-char-items">

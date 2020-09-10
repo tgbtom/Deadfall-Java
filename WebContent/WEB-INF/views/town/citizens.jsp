@@ -41,7 +41,13 @@
 								</div>
 							</c:forEach>
 						</div>
-						<div class="sub-3">Status</div>
+						<div class="sub-3">
+							<c:forEach items="${c.status}" var="charStatus">
+								<div class="citizens-item-group" title="<c:out value="${ stack.item.name }"/>">
+									<img src="${pageContext.request.contextPath}/resources/img/status/<c:out value="${charStatus.status.getName()}" />.png" title="<c:out value="${charStatus.status.getName()}" />"/>
+								</div>
+							</c:forEach>
+						</div>
 					</div>
 				</c:forEach>
 			</div>

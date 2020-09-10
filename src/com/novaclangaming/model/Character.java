@@ -7,6 +7,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -110,6 +111,8 @@ public class Character {
 	@Column(table = "df_characters_legacy")
 	private int deaths;
 	
+	@OneToMany(mappedBy = "character", fetch = FetchType.EAGER)
+	private List<CharacterStatus> status;
 	
 	public Character() {
 		super();
@@ -356,6 +359,31 @@ public class Character {
 
 	public void setZone(Zone zone) {
 		this.zone = zone;
+	}
+
+	public List<CharacterStatus> getStatus() {
+		return status;
+	}
+
+	public void setStatus(List<CharacterStatus> status) {
+		this.status = status;
+	}
+		
+	public CharacterStatus addStatus(Status status) {
+		//see if we already have the status effect
+		boolean haveIt = false;
+		for(CharacterStatus active : this.status) {
+			if(active.getStatus().getStatusId() == status.getStatusId()) {
+				haveIt = true;
+				break;
+			}
+		}
+		if(!haveIt) {
+			CharacterStatus charStatus = new CharacterStatus(status, this);
+			this.status.add(charStatus);
+			return charStatus;
+		}
+		return null;
 	}
 	
 }

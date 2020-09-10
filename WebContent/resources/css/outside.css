@@ -46,3 +46,8 @@
 .circle-blue{
 	fill: rgb(135, 236, 235);
 }
+
+.nav-arrow:hover{
+	cursor: pointer;
+	opacity: 0.4;
+}

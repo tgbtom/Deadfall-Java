@@ -1,7 +1,6 @@
 package com.novaclangaming.controller;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.novaclangaming.dao.ICharacterDao;
 import com.novaclangaming.dao.IItemDao;
-import com.novaclangaming.dao.ITownDao;
 import com.novaclangaming.dao.JPAAuthentication;
 import com.novaclangaming.dao.JPACharacterDao;
 import com.novaclangaming.dao.JPAItemDao;
@@ -125,10 +123,12 @@ public class TownController {
 				List<ItemStackZone> resources = townDao.findItemsInStorage(townId, ItemCategory.Resource);
 				List<ItemStackZone> weapons = townDao.findItemsInStorage(townId, ItemCategory.Weapon);
 				List<ItemStackZone> ammo = townDao.findItemsInStorage(townId, ItemCategory.Ammo);
+				List<ItemStackZone> junk = townDao.findItemsInStorage(townId, ItemCategory.Junk);
 				request.getSession().setAttribute("consumables", consumables);
 				request.getSession().setAttribute("resources", resources);
 				request.getSession().setAttribute("weapons", weapons);
 				request.getSession().setAttribute("ammo", ammo);
+				request.getSession().setAttribute("junk", junk);
 				return "town/storage";
 			}
 		}
@@ -154,6 +154,44 @@ public class TownController {
 			}
 		}
 		return "redirect: ../";
+	}
+	
+	@RequestMapping(value = "/town/outside/nav/{dir}", method = RequestMethod.GET)
+	public String outside(HttpServletRequest request, @PathVariable String dir) {
+		if(auth.loggedUser(request) != null) {
+			Character character =auth.activeCharacter(request);
+			if(character != null ? character.getCurrentAp() >= 1 : false) {
+				int x = character.getZone().getX();
+				int y = character.getZone().getY();
+				switch (dir) {
+				case "up":
+					y += 1;
+					break;
+				case "left":
+					x -= 1;
+					break;
+				case "right":
+					x += 1;
+					break;
+				case "down":
+					y -= 1;
+					break;
+				default:
+					break;
+				}
+				if (x >= -5 && x <= 5 && y >= -5 && y <= 5) {
+					//we can move to this zone, drop ap, update char stat, and move
+					character.setCurrentAp(character.getCurrentAp() - 1);
+					character.setZone(townDao.findZoneByCoords(character.getTown().getTownId(), x, y));
+					character.setCurDistanceTravelled(character.getCurDistanceTravelled() + 1);
+					charDao.update(character);
+				}
+				
+				request.getSession().setAttribute("townDao", townDao);
+				return "redirect: /Deadfall/town/outside";
+			}
+		}
+		return "redirect: /Deadfall/town/outside";
 	}
 	
 	@RequestMapping(value = "/town/construct/{structureId}/{apToAssign}", method = RequestMethod.GET)
@@ -185,7 +223,7 @@ public class TownController {
 						transferAp = true;
 						List<StructureCost> costs = structure.getCosts();
 						for (StructureCost cost : costs) {
-							if(!townDao.removeItemFromStorage(character.getTown().getTownId(), cost.getItem(), cost.getQuantity())) {
+							if(!townDao.removeItemFromZone(townDao.findStorageZone(character.getTown().getTownId()), cost.getItem(), cost.getQuantity())) {
 								transferAp = false;
 							}
 						}

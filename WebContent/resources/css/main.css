@@ -181,6 +181,7 @@ body {
   border-radius: 5px;
   padding: 7px;
   box-shadow: #0e0f12 2px 2px;
+  display: flow-root;
 }
 
 .inner-card{

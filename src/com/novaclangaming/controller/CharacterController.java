@@ -3,6 +3,7 @@ package com.novaclangaming.controller;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -23,11 +24,14 @@ import com.novaclangaming.dao.JPAItemStackCharacterDao;
 import com.novaclangaming.dao.JPATownDao;
 import com.novaclangaming.dao.JPAUserDao;
 import com.novaclangaming.model.CharacterClass;
+import com.novaclangaming.model.CharacterStatus;
 import com.novaclangaming.model.Item;
 import com.novaclangaming.model.ItemStackCharacter;
 import com.novaclangaming.model.Town;
 import com.novaclangaming.model.TownBulletin;
 import com.novaclangaming.model.User;
+import com.novaclangaming.model.Weapon;
+import com.novaclangaming.model.Zone;
 import com.novaclangaming.model.Character;
 
 @Controller
@@ -243,6 +247,21 @@ public class CharacterController {
 					}
 					else {
 						//Joined successfully
+						//TODO clear status effects then add starting ones
+						charDao.clearStatus(c);
+						c = charDao.findById(c.getCharId());
+						CharacterStatus added = c.addStatus(charDao.findStatusById(4));
+							charDao.addStatus(added);
+							
+							System.out.println(c.getStatus().get(0).getId() + " . " + c.getStatus().get(0).getStatus().getName());
+							
+							charDao.update(c);
+						added = c.addStatus(charDao.findStatusById(8));
+							charDao.addStatus(added);
+							charDao.update(c);
+						added = c.addStatus(charDao.findStatusById(12));
+							charDao.addStatus(added);
+							charDao.update(c);
 						c.setTown(town);
 						charDao.update(c);
 						town = townDao.findById(townId);
@@ -281,7 +300,7 @@ public class CharacterController {
 				Item item = itemDao.findById(itemId);
 				//check characters available capacity and compare against item being picked up.
 				if(character.getCapacity() >= item.getMass()) {
-					if(townDao.removeItemFromStorage(character.getTown().getTownId(), item, 1)) {
+					if(townDao.removeItemFromZone(character.getZone(), item, 1)) {
 						charDao.addItem(character.getCharId(), item, 1);
 					}
 				}
@@ -330,8 +349,31 @@ public class CharacterController {
 			JPAItemStackCharacterDao itemStackDao = new JPAItemStackCharacterDao(charDao);
 			if(itemStackDao.findByCharItem(character.getCharId(), itemId).isPresent()) {
 				if(action.equals("Drop")) {
-					System.out.println("Dropped Item");
 					charDao.dropItem(character.getCharId(), itemDao.findById(itemId), 1);
+				} else if (action.equals("Attack")) {
+					//Check if we require AND Have the ammo
+					//ensure at least 1 zed in zone, make sure we have enough AP
+					Weapon weapon = itemDao.findById(itemId).getWeapon();
+					Zone zone = townDao.findZoneById(character.getZone().getZoneId());
+					Town town = townDao.findById(character.getTown().getTownId());
+					if(weapon.getApCost() <= character.getCurrentAp() && 
+							weapon.getAmmo() == null || 
+							itemStackDao.findByCharItem(character.getCharId(), weapon.getAmmo().getItemId()).isPresent() &&
+							zone.getZeds() >= 1){
+						//consume ammo -> chance of output to produce ammo, chance of injure, chance of break
+						if(weapon.getAmmo() != null) {
+							charDao.dropItem(character.getCharId(), weapon.getAmmo(), 1);
+						}	
+						character.setCurrentAp(character.getCurrentAp() - weapon.getApCost());
+						int kills = Math.min(zone.getZeds(), new Random().nextInt(weapon.getMaxKills() - weapon.getMinKills() + 1) + weapon.getMinKills());
+						zone.setZeds( zone.getZeds() - kills);
+						zone.setDanger(zone.getDanger() - kills);
+						zone = townDao.updateZone(zone);
+						character.setCurZedsKilled(character.getCurZedsKilled() + kills);
+						character = charDao.update(character);
+						town.setHordeSize(town.getHordeSize() - kills);
+						town = townDao.update(town);
+					}
 				}
 				
 			}else {

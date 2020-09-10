@@ -11,8 +11,10 @@ import javax.persistence.TypedQuery;
 import com.novaclangaming.model.UserBulletin;
 import com.novaclangaming.model.Zone;
 import com.novaclangaming.model.Character;
+import com.novaclangaming.model.CharacterStatus;
 import com.novaclangaming.model.Item;
 import com.novaclangaming.model.ItemStackCharacter;
+import com.novaclangaming.model.Status;
 
 public class JPACharacterDao implements ICharacterDao{
 
@@ -143,5 +145,51 @@ public class JPACharacterDao implements ICharacterDao{
 		em.getTransaction().commit();
 		em.close();
 	}
+	
+	public Status findStatusById(int statusId) {
+		EntityManager em = JPAConnection.getInstance().createEntityManager();
+		em.getTransaction().begin();
+		Status s = em.find(Status.class, statusId);
+		em.close();
+		return s;
+	}
+	
+	public CharacterStatus findCharacterStatusById(int charStatusId) {
+		EntityManager em = JPAConnection.getInstance().createEntityManager();
+		CharacterStatus result = em.find(CharacterStatus.class, charStatusId);
+		em.close();
+		return result;
+	}
+	
+	public void addStatus(CharacterStatus charStatus) {
+		EntityManager em = JPAConnection.getInstance().createEntityManager();
+		em.getTransaction().begin();
+		em.persist(charStatus);
+		em.getTransaction().commit();
+		em.close();
+	}
 
+	public CharacterStatus removeStatus(CharacterStatus charStatus){
+		EntityManager em = JPAConnection.getInstance().createEntityManager();
+		em.getTransaction().begin();
+		charStatus = findCharacterStatusById(charStatus.getId());
+		CharacterStatus result = em.merge(charStatus);
+		em.getTransaction().commit();
+		em.close();
+		return result;
+	}
+
+	public Character clearStatus(Character character) {
+		EntityManager em = JPAConnection.getInstance().createEntityManager();
+		em.getTransaction().begin();
+		TypedQuery<CharacterStatus> query = em.createNamedQuery("characterStatus.FindByCharacter", CharacterStatus.class);
+		query.setParameter("character", character);
+		List<CharacterStatus> allStatus = query.getResultList();
+		for(CharacterStatus curr : allStatus) {
+			em.remove(curr);
+		}
+		em.getTransaction().commit();
+		em.close();
+		return character;
+	}
 }

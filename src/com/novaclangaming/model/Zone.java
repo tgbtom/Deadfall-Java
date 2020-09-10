@@ -43,6 +43,9 @@ public class Zone {
 	@Column
 	private int zeds;
 	
+	@Column
+	private int danger;
+	
 	@Column(name="SPECIAL_ZONE")
 	private String specialZone;
 	
@@ -178,5 +181,15 @@ public class Zone {
 		}
 		return result;
 	}
+
+	public int getDanger() {
+		return danger;
+	}
+
+	public void setDanger(int danger) {
+		this.danger = danger;
+	}
+	
+	
 	
 }

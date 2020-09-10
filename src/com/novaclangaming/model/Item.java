@@ -6,8 +6,11 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @NamedQueries({
@@ -18,7 +21,6 @@ import javax.persistence.Table;
 public class Item {
 
 	@Id
-	
 	@Column(name="item_id")
 	private int itemId;
 	
@@ -39,7 +41,8 @@ public class Item {
 	@Column
 	private ItemCategory category;
 	
-
+	@OneToOne(mappedBy = "item")
+	private Weapon weapon;
 	
 	public Item() {
 		super();
@@ -86,6 +89,10 @@ public class Item {
 	public String ajaxString() {
 		return itemId + "&" + name + "&" + description + "&" + mass
 				+ "&" + rarity + "&" + category;
+	}
+
+	public Weapon getWeapon() {
+		return weapon;
 	}
 	
 }

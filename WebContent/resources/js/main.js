@@ -94,7 +94,7 @@ function inventoryPopups() {
     		let category = properties[3].split(":")[1];
     		let id = properties[4].split(":")[1];
     		let functions = properties[5].split(":")[1].split(",");
-    		node.innerHTML = "<b>" + name + "</b> <span id='popup-rarity-"+ id +"'>"+ rarity +"</span> <br>Mass:"+ mass +" "+ category + "<br>";
+    		node.innerHTML = "<b>" + name + "</b> <br> <span id='popup-rarity-"+ id +"'>"+ rarity +"</span> <br>Mass:"+ mass +"<br>"+ category + "<br>";
     		
     		for(let k=0; k < functions.length; k++){
     			node.innerHTML += "<button class='btn btn-act' onclick='itemAction(`"+ functions[k] +"`, "+ id +")'>" + functions[k] + "</button><br>";

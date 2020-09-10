@@ -31,13 +31,26 @@ description VARCHAR(500)
 );
 
 CREATE TABLE df_users_skills(
-user_id INTEGER PRIMARY KEY,
+id INTEGER PRIMARY KEY,
+user_id INTEGER,
 skill_id INTEGER NOT NULL
 );
 
 CREATE TABLE df_characters_skills(
-char_id INTEGER PRIMARY KEY,
+id INTEGER PRIMARY KEY,
+char_id INTEGER,
 skill_id INTEGER NOT NULL
+);
+
+CREATE TABLE df_status(
+status_id INTEGER PRIMARY KEY,
+status_name VARCHAR(50)
+);
+
+CREATE TABLE df_characters_status(
+id INTEGER PRIMARY KEY,
+char_id INTEGER,
+status_id INTEGER
 );
 
 CREATE TABLE df_characters_stats(
@@ -102,13 +115,15 @@ levels INTEGER DEFAULT 1
 );
 
 CREATE TABLE df_structure_requirements(
-structure_id INTEGER PRIMARY KEY,
+id INTEGER AUTO_INCREMENT PRIMARY KEY,
+structure_id INTEGER,
 required_id INTEGER NOT NULL,
 required_level INTEGER DEFAULT 1
 );
 
 CREATE TABLE df_structure_costs(
-structure_id INTEGER PRIMARY KEY,
+id INTEGER AUTO_INCREMENT PRIMARY KEY,
+structure_id INTEGER,
 item_id INTEGER NOT NULL,
 item_quantity INTEGER DEFAULT 1
 );
@@ -133,7 +148,8 @@ posted_time TIMESTAMP
 );
 
 CREATE TABLE df_towns_structures(
-town_id INTEGER PRIMARY KEY,
+id INTEGER PRIMARY KEY,
+town_id INTEGER,
 structure_id INTEGER NOT NULL,
 current_level INTEGER DEFAULT 1,
 current_ap INTEGER DEFAULT 0
@@ -200,7 +216,7 @@ VALUES ('Makeshift Spear',
 2, 'Epic', 'Weapon');
 
 INSERT INTO df_weapons(item_id, ammo_id, min_kills, max_kills, chance_of_injury, chance_of_break, item_on_break, ap_cost, chance_output, ammo_output)
-VALUES (6, 0,          1,          1,          15,             15,                 0,           1,         0,            0 );
+VALUES (6, NULL,          1,          1,          15,             15,                 NULL,           1,         0,            NULL );
 
 INSERT INTO df_items (name, description, mass, rarity, category) 
 VALUES ('Stone', 
@@ -213,7 +229,7 @@ VALUES ('Bow',
 2, 'Epic', 'Weapon');
 
 INSERT INTO df_weapons(item_id, ammo_id, min_kills, max_kills, chance_of_injury, chance_of_break, item_on_break, ap_cost, chance_output, ammo_output)
-VALUES (8, 3,          0,          1,          1,             5,                 0,           1,         80,            3 );
+VALUES (8, 3,          0,          1,          1,             5,                 NULL,           1,         80,            3 );
 
 INSERT INTO df_items (name, description, mass, rarity, category) 
 VALUES ('Rope', 
@@ -241,7 +257,7 @@ VALUES ('Grenade',
 2, 'Legendary', 'Weapon');
 
 INSERT INTO df_weapons(item_id, ammo_id, min_kills, max_kills, chance_of_injury, chance_of_break, item_on_break, ap_cost, chance_output, ammo_output)
-VALUES (13, 0,          5,          20,          25,             100,                 0,           0,         0,            0 );
+VALUES (13, NULL,          5,          20,          25,             100,                 NULL,           0,         0,            NULL );
 
 INSERT INTO df_items (name, description, mass, rarity, category) 
 VALUES ('Pistol', 
@@ -249,7 +265,7 @@ VALUES ('Pistol',
 2, 'Legendary', 'Weapon');
 
 INSERT INTO df_weapons(item_id, ammo_id, min_kills, max_kills, chance_of_injury, chance_of_break, item_on_break, ap_cost, chance_output, ammo_output)
-VALUES (14, 17,          1,          3,          1,             1,                 0,           0,         0,            0 );
+VALUES (14, 17,          1,          3,          1,             1,                 NULL,           0,         0,            NULL );
 
 INSERT INTO df_items (name, description, mass, rarity, category) 
 VALUES ('Slingshot', 
@@ -257,7 +273,7 @@ VALUES ('Slingshot',
 2, 'Rare', 'Weapon');
 
 INSERT INTO df_weapons(item_id, ammo_id, min_kills, max_kills, chance_of_injury, chance_of_break, item_on_break, ap_cost, chance_output, ammo_output)
-VALUES (15, 16,          -2,          1,          10,             10,                 0,           1,         100,            16 );
+VALUES (15, 16,          -2,          1,          10,             10,                 NULL,           1,         100,            16 );
 
 INSERT INTO df_items (name, description, mass, rarity, category) 
 VALUES ('Rock', 
@@ -275,7 +291,7 @@ VALUES ('Sharp Stick',
 2, 'Rare', 'Weapon');
 
 INSERT INTO df_weapons(item_id, ammo_id, min_kills, max_kills, chance_of_injury, chance_of_break, item_on_break, ap_cost, chance_output, ammo_output)
-VALUES (18, 0,          0,          1,          20,             25,                 0,           1,         0,            0 );
+VALUES (18, NULL,          0,          1,          20,             25,                 NULL,           1,         0,            NULL );
 
 INSERT INTO df_items (name, description, mass, rarity, category) 
 VALUES ('Assault Rifle', 
@@ -283,7 +299,7 @@ VALUES ('Assault Rifle',
 2, 'Legendary', 'Weapon');
 
 INSERT INTO df_weapons(item_id, ammo_id, min_kills, max_kills, chance_of_injury, chance_of_break, item_on_break, ap_cost, chance_output, ammo_output)
-VALUES (19, 22,          12,          30,          1,             1,                 0,           0,         100,            21 );
+VALUES (19, 22,          12,          30,          1,             1,                 NULL,           0,         100,            21 );
 
 INSERT INTO df_items (name, description, mass, rarity, category) 
 VALUES ('Bag of Sand', 
@@ -360,3 +376,118 @@ VALUES ('Vegetable Garden', 'Supply', 'A small plot to grow vegetables. Generate
 INSERT INTO df_structures(name, category, description, defence, ap_cost, levels)
 VALUES ('Fabrikator Workshop', 'Production', 'Allows the conversion of basic resources at a 3:1 Ratio.', 
 0, 45, 1);
+
+INSERT INTO `df_structure_costs` (`structure_id`, `item_id`, `item_quantity`) VALUES
+(1, 3, 10),
+(1, 9, 2),
+(2, 3, 20),
+(2, 9, 5),
+(3, 3, 5),
+(3, 11, 15),
+(4, 3, 2),
+(4, 4, 2),
+(4, 11, 2),
+(5, 4, 5),
+(5, 9, 6),
+(5, 18, 3),
+(6, 3, 15),
+(7, 4, 15),
+(8, 3, 5),
+(8, 4, 25),
+(8, 11, 5),
+(9, 19, 1),
+(9, 20, 10),
+(9, 22, 3),
+(10, 1, 5),
+(10, 4, 2),
+(10, 6, 10),
+(11, 1, 10),
+(12, 3, 10),
+(12, 4, 10),
+(12, 9, 10);
+
+INSERT INTO `df_structure_requirements` (`structure_id`, `required_id`, `required_level`) VALUES
+(2, 1, 1),
+(3, 2, 1),
+(4, 3, 1),
+(5, 3, 1),
+(6, 2, 1),
+(7, 2, 1),
+(8, 2, 1),
+(9, 2, 1);
+
+INSERT INTO df_status(status_id, status_name)
+VALUES (1, 'Ate');
+
+INSERT INTO df_status(status_id, status_name)
+VALUES (2, 'Drank');
+
+INSERT INTO df_status(status_id, status_name)
+VALUES (3, 'Full');
+
+INSERT INTO df_status(status_id, status_name)
+VALUES (4, 'Hungry');
+
+INSERT INTO df_status(status_id, status_name)
+VALUES (5, 'Very Hungry');
+
+INSERT INTO df_status(status_id, status_name)
+VALUES (6, 'Starving');
+
+INSERT INTO df_status(status_id, status_name)
+VALUES (7, 'Quenched');
+
+INSERT INTO df_status(status_id, status_name)
+VALUES (8, 'Thirsty');
+
+INSERT INTO df_status(status_id, status_name)
+VALUES (9, 'Very Thirsty');
+
+INSERT INTO df_status(status_id, status_name)
+VALUES (10, 'Dehydrated');
+
+INSERT INTO df_status(status_id, status_name)
+VALUES (11, 'Day Ended');
+
+INSERT INTO df_status(status_id, status_name)
+VALUES (12, 'Not Done');
+
+INSERT INTO df_status(status_id, status_name)
+VALUES (13, 'Dead');
+
+INSERT INTO df_status(status_id, status_name)
+VALUES (14, 'Minor Injury');
+
+INSERT INTO df_status(status_id, status_name)
+VALUES (15, 'Moderate Injury');
+
+INSERT INTO df_status(status_id, status_name)
+VALUES (16, 'Severe Injury');
+
+INSERT INTO df_status(status_id, status_name)
+VALUES (17, 'Infected');
+
+INSERT INTO df_items (name, description, mass, rarity, category) 
+VALUES ('Broken Makeshift Spear', 
+'A makeshift spear that has broken',
+2, 'Epic', 'Junk');
+
+INSERT INTO df_items (name, description, mass, rarity, category) 
+VALUES ('Broken Bow', 
+'A basic longbow, snapped in half.',
+2, 'Epic', 'Junk');
+
+INSERT INTO df_items (name, description, mass, rarity, category) 
+VALUES ('Broken Pistol', 
+'A basic handgun. It does not seem to work properly.',
+2, 'Legendary', 'Junk');
+
+INSERT INTO df_items (name, description, mass, rarity, category) 
+VALUES ('Broken Assault Rifle', 
+'Machine gun, seems to be jammed.',
+2, 'Legendary', 'Junk');
+
+INSERT INTO df_items (name, description, mass, rarity, category) 
+VALUES ('Broken Slingshot', 
+'Once used to propel rocks at unsuspecting targets, now just a broken stick and elastic.',
+2, 'Rare', 'Junk');
