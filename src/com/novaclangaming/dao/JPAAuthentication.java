@@ -44,6 +44,12 @@ public class JPAAuthentication implements IAuthenticationDao{
 		return result;
 	}
 	
+	public Character changeCharacter(HttpServletRequest request, Character character) {
+		character = charDao.update(character);
+		request.getSession().setAttribute("character", character);
+		return character;
+	}
+	
 	public void register(User user) {
 		EntityManager em = JPAConnection.getInstance().createEntityManager();
 		em.getTransaction().begin();

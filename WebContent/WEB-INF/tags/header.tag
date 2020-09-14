@@ -9,9 +9,9 @@
 		
 		<div class="col-6">
 			<div class="sub-9 head-box text-center">
-				<img src="${pageContext.request.contextPath}/resources/img/icons/leftArrow.png" class="header-arrow" title="Previous Character">
+				<img src="${pageContext.request.contextPath}/resources/img/icons/leftArrow.png" class="header-arrow" title="Previous Character" onclick="changeCharacter(-1, 'Previous')">
 				<span><c:out value="${sessionScope.character.name}" /></span>
-				<img src="${pageContext.request.contextPath}/resources/img/icons/rightArrow.png" class="header-arrow" title="Next Character">
+				<img src="${pageContext.request.contextPath}/resources/img/icons/rightArrow.png" class="header-arrow" title="Next Character" onclick="changeCharacter(-1, 'Next')">
 			</div>
 			
 			<div class="sub-3 head-box text-center"><c:out value="${sessionScope.character.zone.x}" />, <c:out value="${sessionScope.character.zone.y}" /> </div>

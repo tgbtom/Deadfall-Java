@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -26,6 +27,7 @@ import com.novaclangaming.dao.JPAUserDao;
 import com.novaclangaming.model.CharacterClass;
 import com.novaclangaming.model.CharacterStatus;
 import com.novaclangaming.model.Item;
+import com.novaclangaming.model.ItemRarity;
 import com.novaclangaming.model.ItemStackCharacter;
 import com.novaclangaming.model.Town;
 import com.novaclangaming.model.TownBulletin;
@@ -362,7 +364,7 @@ public class CharacterController {
 							zone.getZeds() >= 1){
 						//consume ammo -> chance of output to produce ammo, chance of injure, chance of break
 						if(weapon.getAmmo() != null) {
-							charDao.dropItem(character.getCharId(), weapon.getAmmo(), 1);
+							charDao.removeItem(character.getCharId(), weapon.getAmmo(), 1);
 						}	
 						character.setCurrentAp(character.getCurrentAp() - weapon.getApCost());
 						int kills = Math.min(zone.getZeds(), new Random().nextInt(weapon.getMaxKills() - weapon.getMinKills() + 1) + weapon.getMinKills());
@@ -373,6 +375,15 @@ public class CharacterController {
 						character = charDao.update(character);
 						town.setHordeSize(town.getHordeSize() - kills);
 						town = townDao.update(town);
+						
+						if(new Random().nextInt(100) + 1 <= weapon.getChanceOfBreak()) {
+							//weapon breaks
+							charDao.removeItem(character.getCharId(), weapon.getItem(), 1);
+							if(weapon.getItemOnBreak() != null) {
+								charDao.addItem(character.getCharId(), weapon.getItemOnBreak(), 1);
+							}
+						}
+						charDao.increaseInjury(character);
 					}
 				}
 				
@@ -383,6 +394,89 @@ public class CharacterController {
 			
 			return "results";
 		}else {
+			return "fail";
+		}
+	}
+	
+	@RequestMapping(value = "/character/change/{charId}/{dir}", method = RequestMethod.POST)
+	@ResponseBody
+	public String changeActiveCharacter(HttpServletRequest request, @PathVariable int charId, @PathVariable String dir) {
+		//dir = Previous, Next, or None
+		//charId = 0, or actual character's id
+		//For dir, find the corresponding character in the given direction by Alphabetical sorting within the town
+		//if CharId is specified then we ignore dir, if it is 0 then we check dir
+		//if dir is "none" and charId is 0 then nothing should happen (unexpected input)
+		User user = auth.loggedUser(request);
+		Character currentChar = auth.activeCharacter(request);
+		if(user != null) {
+			if(charId != -1) {
+				//specific character
+				Character changedChar = charDao.findById(charId).getUser().getId() == user.getId() ? charDao.findById(charId) : null;
+				if (changedChar != null) {
+					auth.changeCharacter(request, charDao.findById(charId));
+				}
+			}
+			else if (!dir.equals("none")) {
+				if(dir.equals("Previous")) {
+					auth.changeCharacter(request, townDao.getAdjacentChar(currentChar, "Previous"));
+				}else if (dir.equals("Next")) {
+					auth.changeCharacter(request, townDao.getAdjacentChar(currentChar, "Next"));
+				}
+			}else {
+				//do nothing
+			}
+			return null;
+		}else {
+			return "fail";
+		}
+	}
+	
+	@RequestMapping(value = "/character/loot", method = RequestMethod.POST)
+	@ResponseBody
+	public String lootFromActiveCharacter(HttpServletRequest request) {
+		User user = auth.loggedUser(request);
+		Character currentChar = auth.activeCharacter(request);
+		if(user != null) {
+			Item looted;
+			if(currentChar.getCurrentAp() >= 1) {
+				//drop AP by 1
+				currentChar.setCurrentAp(currentChar.getCurrentAp() - 1);
+				charDao.update(currentChar);
+				if(currentChar.getZone().getLootability() > 0) {
+					int randomNum = new Random().nextInt(200) + 1;
+					if(randomNum > 0 && randomNum <= 120) {
+						//loot common
+						looted = itemDao.getRandom(ItemRarity.Common);
+					} else if (randomNum >= 121 && randomNum <= 170) {
+						//loot uncommon
+						looted = itemDao.getRandom(ItemRarity.UnCommon);
+					}else if (randomNum >= 171 && randomNum <= 190) {
+						//loot rare
+						looted = itemDao.getRandom(ItemRarity.Rare);
+					}else if (randomNum >= 191 && randomNum <= 197) {
+						//loot Epic
+						looted = itemDao.getRandom(ItemRarity.Epic);
+					}else {
+						//loot Legendary
+						looted = itemDao.getRandom(ItemRarity.Legendary);
+					}
+				}
+				else {
+					looted = itemDao.getRandom(ItemRarity.Scrap);
+				}
+				
+				if(currentChar.getCapacity() >= looted.getMass()) {
+					charDao.addItem(currentChar.getCharId(), looted, 1);
+				}else {
+					townDao.addItemToZone(currentChar.getZone().getZoneId(), looted.getItemId(), 1);
+				}
+				
+				return looted.getName() + " - " + looted.getRarity();
+				
+			} else {
+				return "fail: not enough ap";
+			}
+		} else {
 			return "fail";
 		}
 	}

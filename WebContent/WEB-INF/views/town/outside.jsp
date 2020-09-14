@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/outside.css" />
 
 <script src="${pageContext.request.contextPath}/resources/js/storage.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/outside.js"></script>
 
 <title>Outside</title>
 <!-- copy this file into a new JSP file to include universal header with container -->
@@ -117,7 +118,7 @@
 					<img src="${pageContext.request.contextPath}/resources/img/icons/zombie.png"/> <c:out value="${myZone.zeds}"/> | 
 					<img src="${pageContext.request.contextPath}/resources/img/icons/blocked.png" alt="danger"/> <c:out value="${myZone.danger}"/>
 				</div>
-				<div class="card-body">
+				<div class="card-body" style="display: flex">
 				<c:set var="itemStacks" value="${myZone.itemStacks}"/>
 				<c:forEach items="${itemStacks}" var="stack">
 					<!-- each stack from the zone floor goes here -->
@@ -127,6 +128,17 @@
 							<span class="item-counter" id="stack-${ stack.item.itemId}"><c:out value="${ stack.quantity }"/></span>
 						</div>
 				</c:forEach>
+				</div>
+				<hr>
+				<div class="card-body text-center">
+					<c:choose>
+						<c:when test="${ myZone.lootability > 0 }">
+							<button class="btn btn-join" onclick="loot()">Search Zone (<c:out value="${myZone.lootability}"/>)</button>
+						</c:when>
+						<c:otherwise>
+							<button class="btn btn-delete" onclick="loot()">Search Zone (<c:out value="${myZone.lootability}"/>)</button>
+						</c:otherwise>
+					</c:choose>
 				</div>
 			</div>
 		

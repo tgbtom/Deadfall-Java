@@ -32,6 +32,7 @@ import com.novaclangaming.model.StructureProgress;
 import com.novaclangaming.model.Town;
 import com.novaclangaming.model.TownStatus;
 import com.novaclangaming.model.User;
+import com.novaclangaming.model.Zone;
 
 @Controller
 public class TownController {
@@ -77,6 +78,7 @@ public class TownController {
 	public String citizens(HttpServletRequest request) {
 		if(auth.loggedUser(request) != null) {
 			if(auth.activeCharacter(request) != null) {
+				request.getSession().setAttribute("charDao", charDao);
 				return "town/citizens";
 			}
 		}
@@ -179,12 +181,15 @@ public class TownController {
 				default:
 					break;
 				}
-				if (x >= -5 && x <= 5 && y >= -5 && y <= 5) {
+				if (x >= -5 && x <= 5 && y >= -5 && y <= 5 && character.getZone().getDanger() <= 0) {
 					//we can move to this zone, drop ap, update char stat, and move
 					character.setCurrentAp(character.getCurrentAp() - 1);
-					character.setZone(townDao.findZoneByCoords(character.getTown().getTownId(), x, y));
+					Zone newZone = townDao.findZoneByCoords(character.getTown().getTownId(), x, y);
+					character.setZone(newZone);
 					character.setCurDistanceTravelled(character.getCurDistanceTravelled() + 1);
-					charDao.update(character);
+					character = charDao.update(character);
+					newZone.setDanger(newZone.getDanger() - 3);
+					townDao.updateZone(newZone);
 				}
 				
 				request.getSession().setAttribute("townDao", townDao);

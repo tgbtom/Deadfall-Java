@@ -27,8 +27,24 @@
 			</div>
 			<div class="card-content">
 			
+				<c:set var="deadStatus" scope="session" value="${ sessionScope.charDao.findStatusByName('Dead') }"/>
+			
 				<c:forEach items="${sessionScope.character.town.characters}" var="c">
-					<div class="row">
+					<c:choose>
+						<c:when test="${ sessionScope.charDao.findCharacterStatus(c, deadStatus) != null }">
+							<div class="row deadCharacter">
+						</c:when>
+						<c:when test="${ c.user.id == sessionScope.user.id && c.charId == sessionScope.character.charId}">
+							<div class="row activeCharacter">
+						</c:when>
+						<c:when test="${ c.user.id == sessionScope.user.id}">
+							<div class="row myCharacter" onclick="changeCharacter(<c:out value="${ c.charId }"/>, 'none')">
+						</c:when>
+						<c:otherwise>
+							<div class="row">
+						</c:otherwise>
+					</c:choose>
+
 						<div class="sub-3"><c:out value="${c.name}"/></div>
 						<div class="sub-3"><img src="${pageContext.request.contextPath}/resources/img/icons/${c.classification}.png"> <c:out value="${c.classification}"/></div>
 						<div class="sub-3">

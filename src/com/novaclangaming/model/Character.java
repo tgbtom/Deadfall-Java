@@ -386,4 +386,15 @@ public class Character {
 		return null;
 	}
 	
+	public void removeStatus(Status status) {
+		//see if we already have the status effect
+		for(CharacterStatus active : this.status) {
+			if(active.getStatus().getStatusId() == status.getStatusId()) {
+				this.status.remove(active);
+				break;
+			}
+		}
+
+	}
+	
 }

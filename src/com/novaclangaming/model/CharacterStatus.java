@@ -12,7 +12,8 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 @NamedQueries({
-		@NamedQuery(name="characterStatus.FindByCharacter", query="SELECT cs FROM CharacterStatus cs WHERE character = :character")
+		@NamedQuery(name="characterStatus.FindByCharacter", query="SELECT cs FROM CharacterStatus cs WHERE cs.character = :character"),
+		@NamedQuery(name="CharacterStatus.findByCharacterAndStatus", query="SELECT cs FROM CharacterStatus cs WHERE cs.character = :character AND cs.status = :status")
 })
 @Entity
 @Table(name="DF_CHARACTERS_STATUS")

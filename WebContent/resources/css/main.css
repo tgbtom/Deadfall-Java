@@ -472,3 +472,20 @@ yellow {
 	background-color: #75a60c;
 }
 
+.myCharacter{
+	background-color: rgba(65,140,185,0.3);
+}
+
+.myCharacter:hover{
+	cursor: pointer;
+	background-color: rgba(65,140,185,0.45);
+}
+
+.activeCharacter{
+	background-color: rgba(65,185,140,0.3);
+}
+
+.deadCharacter{
+	background-color: rgba(185,110,110,0.3);
+}
+

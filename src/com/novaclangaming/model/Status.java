@@ -5,9 +5,14 @@ import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+@NamedQueries({
+	@NamedQuery(name="Status.findByName", query = "SELECT s FROM Status s WHERE s.name = :name")
+})
 @Entity
 @Table(name="DF_STATUS")
 public class Status {

@@ -26,7 +26,14 @@ public class JPACharacterDao implements ICharacterDao{
 		super();
 		stackDao = new JPAItemStackCharacterDao(this);
 		itemDao = new JPAItemDao();
-		townDao = new JPATownDao();
+		townDao = new JPATownDao(this);
+	}
+	
+	public JPACharacterDao(JPATownDao townDao) {
+		super();
+		stackDao = new JPAItemStackCharacterDao(this);
+		itemDao = new JPAItemDao();
+		this.townDao = townDao;
 	}
 
 	public void create(Character character) {
@@ -118,6 +125,29 @@ public class JPACharacterDao implements ICharacterDao{
 		 em.close();
 	}
 	
+	public void removeItem(int charId, Item item, int qty) {
+		EntityManager em = JPAConnection.getInstance().createEntityManager();
+		em.getTransaction().begin();
+		
+		Optional<ItemStackCharacter> stack = stackDao.findByCharItem(charId, item.getItemId());
+		
+		if(stack.isPresent() && stack.get().getQuantity() >= qty) {
+			ItemStackCharacter charStack = stack.get();
+			charStack.removeFromStack(qty);
+			
+			if(charStack.getQuantity() > 0 ) {
+				em.merge(charStack);
+			}
+			else {
+				em.remove(em.merge(charStack));
+			}
+			
+		}
+		
+		em.getTransaction().commit();
+		em.close();
+	}
+	
 	public void dropItem(int charId, Item item, int qty) {
 		EntityManager em = JPAConnection.getInstance().createEntityManager();
 		em.getTransaction().begin();
@@ -154,6 +184,16 @@ public class JPACharacterDao implements ICharacterDao{
 		return s;
 	}
 	
+	public Status findStatusByName(String statusName) {
+		EntityManager em = JPAConnection.getInstance().createEntityManager();
+		em.getTransaction().begin();
+		TypedQuery<Status> query = em.createNamedQuery("Status.findByName", Status.class);
+		query.setParameter("name", statusName);
+		Status s = query.getSingleResult();
+		em.close();
+		return s;
+	}
+	
 	public CharacterStatus findCharacterStatusById(int charStatusId) {
 		EntityManager em = JPAConnection.getInstance().createEntityManager();
 		CharacterStatus result = em.find(CharacterStatus.class, charStatusId);
@@ -169,14 +209,12 @@ public class JPACharacterDao implements ICharacterDao{
 		em.close();
 	}
 
-	public CharacterStatus removeStatus(CharacterStatus charStatus){
+	public void removeStatus(CharacterStatus charStatus){
 		EntityManager em = JPAConnection.getInstance().createEntityManager();
 		em.getTransaction().begin();
-		charStatus = findCharacterStatusById(charStatus.getId());
-		CharacterStatus result = em.merge(charStatus);
+		em.remove(em.merge(charStatus));
 		em.getTransaction().commit();
 		em.close();
-		return result;
 	}
 
 	public Character clearStatus(Character character) {
@@ -190,6 +228,67 @@ public class JPACharacterDao implements ICharacterDao{
 		}
 		em.getTransaction().commit();
 		em.close();
+		return character;
+	}
+	
+	public CharacterStatus findCharacterStatus(Character character, Status status) {
+		EntityManager em = JPAConnection.getInstance().createEntityManager();
+		TypedQuery<CharacterStatus> query = em.createNamedQuery("CharacterStatus.findByCharacterAndStatus", CharacterStatus.class);
+		query.setParameter("character", character);
+		query.setParameter("status", status);
+		CharacterStatus result = null;
+		try {
+			result = query.getSingleResult();
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		em.close();
+		return result;
+	}
+	
+	public Character increaseInjury(Character character) {
+		//Check if we have an injury status or not
+		boolean increased = false;
+		for(CharacterStatus status : character.getStatus()) {
+			String statusName = status.getStatus().getName();
+			if(statusName.equals("Minor Injury")) {
+				character.removeStatus(status.getStatus());
+				character = update(character);
+				removeStatus(status);
+				addStatus(new CharacterStatus(findStatusByName("Moderate Injury"), character));		
+				increased = true;
+				break;
+			}else if (statusName.equals("Moderate Injury")) {
+				character.removeStatus(status.getStatus());
+				character = update(character);
+				removeStatus(status);
+				addStatus(new CharacterStatus(findStatusByName("Severe Injury"), character));	
+				increased = true;
+				break;
+			}else if (statusName.equals("Severe Injury")) {
+				character.removeStatus(status.getStatus());
+				character = update(character);
+				removeStatus(status);
+				addStatus(new CharacterStatus(findStatusByName("Infected"), character));	
+				increased = true;
+				break;
+			}else if (statusName.equals("Infected")) {
+				character.removeStatus(status.getStatus());
+				character = update(character);
+				removeStatus(status);
+				addStatus(new CharacterStatus(findStatusByName("Dead"), character));
+				increased = true;
+				break;
+			}
+		}
+		if(!increased) {
+			addStatus(new CharacterStatus(findStatusByName("Minor Injury"), character));
+		}
+		return character;
+	}
+	
+	public Character decreaseInjury(Character character) {
+		//check if we have an injury status or not
 		return character;
 	}
 }

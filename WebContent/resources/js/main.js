@@ -139,6 +139,17 @@ function itemAction(action, itemId){
 	xhttp.send("itemId=" + itemId);
 }
 
+function changeCharacter(charId = -1, dir = "none"){
+	var xhttp = new XMLHttpRequest();
+	xhttp.onreadystatechange = function(){
+		if(this.readyState == 4 && this.status == 200){
+			location.reload();
+		}
+	};
+	xhttp.open("POST", "../character/change/"+charId+"/"+dir);
+	xhttp.send();
+}
+
 function hideAllItemPopups(){
 	var popups = document.getElementsByClassName("popup-text");
 	for(let i = 0; i < popups.length; i++){

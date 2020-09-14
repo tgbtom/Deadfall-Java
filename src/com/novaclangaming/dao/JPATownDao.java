@@ -12,19 +12,30 @@ import javax.persistence.TypedQuery;
 import com.novaclangaming.model.Item;
 import com.novaclangaming.model.ItemCategory;
 import com.novaclangaming.model.ItemStackZone;
+import com.novaclangaming.model.Status;
 import com.novaclangaming.model.Town;
 import com.novaclangaming.model.TownBulletin;
 import com.novaclangaming.model.Zone;
+import com.novaclangaming.model.Character;
 
 public class JPATownDao implements ITownDao {
 
 	private IItemDao itemDao;
 	private IItemStackZoneDao stackDao;
+	private JPACharacterDao charDao;
 	
 	public JPATownDao() {
 		super();
 		itemDao = new JPAItemDao();
 		stackDao = new JPAItemStackZoneDao(this);
+		charDao = new JPACharacterDao(this);
+	}
+	
+	public JPATownDao(JPACharacterDao charDao) {
+		super();
+		itemDao = new JPAItemDao();
+		stackDao = new JPAItemStackZoneDao(this);
+		this.charDao = charDao;
 	}
 
 	public void create(Town town) {
@@ -288,6 +299,38 @@ public class JPATownDao implements ITownDao {
 		em.getTransaction().commit();
 		em.close();
 		return managedZone;
+	}
+	
+	public Character getAdjacentChar(Character currentChar, String dir) {
+		List<Character> townCharacters;
+		if(dir.equals("Next")) {
+			townCharacters = currentChar.getTown().getOrderedCharacters();
+		}
+		else {
+			townCharacters = currentChar.getTown().getReverseOrderedCharacters();
+		}
+		int currentCharIndex = -1;
+		Character target = null;
+		Status deadStatus = charDao.findStatusByName("Dead");
+		for (Character iChar : townCharacters) {
+			if(currentCharIndex >= 0 && iChar.getUser().getId() == currentChar.getUser().getId() && charDao.findCharacterStatus(iChar, deadStatus) == null) {
+				target = iChar;
+				break;
+			} else if(iChar.getCharId() == currentChar.getCharId()) {
+				currentCharIndex = townCharacters.indexOf(iChar);
+			}
+		}
+		
+		if(target == null) {
+			//we need to search from index 0 to index of currentChar
+			for(int i = 0; i < currentCharIndex; i++) {
+				if(townCharacters.get(i).getUser().getId() == currentChar.getUser().getId() && charDao.findCharacterStatus(townCharacters.get(i), deadStatus) == null) {
+					target = townCharacters.get(i);
+					break;
+				}
+			}
+		}
+		return target;
 	}
 
 }

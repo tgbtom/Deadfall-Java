@@ -180,6 +180,24 @@ public class Town {
 		});
 		return this.bulletins;
 	}
+	
+	public List<Character> getOrderedCharacters(){
+		this.characters.sort(new Comparator<Character>() {
+			public int compare(Character o1, Character o2) {
+				return o1.getName().compareTo(o2.getName());
+			}
+		});
+		return this.characters;
+	}
+	
+	public List<Character> getReverseOrderedCharacters(){
+		this.characters.sort(new Comparator<Character>() {
+			public int compare(Character o1, Character o2) {
+				return o2.getName().compareTo(o1.getName());
+			}
+		});
+		return this.characters;
+	}
 
 	public void addZone(Zone zone) {
 		this.zones.add(zone);

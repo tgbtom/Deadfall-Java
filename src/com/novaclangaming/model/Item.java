@@ -14,7 +14,8 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @NamedQueries({
-	@NamedQuery(name = "Item.findByName", query = "SELECT i FROM item i WHERE i.name LIKE :name")
+	@NamedQuery(name = "Item.findByName", query = "SELECT i FROM item i WHERE i.name LIKE :name"),
+	@NamedQuery(name="Item.findByRarity", query="SELECT i FROM item i WHERE i.rarity LIKE :rarity AND i.category NOT LIKE 'Junk'")
 })
 @Table(name = "df_items")
 @Entity(name = "item")
