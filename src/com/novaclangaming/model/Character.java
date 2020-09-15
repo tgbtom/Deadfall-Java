@@ -397,4 +397,26 @@ public class Character {
 
 	}
 	
+	public boolean hasStatus(Status status) {
+		boolean result = false;
+		for(CharacterStatus charStat : this.status) {
+			if(charStat.getStatus().getStatusId() == status.getStatusId()) {
+				result = true;
+				break;
+			}
+		}
+		return result;
+	}
+	
+	public boolean hasStatusByName(String statusName) {
+		boolean result = false;
+		for(CharacterStatus charStat : this.status) {
+			if(charStat.getStatus().getName().equals(statusName)) {
+				result = true;
+				break;
+			}
+		}
+		return result;
+	}
+	
 }

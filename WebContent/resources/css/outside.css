@@ -51,3 +51,8 @@
 	cursor: pointer;
 	opacity: 0.4;
 }
+
+.zone-bulletins{
+	max-height: 400px;
+	overflow: auto;
+}

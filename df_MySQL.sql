@@ -172,6 +172,13 @@ item_id INTEGER NOT NULL,
 quantity INTEGER DEFAULT 1
 );
 
+CREATE TABLE df_town_zone_bulletins(
+bulletin_id INTEGER AUTO_INCREMENT PRIMARY KEY,
+zone_id INTEGER NOT NULL,
+content VARCHAR(1000),
+posted_time timestamp
+);
+
 CREATE TABLE df_characters_items(
 stack_id INTEGER AUTO_INCREMENT PRIMARY KEY,
 char_id INTEGER NOT NULL,
@@ -378,32 +385,32 @@ VALUES ('Fabrikator Workshop', 'Production', 'Allows the conversion of basic res
 0, 45, 1);
 
 INSERT INTO `df_structure_costs` (`structure_id`, `item_id`, `item_quantity`) VALUES
-(1, 3, 10),
+(1, 4, 10),
 (1, 9, 2),
-(2, 3, 20),
+(2, 4, 20),
 (2, 9, 5),
-(3, 3, 5),
+(3, 4, 5),
 (3, 11, 15),
-(4, 3, 2),
 (4, 4, 2),
+(4, 5, 2),
 (4, 11, 2),
-(5, 4, 5),
+(5, 5, 5),
 (5, 9, 6),
 (5, 18, 3),
-(6, 3, 15),
-(7, 4, 15),
-(8, 3, 5),
-(8, 4, 25),
+(6, 4, 15),
+(7, 5, 15),
+(8, 4, 5),
+(8, 5, 25),
 (8, 11, 5),
 (9, 19, 1),
 (9, 20, 10),
 (9, 22, 3),
 (10, 1, 5),
-(10, 4, 2),
-(10, 6, 10),
+(10, 5, 2),
+(10, 9, 10),
 (11, 1, 10),
-(12, 3, 10),
 (12, 4, 10),
+(12, 5, 10),
 (12, 9, 10);
 
 INSERT INTO `df_structure_requirements` (`structure_id`, `required_id`, `required_level`) VALUES

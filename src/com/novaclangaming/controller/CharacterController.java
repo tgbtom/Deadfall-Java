@@ -2,14 +2,15 @@ package com.novaclangaming.controller;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -29,11 +30,14 @@ import com.novaclangaming.model.CharacterStatus;
 import com.novaclangaming.model.Item;
 import com.novaclangaming.model.ItemRarity;
 import com.novaclangaming.model.ItemStackCharacter;
+import com.novaclangaming.model.Status;
 import com.novaclangaming.model.Town;
 import com.novaclangaming.model.TownBulletin;
+import com.novaclangaming.model.TownStatus;
 import com.novaclangaming.model.User;
 import com.novaclangaming.model.Weapon;
 import com.novaclangaming.model.Zone;
+import com.novaclangaming.model.ZoneBulletin;
 import com.novaclangaming.model.Character;
 
 @Controller
@@ -438,8 +442,8 @@ public class CharacterController {
 		Character currentChar = auth.activeCharacter(request);
 		if(user != null) {
 			Item looted;
+			String bulletinString;
 			if(currentChar.getCurrentAp() >= 1) {
-				//drop AP by 1
 				currentChar.setCurrentAp(currentChar.getCurrentAp() - 1);
 				charDao.update(currentChar);
 				if(currentChar.getZone().getLootability() > 0) {
@@ -447,22 +451,28 @@ public class CharacterController {
 					if(randomNum > 0 && randomNum <= 120) {
 						//loot common
 						looted = itemDao.getRandom(ItemRarity.Common);
+						bulletinString = currentChar.getName() + " found <span class='text-Common'>" + looted.getName() + "</span>";
 					} else if (randomNum >= 121 && randomNum <= 170) {
 						//loot uncommon
 						looted = itemDao.getRandom(ItemRarity.UnCommon);
+						bulletinString = currentChar.getName() + " found <span class='text-UnCommon'>" + looted.getName() + "</span>";
 					}else if (randomNum >= 171 && randomNum <= 190) {
 						//loot rare
 						looted = itemDao.getRandom(ItemRarity.Rare);
+						bulletinString = currentChar.getName() + " found <span class='text-Rare'>" + looted.getName() + "</span>";
 					}else if (randomNum >= 191 && randomNum <= 197) {
 						//loot Epic
 						looted = itemDao.getRandom(ItemRarity.Epic);
+						bulletinString = currentChar.getName() + " found <span class='text-Epic'>" + looted.getName() + "</span>";
 					}else {
 						//loot Legendary
 						looted = itemDao.getRandom(ItemRarity.Legendary);
+						bulletinString = currentChar.getName() + " found <span class='text-Legendary'>" + looted.getName() + "</span>";
 					}
 				}
 				else {
 					looted = itemDao.getRandom(ItemRarity.Scrap);
+					bulletinString = currentChar.getName() + " found <span class='text-Scrap'>" + looted.getName() + "</span>";
 				}
 				
 				if(currentChar.getCapacity() >= looted.getMass()) {
@@ -471,6 +481,24 @@ public class CharacterController {
 					townDao.addItemToZone(currentChar.getZone().getZoneId(), looted.getItemId(), 1);
 				}
 				
+				if(currentChar.getZone().getDanger() > 0) {
+					int chanceOfInjury = currentChar.getZone().getDanger() * 10;
+					int randomRoll = new Random().nextInt(100) + 1;
+					if(randomRoll <= chanceOfInjury) {
+						charDao.increaseInjury(currentChar);
+					}
+				}
+				Zone thisZone = currentChar.getZone();
+				if(thisZone.getLootability() == 1) {
+					bulletinString += ". <span class='text-bright-red'>The zone has been depleted</span>.";
+				}
+				thisZone.setLootability(Math.max(0, thisZone.getLootability() - 1));
+				townDao.updateZone(thisZone);
+				currentChar.setCurTimesLooted(currentChar.getCurTimesLooted() + 1);
+				currentChar = charDao.update(currentChar);
+				
+				ZoneBulletin bulletin = new ZoneBulletin(bulletinString, new Date(), thisZone);
+				townDao.addBulletin(bulletin);
 				return looted.getName() + " - " + looted.getRarity();
 				
 			} else {
@@ -479,6 +507,178 @@ public class CharacterController {
 		} else {
 			return "fail";
 		}
+	}
+	
+	@RequestMapping(value="/character/endday", method = RequestMethod.GET)
+	public String endDay(HttpServletRequest request) {
+		//update character status then redirect to the citizens page
+		User user = auth.loggedUser(request);
+		Character currentChar = auth.activeCharacter(request);
+		if(user != null) {
+			Status dayEnded = charDao.findStatusByName("Day Ended");
+			Status notDone = charDao.findStatusByName("Not Done");
+			Status dead = charDao.findStatusByName("Dead");
+			if(currentChar.hasStatus(notDone)) {
+				charDao.removeStatus(charDao.findCharacterStatus(currentChar, notDone));
+				charDao.addStatus(new CharacterStatus(dayEnded, currentChar));
+			}
+			//Check if Dead characters + alive characters with status of Day Ended = towns max size
+			int numOfCompleted = 0;
+			for(Character townChar : currentChar.getTown().getCharacters()) {
+				if(townChar.hasStatus(dayEnded) || townChar.hasStatus(dead)) {
+					numOfCompleted++;
+				}
+			}
+			if(numOfCompleted >= currentChar.getTown().getTownSize()) {
+				//DAY ENDS
+				
+				endTheDay(currentChar.getTown());
+				
+			}
+			return "redirect: ../town/citizens";
+		}else {
+			return "redirect: ../";
+		}
+	}
+	
+	private void endTheDay(Town town) {
+		//Midnight attack 
+		//Death by Overrun
+		//Zed Spread if Day >= 4
+		//Nightly structure functions
+		//Death by camping out of town ()
+		List<Character> aliveOutOfTown = aliveAndOutOfTownCharacters(town);
+		List<Character> aliveInTown = aliveAndInTownCharacters(town);
+		if(town.getHordeSize() > town.getDefence()) {
+			//OVERRUN
+			//calculate number of deaths, and find a way to randomize deaths between alive survivors in TOWN, chars out of town cannot die from OVERRUN
+			int overrun = town.getHordeSize() - town.getDefence();
+			int numOfDeaths = overrun * 5;
+			int chanceDeath = numOfDeaths % 100;
+			if(new Random().nextInt(100) + 1 < chanceDeath) {
+				numOfDeaths++;
+			}
+			Status dead = charDao.findStatusByName("Dead");
+			for(int i = 0; i < numOfDeaths; i++) {
+				//kill random citizen
+				int randomIndex = new Random().nextInt(aliveInTown.size());
+				charDao.addStatus(new CharacterStatus(dead, aliveInTown.get(randomIndex)));
+				townDao.addBulletin(new TownBulletin(aliveInTown.get(randomIndex).getName() + " was killed by the zeds that broke through town defences.", new Date(), town));
+				aliveInTown.remove(randomIndex);
+			}
+			
+			
+			for(Character campingChar : aliveOutOfTown) {
+				int chanceOfDeath = Math.min(30 + campingChar.getZone().getZeds() * 10, 95);
+				if (new Random().nextInt(100) + 1 <= chanceOfDeath) {
+					charDao.addStatus(new CharacterStatus(dead, campingChar));
+					townDao.addBulletin(new TownBulletin(campingChar.getName() + " did not survive the night outside of town.", new Date(), town));
+					aliveOutOfTown.remove(campingChar);
+				}
+			}
+			
+			townDao.addBulletin(new TownBulletin("The town was overrun overnight and "+ numOfDeaths +" citizens have been killed!", new Date(), town));
+		} else {
+			//SAFE FROM ATTACK
+			townDao.addBulletin(new TownBulletin("Defences held out and no zombies got into town overnight.", new Date(), town));
+		}
+		
+		//Update Hunger Thirst, Injury, including deaths
+		for(Character townChar : town.getCharacters()) {
+			if(town.getDayNumber() % 2 == 1) {
+				charDao.increaseHunger(townChar);
+			}
+			charDao.increaseThirst(townChar);
+			if(townChar.hasStatusByName("Minor Injury") ||
+					townChar.hasStatusByName("Moderate Injury")||
+					townChar.hasStatusByName("Severe Injury")||
+					townChar.hasStatusByName("Infected")) {
+				if(new Random().nextInt(100) > 49) {
+					charDao.increaseInjury(townChar);
+				}
+			}
+		}
+		
+		aliveOutOfTown = aliveAndOutOfTownCharacters(town);
+		aliveInTown = aliveAndInTownCharacters(town);
+		
+		if (aliveInTown.size() + aliveOutOfTown.size() <= 0) {
+			//all characters are dead
+			//Update all characters current stats to legacy stats and chenge town to null
+			//change town Status to Ended
+			town.setStatus(TownStatus.Ended);
+			townDao.update(town);
+			for (Character townChar : town.getCharacters()) {
+				townChar.setLifetimeCamps(townChar.getLifetimeCamps() + townChar.getCurCamps());
+				townChar.setLifetimeConstructionCont(townChar.getLifetimeConstructionCont() + townChar.getCurConstructionCont());
+				townChar.setCurConstructionCont(0);
+				townChar.setLifetimeDistanceTravelled(townChar.getLifetimeDistanceTravelled() + townChar.getCurDistanceTravelled());
+				townChar.setCurDistanceTravelled(0);
+				townChar.setLifetimeTimesLooted(townChar.getLifetimeTimesLooted() + townChar.getCurTimesLooted());
+				townChar.setCurTimesLooted(0);
+				townChar.setLifetimeZedsKilled(townChar.getLifetimeZedsKilled() + townChar.getCurZedsKilled());
+				townChar.setCurZedsKilled(0);
+				townChar.setTown(null);
+				charDao.update(townChar);
+			}
+		} else {
+			//ZED SPREAD
+			spreadZeds(town);
+		}
+	}
+	
+	private List<Character> aliveAndInTownCharacters(Town town){
+		ArrayList<Character> results = new ArrayList<Character>();
+		for(Character townChar : town.getCharacters()) {
+			if(townChar.getZone().getX() == 0 && townChar.getZone().getY() == 0 && !townChar.hasStatusByName("Dead")) {
+				results.add(townChar);
+			}
+		}
+		return results;
+	}
+	
+	private List<Character> aliveAndOutOfTownCharacters(Town town){
+		ArrayList<Character> results = new ArrayList<Character>();
+		for(Character townChar : town.getCharacters()) {
+			if(townChar.getZone().getX() != 0 && townChar.getZone().getY() != 0 && !townChar.hasStatusByName("Dead")) {
+				results.add(townChar);
+			}
+		}
+		return results;
+	}
+	
+	private void spreadZeds(Town town) {
+		Map<Zone, Integer> newZeds = new HashMap<Zone, Integer>();
+		for(Zone zone : town.getZones()) {
+			int x = zone.getX();
+			int y = zone.getY();
+			int spacialDanger = zone.getZeds();
+			if(x-1 > -6) {
+				spacialDanger += town.getZone(x-1, y).getZeds();
+			}
+			if(x+1 < 6) {
+				spacialDanger += town.getZone(x+1, y).getZeds();
+			}
+			if(y-1 > -6) {
+				spacialDanger += town.getZone(x, y-1).getZeds();
+			}
+			if(y+1 < 6) {
+				spacialDanger += town.getZone(x, y+1).getZeds();
+			}
+			
+			int maxSpread = (int) Math.ceil(spacialDanger * 0.09);
+			int minSpread = (int) Math.ceil(maxSpread * 0.2);
+			if(maxSpread > 0) {
+				newZeds.put(zone, zone.getZeds() + new Random().nextInt(maxSpread - minSpread) + 1);
+			}else {
+				newZeds.put(zone, zone.getZeds());
+			}
+		}
+		
+		//update all zones that are in the MAP
+		ArrayList<Zone> updateZones = new ArrayList<Zone>();
+		newZeds.forEach((key, value) -> updateZones.add(key.setZeds(value)));
+		townDao.updateZones(updateZones);
 	}
 
 }

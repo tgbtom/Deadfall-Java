@@ -456,6 +456,10 @@ yellow {
 	color: #AA2222;
 }
 
+.text-bright-red{
+	color: #dc5252;
+}
+
 .text-green{
 	color: #6EA53A;
 }
@@ -487,5 +491,24 @@ yellow {
 
 .deadCharacter{
 	background-color: rgba(185,110,110,0.3);
+}
+
+.text-Common{
+	color: #848484;
+}
+.text-UnCommon{
+	color:#00cc66;
+}
+.text-Rare{
+	color: #0088f7;
+}
+.text-Epic{
+	color:#be00ff;
+}
+.text-Legendary{
+	color:#ff9700;
+}
+.text-Scrap{
+	color:#222222;
 }
 

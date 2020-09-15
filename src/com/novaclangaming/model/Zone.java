@@ -1,6 +1,7 @@
 package com.novaclangaming.model;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -58,6 +59,9 @@ public class Zone {
 	@ManyToOne
 	@JoinColumn(name="TOWN_ID", referencedColumnName = "TOWN_ID")
 	private Town town;
+	
+	@OneToMany(mappedBy = "zone")
+	private List<ZoneBulletin> bulletins;
 
 	public Zone() {
 		super();
@@ -108,8 +112,9 @@ public class Zone {
 		return zeds;
 	}
 
-	public void setZeds(int zeds) {
+	public Zone setZeds(int zeds) {
 		this.zeds = zeds;
+		return this;
 	}
 
 	public String getSpecialZone() {
@@ -189,7 +194,22 @@ public class Zone {
 	public void setDanger(int danger) {
 		this.danger = danger;
 	}
+
+	public List<ZoneBulletin> getBulletins() {
+		return bulletins;
+	}
+
+	public void setBulletins(List<ZoneBulletin> bulletins) {
+		this.bulletins = bulletins;
+	}
 	
-	
+	public List<ZoneBulletin> getOrderedBulletins(){
+		this.bulletins.sort(new Comparator<ZoneBulletin>() {
+			public int compare(ZoneBulletin o1, ZoneBulletin o2) {
+				return o2.getBulletinId() - o1.getBulletinId();
+			}
+		});
+		return this.bulletins;
+	}
 	
 }

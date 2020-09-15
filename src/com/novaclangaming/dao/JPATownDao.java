@@ -2,6 +2,7 @@ package com.novaclangaming.dao;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 
@@ -16,6 +17,7 @@ import com.novaclangaming.model.Status;
 import com.novaclangaming.model.Town;
 import com.novaclangaming.model.TownBulletin;
 import com.novaclangaming.model.Zone;
+import com.novaclangaming.model.ZoneBulletin;
 import com.novaclangaming.model.Character;
 
 public class JPATownDao implements ITownDao {
@@ -46,6 +48,7 @@ public class JPATownDao implements ITownDao {
 
 		// populate df_town_zones with all of the necessary rows for this town size
 		em.getTransaction().begin();
+		int zedCount = 0;
 		int x = 6, y = 5;
 		Zone zone;
 		for (int i = 0; i < town.getMapSize() * town.getMapSize(); i++) {
@@ -58,6 +61,7 @@ public class JPATownDao implements ITownDao {
 			zone = new Zone(x, y, 10, this.getRandomZeds(Math.abs(x) + Math.abs(y)), "");
 			zone.setTown(town);
 			em.persist(zone);
+			zedCount += zone.getZeds();
 		}
 		em.getTransaction().commit();
 
@@ -90,6 +94,9 @@ public class JPATownDao implements ITownDao {
 		 }
 		 em.merge(storage);
 		 em.merge(stack);
+		 
+		 town.setHordeSize(zedCount);
+		 update(town);
 		 
 		 em.getTransaction().commit();
 		 em.close();
@@ -200,6 +207,14 @@ public class JPATownDao implements ITownDao {
 		em.close();
 	}
 	
+	public void addBulletin(ZoneBulletin zb) {
+		EntityManager em = JPAConnection.getInstance().createEntityManager();
+		em.getTransaction().begin();
+		em.persist(zb);
+		em.getTransaction().commit();
+		em.close();
+	}
+	
 	public List<ItemStackZone> findItemsInStorage(int townId, ItemCategory category) {
 		Zone storage = findStorageZone(townId);
 		List<ItemStackZone> categoryStacks = new ArrayList<ItemStackZone>();
@@ -299,6 +314,15 @@ public class JPATownDao implements ITownDao {
 		em.getTransaction().commit();
 		em.close();
 		return managedZone;
+	}
+	
+	public ArrayList<Zone> updateZones(ArrayList<Zone> zones) {
+		EntityManager em = JPAConnection.getInstance().createEntityManager();
+		em.getTransaction().begin();
+		ArrayList<Zone> managedZones = em.merge(zones);
+		em.getTransaction().commit();
+		em.close();
+		return managedZones;
 	}
 	
 	public Character getAdjacentChar(Character currentChar, String dir) {

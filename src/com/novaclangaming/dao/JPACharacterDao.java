@@ -77,7 +77,7 @@ public class JPACharacterDao implements ICharacterDao{
 		em.close();
 		return managedChar;
 	}
-
+	
 	public void delete(Character character) {
 		EntityManager em = JPAConnection.getInstance().createEntityManager();
 		em.getTransaction().begin();
@@ -291,4 +291,87 @@ public class JPACharacterDao implements ICharacterDao{
 		//check if we have an injury status or not
 		return character;
 	}
+	
+	public Character increaseHunger(Character character) {
+		//Check if we have an injury status or not
+		boolean increased = false;
+		for(CharacterStatus status : character.getStatus()) {
+			String statusName = status.getStatus().getName();
+			if(statusName.equals("Full")) {
+				character.removeStatus(status.getStatus());
+				character = update(character);
+				removeStatus(status);
+				addStatus(new CharacterStatus(findStatusByName("Hungry"), character));		
+				increased = true;
+				break;
+			}else if (statusName.equals("Hungry")) {
+				character.removeStatus(status.getStatus());
+				character = update(character);
+				removeStatus(status);
+				addStatus(new CharacterStatus(findStatusByName("Very Hungry"), character));	
+				increased = true;
+				break;
+			}else if (statusName.equals("Very Hungry")) {
+				character.removeStatus(status.getStatus());
+				character = update(character);
+				removeStatus(status);
+				addStatus(new CharacterStatus(findStatusByName("Starving"), character));	
+				increased = true;
+				break;
+			}else if (statusName.equals("Starving")) {
+				character.removeStatus(status.getStatus());
+				character = update(character);
+				removeStatus(status);
+				addStatus(new CharacterStatus(findStatusByName("Dead"), character));
+				increased = true;
+				break;
+			}
+		}
+		if(!increased) {
+			addStatus(new CharacterStatus(findStatusByName("Starving"), character));
+		}
+		return character;
+	}
+	
+	public Character increaseThirst(Character character) {
+		//Check if we have an injury status or not
+		boolean increased = false;
+		for(CharacterStatus status : character.getStatus()) {
+			String statusName = status.getStatus().getName();
+			if(statusName.equals("Quenched")) {
+				character.removeStatus(status.getStatus());
+				character = update(character);
+				removeStatus(status);
+				addStatus(new CharacterStatus(findStatusByName("Thirsty"), character));		
+				increased = true;
+				break;
+			}else if (statusName.equals("Thirsty")) {
+				character.removeStatus(status.getStatus());
+				character = update(character);
+				removeStatus(status);
+				addStatus(new CharacterStatus(findStatusByName("Very Thirsty"), character));	
+				increased = true;
+				break;
+			}else if (statusName.equals("Very Thirsty")) {
+				character.removeStatus(status.getStatus());
+				character = update(character);
+				removeStatus(status);
+				addStatus(new CharacterStatus(findStatusByName("Dehydrated"), character));	
+				increased = true;
+				break;
+			}else if (statusName.equals("Dehydrated")) {
+				character.removeStatus(status.getStatus());
+				character = update(character);
+				removeStatus(status);
+				addStatus(new CharacterStatus(findStatusByName("Dead"), character));
+				increased = true;
+				break;
+			}
+		}
+		if(!increased) {
+			addStatus(new CharacterStatus(findStatusByName("Dehydrated"), character));
+		}
+		return character;
+	}
+	
 }

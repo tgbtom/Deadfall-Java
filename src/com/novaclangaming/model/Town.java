@@ -214,5 +214,24 @@ public class Town {
 	public void addDefence(int amount) {
 		this.defence += amount;
 	}
+
+	public List<Zone> getZones() {
+		return zones;
+	}
+
+	public void setZones(List<Zone> zones) {
+		this.zones = zones;
+	}
+	
+	public Zone getZone(int x, int y) {
+		Zone result = null;
+		for(Zone zone : this.zones) {
+			if(zone.getX() == x && zone.getY() == y) {
+				result = zone;
+				break;
+			}
+		}
+		return result;
+	}
 	
 }

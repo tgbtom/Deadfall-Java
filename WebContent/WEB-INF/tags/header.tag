@@ -27,6 +27,10 @@
 					<div class="card-content">No Status</div>
 				</c:if>
 				
+				<br> 
+				
+				<a href="../character/endday"><button class="btn btn-play">End Day</button></a>
+				
 			</div>
 		</div>
 		<div class="col-6">
