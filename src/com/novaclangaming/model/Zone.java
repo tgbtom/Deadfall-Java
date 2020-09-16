@@ -191,8 +191,9 @@ public class Zone {
 		return danger;
 	}
 
-	public void setDanger(int danger) {
+	public Zone setDanger(int danger) {
 		this.danger = danger;
+		return this;
 	}
 
 	public List<ZoneBulletin> getBulletins() {

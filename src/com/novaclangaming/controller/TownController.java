@@ -77,7 +77,8 @@ public class TownController {
 	@RequestMapping(value = "/town/citizens", method = RequestMethod.GET)
 	public String citizens(HttpServletRequest request) {
 		if(auth.loggedUser(request) != null) {
-			if(auth.activeCharacter(request) != null) {
+			Character activeChar = auth.activeCharacter(request);
+			if(activeChar != null ? activeChar.getTown() != null : false) {
 				request.getSession().setAttribute("charDao", charDao);
 				return "town/citizens";
 			}

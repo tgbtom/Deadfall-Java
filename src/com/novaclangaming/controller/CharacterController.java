@@ -525,13 +525,13 @@ public class CharacterController {
 			//Check if Dead characters + alive characters with status of Day Ended = towns max size
 			int numOfCompleted = 0;
 			for(Character townChar : currentChar.getTown().getCharacters()) {
-				if(townChar.hasStatus(dayEnded) || townChar.hasStatus(dead)) {
+				if(townChar.hasStatusByName("Day Ended") || townChar.hasStatusByName("Dead")) {
 					numOfCompleted++;
 				}
 			}
-			if(numOfCompleted >= currentChar.getTown().getTownSize()) {
+			System.out.println("Done: " + numOfCompleted);
+			if(numOfCompleted >= currentChar.getTown().getTownSize() - 1) {
 				//DAY ENDS
-				
 				endTheDay(currentChar.getTown());
 				
 			}
@@ -544,27 +544,31 @@ public class CharacterController {
 	private void endTheDay(Town town) {
 		//Midnight attack 
 		//Death by Overrun
-		//Zed Spread if Day >= 4
 		//Nightly structure functions
 		//Death by camping out of town ()
-		List<Character> aliveOutOfTown = aliveAndOutOfTownCharacters(town);
-		List<Character> aliveInTown = aliveAndInTownCharacters(town);
+		ArrayList<Character> aliveOutOfTown = aliveAndOutOfTownCharacters(town);
+		ArrayList<Character> aliveInTown = aliveAndInTownCharacters(town);
 		if(town.getHordeSize() > town.getDefence()) {
 			//OVERRUN
 			//calculate number of deaths, and find a way to randomize deaths between alive survivors in TOWN, chars out of town cannot die from OVERRUN
 			int overrun = town.getHordeSize() - town.getDefence();
-			int numOfDeaths = overrun * 5;
-			int chanceDeath = numOfDeaths % 100;
+			int numOfDeaths = overrun * 5 / 100;
+			int chanceDeath = numOfDeaths * 100 % 100;
 			if(new Random().nextInt(100) + 1 < chanceDeath) {
 				numOfDeaths++;
 			}
 			Status dead = charDao.findStatusByName("Dead");
-			for(int i = 0; i < numOfDeaths; i++) {
-				//kill random citizen
-				int randomIndex = new Random().nextInt(aliveInTown.size());
-				charDao.addStatus(new CharacterStatus(dead, aliveInTown.get(randomIndex)));
-				townDao.addBulletin(new TownBulletin(aliveInTown.get(randomIndex).getName() + " was killed by the zeds that broke through town defences.", new Date(), town));
-				aliveInTown.remove(randomIndex);
+			if(aliveInTown.size() > 0) {
+				for(int i = 0; i < numOfDeaths; i++) {
+					//kill random citizen
+					int randomIndex = new Random().nextInt(aliveInTown.size());
+					charDao.addStatus(new CharacterStatus(dead, aliveInTown.get(randomIndex)));
+					townDao.addBulletin(new TownBulletin(aliveInTown.get(randomIndex).getName() + " was killed by the zeds that broke through town defences.", new Date(), town));
+					aliveInTown.remove(randomIndex);
+					if(aliveInTown.size() <= 0) {
+						break;
+					}
+				}
 			}
 			
 			
@@ -574,6 +578,9 @@ public class CharacterController {
 					charDao.addStatus(new CharacterStatus(dead, campingChar));
 					townDao.addBulletin(new TownBulletin(campingChar.getName() + " did not survive the night outside of town.", new Date(), town));
 					aliveOutOfTown.remove(campingChar);
+					if(aliveOutOfTown.size() <= 0) {
+						break;
+					}
 				}
 			}
 			
@@ -599,6 +606,7 @@ public class CharacterController {
 			}
 		}
 		
+		town = townDao.findById(town.getTownId());
 		aliveOutOfTown = aliveAndOutOfTownCharacters(town);
 		aliveInTown = aliveAndInTownCharacters(town);
 		
@@ -622,12 +630,24 @@ public class CharacterController {
 				charDao.update(townChar);
 			}
 		} else {
-			//ZED SPREAD
-			spreadZeds(town);
+			//Zed Spread if Day >= 4
+			if(town.getDayNumber() >= 4) {
+				spreadZeds(town);
+			}
+			town.setDayNumber(town.getDayNumber() + 1);
+			performNightlyFunctions(town);
+			townDao.update(town);
+			
+			ArrayList<Character> aliveChars = aliveInTown;
+			aliveChars.addAll(aliveOutOfTown);
+			for(Character aliveChar : aliveChars) {
+				charDao.removeStatus(aliveChar.findCharacterStatusByName("Day Ended"));
+				charDao.addStatus(new CharacterStatus(charDao.findStatusByName("Not Done"), aliveChar));
+			}
 		}
 	}
 	
-	private List<Character> aliveAndInTownCharacters(Town town){
+	private ArrayList<Character> aliveAndInTownCharacters(Town town){
 		ArrayList<Character> results = new ArrayList<Character>();
 		for(Character townChar : town.getCharacters()) {
 			if(townChar.getZone().getX() == 0 && townChar.getZone().getY() == 0 && !townChar.hasStatusByName("Dead")) {
@@ -637,7 +657,7 @@ public class CharacterController {
 		return results;
 	}
 	
-	private List<Character> aliveAndOutOfTownCharacters(Town town){
+	private ArrayList<Character> aliveAndOutOfTownCharacters(Town town){
 		ArrayList<Character> results = new ArrayList<Character>();
 		for(Character townChar : town.getCharacters()) {
 			if(townChar.getZone().getX() != 0 && townChar.getZone().getY() != 0 && !townChar.hasStatusByName("Dead")) {
@@ -668,7 +688,7 @@ public class CharacterController {
 			
 			int maxSpread = (int) Math.ceil(spacialDanger * 0.09);
 			int minSpread = (int) Math.ceil(maxSpread * 0.2);
-			if(maxSpread > 0) {
+			if(maxSpread - minSpread > 0) {
 				newZeds.put(zone, zone.getZeds() + new Random().nextInt(maxSpread - minSpread) + 1);
 			}else {
 				newZeds.put(zone, zone.getZeds());
@@ -677,8 +697,16 @@ public class CharacterController {
 		
 		//update all zones that are in the MAP
 		ArrayList<Zone> updateZones = new ArrayList<Zone>();
+		int newHorde = 0;
 		newZeds.forEach((key, value) -> updateZones.add(key.setZeds(value)));
+		updateZones.replaceAll(zone -> zone.setDanger(zone.getZeds() - 3 * zone.getCharacters().size()));
+		
 		townDao.updateZones(updateZones);
+	}
+	
+	private void performNightlyFunctions(Town town) {
+		//Search for structures that perform special features overnight
+		
 	}
 
 }

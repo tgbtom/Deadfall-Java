@@ -29,7 +29,14 @@
 				
 				<br> 
 				
-				<a href="../character/endday"><button class="btn btn-play">End Day</button></a>
+				<c:choose>
+					<c:when test='${ sessionScope.character.hasStatusByName("Not Done") }'>
+						<a href="../character/endday"><button class="btn btn-play">End Day []</button></a>
+					</c:when>
+					<c:otherwise>
+						<button class="btn btn-delete">End Day</button>
+					</c:otherwise>
+				</c:choose>
 				
 			</div>
 		</div>

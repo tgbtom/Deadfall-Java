@@ -319,7 +319,14 @@ public class JPATownDao implements ITownDao {
 	public ArrayList<Zone> updateZones(ArrayList<Zone> zones) {
 		EntityManager em = JPAConnection.getInstance().createEntityManager();
 		em.getTransaction().begin();
-		ArrayList<Zone> managedZones = em.merge(zones);
+		ArrayList<Zone> managedZones = new ArrayList<Zone>();
+		int newHorde = 0;
+		for(Zone zone : zones) {
+			managedZones.add(em.merge(zone));
+			newHorde += zone.getZeds();
+		}
+		zones.get(0).getTown().setHordeSize(newHorde);
+		em.merge(zones.get(0).getTown());
 		em.getTransaction().commit();
 		em.close();
 		return managedZones;

@@ -46,7 +46,7 @@ public class Character {
 	private User user;
 	
 	@ManyToOne
-	@JoinColumn(name = "town_id", referencedColumnName = "town_id")
+	@JoinColumn(name = "town_id", referencedColumnName = "town_id", nullable = true)
 	private Town town;
 	
 	@ManyToOne
@@ -172,7 +172,9 @@ public class Character {
 	public void setTown(Town town) {
 		this.town = town;
 		JPATownDao townDao = new JPATownDao();
-		this.zone = townDao.findStorageZone(town.getTownId());
+		if(town != null) {
+			this.zone = townDao.findStorageZone(town.getTownId());
+		}
 	}
 
 	public int getCurConstructionCont() {
@@ -417,6 +419,15 @@ public class Character {
 			}
 		}
 		return result;
+	}
+	
+	public CharacterStatus findCharacterStatusByName(String statusName) {
+		for(CharacterStatus charStat : this.status) {
+			if(charStat.getStatus().getName().equals(statusName)) {
+				return charStat;
+			}
+		}
+		return null;
 	}
 	
 }

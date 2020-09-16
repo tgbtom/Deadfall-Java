@@ -15,6 +15,7 @@ import com.novaclangaming.model.CharacterStatus;
 import com.novaclangaming.model.Item;
 import com.novaclangaming.model.ItemStackCharacter;
 import com.novaclangaming.model.Status;
+import com.novaclangaming.model.TownBulletin;
 
 public class JPACharacterDao implements ICharacterDao{
 
@@ -248,35 +249,28 @@ public class JPACharacterDao implements ICharacterDao{
 	
 	public Character increaseInjury(Character character) {
 		//Check if we have an injury status or not
-		boolean increased = false;
+		boolean increased = character.hasStatusByName("Dead");
 		for(CharacterStatus status : character.getStatus()) {
 			String statusName = status.getStatus().getName();
 			if(statusName.equals("Minor Injury")) {
-				character.removeStatus(status.getStatus());
-				character = update(character);
 				removeStatus(status);
 				addStatus(new CharacterStatus(findStatusByName("Moderate Injury"), character));		
 				increased = true;
 				break;
 			}else if (statusName.equals("Moderate Injury")) {
-				character.removeStatus(status.getStatus());
-				character = update(character);
 				removeStatus(status);
 				addStatus(new CharacterStatus(findStatusByName("Severe Injury"), character));	
 				increased = true;
 				break;
 			}else if (statusName.equals("Severe Injury")) {
-				character.removeStatus(status.getStatus());
-				character = update(character);
 				removeStatus(status);
 				addStatus(new CharacterStatus(findStatusByName("Infected"), character));	
 				increased = true;
 				break;
 			}else if (statusName.equals("Infected")) {
-				character.removeStatus(status.getStatus());
-				character = update(character);
 				removeStatus(status);
 				addStatus(new CharacterStatus(findStatusByName("Dead"), character));
+				townDao.addBulletin(new TownBulletin(character.getName() + " died of infection.", new Date(), character.getTown()));
 				increased = true;
 				break;
 			}
@@ -294,37 +288,32 @@ public class JPACharacterDao implements ICharacterDao{
 	
 	public Character increaseHunger(Character character) {
 		//Check if we have an injury status or not
-		boolean increased = false;
-		for(CharacterStatus status : character.getStatus()) {
-			String statusName = status.getStatus().getName();
-			if(statusName.equals("Full")) {
-				character.removeStatus(status.getStatus());
-				character = update(character);
-				removeStatus(status);
-				addStatus(new CharacterStatus(findStatusByName("Hungry"), character));		
-				increased = true;
-				break;
-			}else if (statusName.equals("Hungry")) {
-				character.removeStatus(status.getStatus());
-				character = update(character);
-				removeStatus(status);
-				addStatus(new CharacterStatus(findStatusByName("Very Hungry"), character));	
-				increased = true;
-				break;
-			}else if (statusName.equals("Very Hungry")) {
-				character.removeStatus(status.getStatus());
-				character = update(character);
-				removeStatus(status);
-				addStatus(new CharacterStatus(findStatusByName("Starving"), character));	
-				increased = true;
-				break;
-			}else if (statusName.equals("Starving")) {
-				character.removeStatus(status.getStatus());
-				character = update(character);
-				removeStatus(status);
-				addStatus(new CharacterStatus(findStatusByName("Dead"), character));
-				increased = true;
-				break;
+		boolean increased = character.hasStatusByName("Dead");
+		if(increased == false) {
+			for(CharacterStatus status : character.getStatus()) {
+				String statusName = status.getStatus().getName();
+				if(statusName.equals("Full")) {
+					removeStatus(status);
+					addStatus(new CharacterStatus(findStatusByName("Hungry"), character));		
+					increased = true;
+					break;
+				}else if (statusName.equals("Hungry")) {
+					removeStatus(status);
+					addStatus(new CharacterStatus(findStatusByName("Very Hungry"), character));	
+					increased = true;
+					break;
+				}else if (statusName.equals("Very Hungry")) {
+					removeStatus(status);
+					addStatus(new CharacterStatus(findStatusByName("Starving"), character));	
+					increased = true;
+					break;
+				}else if (statusName.equals("Starving")) {
+					removeStatus(status);
+					addStatus(new CharacterStatus(findStatusByName("Dead"), character));
+					townDao.addBulletin(new TownBulletin(character.getName() + " died of starvation.", new Date(), character.getTown()));
+					increased = true;
+					break;
+				}
 			}
 		}
 		if(!increased) {
@@ -335,37 +324,32 @@ public class JPACharacterDao implements ICharacterDao{
 	
 	public Character increaseThirst(Character character) {
 		//Check if we have an injury status or not
-		boolean increased = false;
-		for(CharacterStatus status : character.getStatus()) {
-			String statusName = status.getStatus().getName();
-			if(statusName.equals("Quenched")) {
-				character.removeStatus(status.getStatus());
-				character = update(character);
-				removeStatus(status);
-				addStatus(new CharacterStatus(findStatusByName("Thirsty"), character));		
-				increased = true;
-				break;
-			}else if (statusName.equals("Thirsty")) {
-				character.removeStatus(status.getStatus());
-				character = update(character);
-				removeStatus(status);
-				addStatus(new CharacterStatus(findStatusByName("Very Thirsty"), character));	
-				increased = true;
-				break;
-			}else if (statusName.equals("Very Thirsty")) {
-				character.removeStatus(status.getStatus());
-				character = update(character);
-				removeStatus(status);
-				addStatus(new CharacterStatus(findStatusByName("Dehydrated"), character));	
-				increased = true;
-				break;
-			}else if (statusName.equals("Dehydrated")) {
-				character.removeStatus(status.getStatus());
-				character = update(character);
-				removeStatus(status);
-				addStatus(new CharacterStatus(findStatusByName("Dead"), character));
-				increased = true;
-				break;
+		boolean increased = character.hasStatusByName("Dead");
+		if(increased == false) {
+			for(CharacterStatus status : character.getStatus()) {
+				String statusName = status.getStatus().getName();
+				if(statusName.equals("Quenched")) {
+					removeStatus(status);
+					addStatus(new CharacterStatus(findStatusByName("Thirsty"), character));		
+					increased = true;
+					break;
+				}else if (statusName.equals("Thirsty")) {
+					removeStatus(status);
+					addStatus(new CharacterStatus(findStatusByName("Very Thirsty"), character));	
+					increased = true;
+					break;
+				}else if (statusName.equals("Very Thirsty")) {
+					removeStatus(status);
+					addStatus(new CharacterStatus(findStatusByName("Dehydrated"), character));	
+					increased = true;
+					break;
+				}else if (statusName.equals("Dehydrated")) {
+					removeStatus(status);
+					addStatus(new CharacterStatus(findStatusByName("Dead"), character));
+					townDao.addBulletin(new TownBulletin(character.getName() + " died of dehydration.", new Date(), character.getTown()));
+					increased = true;
+					break;
+				}
 			}
 		}
 		if(!increased) {
