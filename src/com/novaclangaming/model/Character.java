@@ -20,6 +20,9 @@ import javax.persistence.SecondaryTable;
 import javax.persistence.SecondaryTables;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
+
 import com.novaclangaming.dao.JPATownDao;
 
 @NamedQueries({
@@ -63,6 +66,7 @@ public class Character {
 	private String name;
 	
 	@OneToMany(mappedBy = "character")
+	@LazyCollection(LazyCollectionOption.FALSE)
 	private List<ItemStackCharacter> itemStacks;
 	
 	@Column

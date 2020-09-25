@@ -117,7 +117,7 @@
 						<c:out value="${myZone.x}"/>, <c:out value="${myZone.y}"/> | 
 						<img src="${pageContext.request.contextPath}/resources/img/icons/lootability.png" /> <c:out value="${myZone.lootability}"/> | 
 						<img src="${pageContext.request.contextPath}/resources/img/icons/zombie.png"/> <c:out value="${myZone.zeds}"/> | 
-						<img src="${pageContext.request.contextPath}/resources/img/icons/blocked.png" alt="danger"/> <c:out value="${myZone.danger}"/>
+						<img src="${pageContext.request.contextPath}/resources/img/icons/blocked.png" alt="danger"/> <c:out value="${Math.max(myZone.danger, 0)}"/>
 					</div>
 					<div class="card-body" style="display: inline-block">
 					<c:set var="itemStacks" value="${myZone.itemStacks}"/>

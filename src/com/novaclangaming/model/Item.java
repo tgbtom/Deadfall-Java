@@ -45,6 +45,9 @@ public class Item {
 	@OneToOne(mappedBy = "item")
 	private Weapon weapon;
 	
+	@OneToOne(mappedBy = "item")
+	private Consumable consumable;
+	
 	public Item() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -94,6 +97,10 @@ public class Item {
 
 	public Weapon getWeapon() {
 		return weapon;
+	}
+
+	public Consumable getConsumable() {
+		return consumable;
 	}
 	
 }

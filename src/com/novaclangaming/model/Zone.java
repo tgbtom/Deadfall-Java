@@ -67,13 +67,14 @@ public class Zone {
 		super();
 	}
 
-	public Zone(int x, int y, int lootability, int zeds, String specialZone) {
+	public Zone(int x, int y, int lootability, int zeds, String specialZone, int danger) {
 		this();
 		this.x = x;
 		this.y = y;
 		this.lootability = lootability;
 		this.zeds = zeds;
 		this.specialZone = specialZone;
+		this.danger = danger;
 	}
 
 	public int getZoneId() {

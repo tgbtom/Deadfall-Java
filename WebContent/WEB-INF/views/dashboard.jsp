@@ -26,7 +26,7 @@ pageEncoding="ISO-8859-1"%>
 			
 			<c:forEach items="${charDao.findByUserId(sessionScope.user.id)}" var="c">
             	<c:set var="btnText" scope="page" value = "${c.getTown() == null ? \"Join\" : \"Play\"}"/>
-            	<c:set var="btnClass" scope="page" value = "${c.getTown() == null ? \"btn-join\" : \"btn-play\"}"/>
+            	<c:set var="btnClass" scope="page" value = "${c.getTown() == null ? \"btn-join\" : c.hasStatusByName(\"Dead\") ? \"btn-delete\" : \"btn-play\"}"/>
 
             	<div class="row bb">
 				<form action="${pageContext.request.contextPath}/character/check" method="POST">

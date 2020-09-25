@@ -27,10 +27,12 @@ import com.novaclangaming.dao.JPATownDao;
 import com.novaclangaming.dao.JPAUserDao;
 import com.novaclangaming.model.CharacterClass;
 import com.novaclangaming.model.CharacterStatus;
+import com.novaclangaming.model.Consumable;
 import com.novaclangaming.model.Item;
 import com.novaclangaming.model.ItemRarity;
 import com.novaclangaming.model.ItemStackCharacter;
 import com.novaclangaming.model.Status;
+import com.novaclangaming.model.StructureProgress;
 import com.novaclangaming.model.Town;
 import com.novaclangaming.model.TownBulletin;
 import com.novaclangaming.model.TownStatus;
@@ -389,6 +391,29 @@ public class CharacterController {
 						}
 						charDao.increaseInjury(character);
 					}
+				} else if (action.equals("Consume")) {
+					
+					Consumable consumable = itemDao.findById(itemId).getConsumable();
+					//If food, reduce hunger, if not ATE add ATE and give AP ELSE only reduce hunger and give health
+					//If drink, reduce hunger, if not DRANK add DRANK and give AP ELSE only reduce thirst and give health
+					if(consumable.getConsumeType().equals("Drink")) {
+						if(!character.hasStatusByName("Drank")) {
+							character.setCurrentAp(Math.min(character.getMaxAp(), character.getCurrentAp() + (character.getMaxAp() * consumable.getApGain() / 100)));
+							charDao.update(character);
+							charDao.addStatus(new CharacterStatus(charDao.findStatusByName("Drank"), character));
+						} 
+						charDao.decreaseThirst(character);
+						charDao.removeItem(character.getCharId(), consumable.getItem(), 1);
+					} else if (consumable.getConsumeType().equals("Eat")) {
+						if(!character.hasStatusByName("Ate")) {
+							character.setCurrentAp(Math.min(character.getMaxAp(), character.getCurrentAp() + (character.getMaxAp() * consumable.getApGain() / 100)));
+							charDao.update(character);
+							charDao.addStatus(new CharacterStatus(charDao.findStatusByName("Ate"), character));
+						} 
+						charDao.decreaseHunger(character);
+						charDao.removeItem(character.getCharId(), consumable.getItem(), 1);
+					}
+					
 				}
 				
 			}else {
@@ -440,7 +465,7 @@ public class CharacterController {
 	public String lootFromActiveCharacter(HttpServletRequest request) {
 		User user = auth.loggedUser(request);
 		Character currentChar = auth.activeCharacter(request);
-		if(user != null) {
+		if(user != null && currentChar != null) {
 			Item looted;
 			String bulletinString;
 			if(currentChar.getCurrentAp() >= 1) {
@@ -706,7 +731,27 @@ public class CharacterController {
 	
 	private void performNightlyFunctions(Town town) {
 		//Search for structures that perform special features overnight
-		
+		int found = 0;
+		int itemGain = 0;
+		for(StructureProgress struc : town.getStructuresInProgress()) {
+			//Currently there are 2 nightly structure, if we found both exist we dont need to check any more records
+			if(found >= 2) {
+				break;
+			} else {
+				if(struc.getStructure().getName().equals("Water Reserve")) {
+					itemGain = new Random().nextInt(3)+2;
+					townDao.addItemToStorage(town.getTownId(), itemDao.findByName("Water Ration"), itemGain);
+					townDao.addBulletin(new TownBulletin(itemGain + " water rations were gained from the Water Reserve. ", new Date(), town));
+					found++;
+				}
+				else if(struc.getStructure().getName().equals("Vegetable Garden")) {
+					itemGain = new Random().nextInt(4)+1;
+					townDao.addItemToStorage(town.getTownId(), itemDao.findByName("Carrot"), itemGain);
+					townDao.addBulletin(new TownBulletin(itemGain + " carrots were gained from the Vegetable Garden. ", new Date(), town));
+					found++;
+				}
+			}
+		}
 	}
 
 }

@@ -36,10 +36,19 @@ public class JPAAuthentication implements IAuthenticationDao{
 	
 	public Character activeCharacter(HttpServletRequest request) {
 		Character character = (Character) request.getSession().getAttribute("character");
+		Character result = null;
 		EntityManager em = JPAConnection.getInstance().createEntityManager();
 		em.getTransaction().begin();
-		Character result = charDao.findById(character.getCharId());
-		request.getSession().setAttribute("character", result); //refreshes the session variable to match db
+		if(character != null) {
+			result = charDao.findById(character.getCharId());
+			if(result.hasStatusByName("Dead")) {
+				request.getSession().setAttribute("character", null); //refreshes the session variable to match db
+				return null;
+			}else {
+				request.getSession().setAttribute("character", result); //refreshes the session variable to match db
+			}
+		}
+		
 		em.close();
 		return result;
 	}

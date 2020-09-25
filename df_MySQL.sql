@@ -48,7 +48,7 @@ status_name VARCHAR(50)
 );
 
 CREATE TABLE df_characters_status(
-id INTEGER PRIMARY KEY,
+id INTEGER AUTO_INCREMENT PRIMARY KEY,
 char_id INTEGER,
 status_id INTEGER
 );
@@ -162,7 +162,8 @@ x INTEGER NOT NULL,
 y INTEGER NOT NULL,
 lootability INTEGER DEFAULT 10,
 zeds INTEGER DEFAULT 0,
-special_zone VARCHAR(50) DEFAULT NULL
+special_zone VARCHAR(50) DEFAULT NULL,
+danger INTEGER
 );
 
 CREATE TABLE df_town_zone_items(

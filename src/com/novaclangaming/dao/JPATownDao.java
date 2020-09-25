@@ -58,7 +58,8 @@ public class JPATownDao implements ITownDao {
 				x = 5;
 				y--;
 			}
-			zone = new Zone(x, y, 10, this.getRandomZeds(Math.abs(x) + Math.abs(y)), "");
+			int zedZone = this.getRandomZeds(Math.abs(x) + Math.abs(y));
+			zone = new Zone(x, y, 10, zedZone, "", zedZone);
 			zone.setTown(town);
 			em.persist(zone);
 			zedCount += zone.getZeds();

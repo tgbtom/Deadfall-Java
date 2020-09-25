@@ -69,6 +69,8 @@ public class TownController {
 		if(auth.loggedUser(request) != null) {
 			if(auth.activeCharacter(request) != null) {
 				return "town/home";
+			}else {
+				return "redirect: ../dashboard";
 			}
 		}
 		return "redirect: ../";
@@ -81,6 +83,8 @@ public class TownController {
 			if(activeChar != null ? activeChar.getTown() != null : false) {
 				request.getSession().setAttribute("charDao", charDao);
 				return "town/citizens";
+			}else {
+				return "redirect: ../dashboard";
 			}
 		}
 		return "redirect: ../";
@@ -111,6 +115,8 @@ public class TownController {
 				request.getSession().setAttribute("structureDao", new JPAStructureDao());
 				request.getSession().setAttribute("stackZoneDao", new JPAItemStackZoneDao(this.townDao));
 				return "town/construction";
+			} else {
+				return "redirect: /Deadfall/dashboard";
 			}
 		}
 		return "redirect: ../";
@@ -133,6 +139,8 @@ public class TownController {
 				request.getSession().setAttribute("ammo", ammo);
 				request.getSession().setAttribute("junk", junk);
 				return "town/storage";
+			} else {
+				return "redirect: /Deadfall/dashboard";
 			}
 		}
 		return "redirect: ../";
@@ -143,6 +151,8 @@ public class TownController {
 		if(auth.loggedUser(request) != null) {
 			if(auth.activeCharacter(request) != null) {
 				return "town/special";
+			} else {
+				return "redirect: /Deadfall/dashboard";
 			}
 		}
 		return "redirect: ../";
@@ -155,6 +165,9 @@ public class TownController {
 				request.getSession().setAttribute("townDao", townDao);
 				return "town/outside";
 			}
+			else {
+				return "redirect: /Deadfall/dashboard";
+			}
 		}
 		return "redirect: ../";
 	}
@@ -162,7 +175,7 @@ public class TownController {
 	@RequestMapping(value = "/town/outside/nav/{dir}", method = RequestMethod.GET)
 	public String outside(HttpServletRequest request, @PathVariable String dir) {
 		if(auth.loggedUser(request) != null) {
-			Character character =auth.activeCharacter(request);
+			Character character = auth.activeCharacter(request);
 			if(character != null ? character.getCurrentAp() >= 1 : false) {
 				int x = character.getZone().getX();
 				int y = character.getZone().getY();
@@ -196,8 +209,11 @@ public class TownController {
 				request.getSession().setAttribute("townDao", townDao);
 				return "redirect: /Deadfall/town/outside";
 			}
+			else {
+				return "redirect: /Deadfall/dashboard";
+			}
 		}
-		return "redirect: /Deadfall/town/outside";
+		return "redirect: /Deadfall/";
 	}
 	
 	@RequestMapping(value = "/town/construct/{structureId}/{apToAssign}", method = RequestMethod.GET)
@@ -212,10 +228,13 @@ public class TownController {
 		
 		if(auth.loggedUser(request) != null) {
 			Character character = auth.activeCharacter(request);
+			if(character == null) {
+				return "redirect: /Deadfall/dashboard";
+			}
 			Structure structure = structureDao.findById(structureId);
 			Optional<StructureProgress> progress = JPAStructureDao.findProgress(character.getTown(), structure);
 			//if character has enough ap AND the building is not already max level
-			if(character.getCurrentAp() >= apToAssign && progress.isPresent() ? progress.get().getLevel() < structure.getLevels() : false) {
+			if(character.getCurrentAp() >= apToAssign && progress.isPresent() ? progress.get().getLevel() < structure.getLevels() : true) {
 				//has the structure began yet?
 				boolean transferAp = false;
 				if(progress.isPresent() ? progress.get().getAp() > 0 : false) {
