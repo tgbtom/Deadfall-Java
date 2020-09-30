@@ -33,20 +33,10 @@
 					<div class="sub-12 text-center" style="min-width:230px;">
 						<a href="outside/nav/left"><img src="${pageContext.request.contextPath}/resources/img/icons/leftArrow.png" class="nav-arrow" id="nav-left" style="margin-bottom:64px;"/></a>
 						<svg width="165" height="165" >
-							<c:forEach var="i" begin="0" end="120">
-								<c:choose>
-									<c:when test="${i * 15 >= 165}">
-										<c:set var="left" value="${ i * 15 - Math.floor(i * 15 / 165) * 165 }" />
-									</c:when>
-									<c:otherwise>
-										<c:set var="left" value="${i * 15}" />
-									</c:otherwise>
-								</c:choose>
-								<c:set var="x" value="${left / 15 - 5}" />
-								<c:set var="top" value="${ Math.floor(i/11) * 15 }" />
-								<c:set var="y" value="${5 - top / 15}" />
+							<c:forEach items="${ sessionScope.character.town.zones }" var="zone">
+								<c:set var="left" value="${ (15 * zone.x) + 75 }" />
+								<c:set var="top" value="${ (-15 * zone.y) + 75 }" />
 								
-								<c:set var="zone" value="${sessionScope.townDao.findZoneByCoords(sessionScope.character.town.townId , x, y)}"/>
 								<c:choose>
 									<c:when test="${ zone.x == 0 && zone.y == 0 }">
 										<rect x="${left}" y="${top}" height="15" width="15" class="grid-brown">
@@ -117,7 +107,7 @@
 						<c:out value="${myZone.x}"/>, <c:out value="${myZone.y}"/> | 
 						<img src="${pageContext.request.contextPath}/resources/img/icons/lootability.png" /> <c:out value="${myZone.lootability}"/> | 
 						<img src="${pageContext.request.contextPath}/resources/img/icons/zombie.png"/> <c:out value="${myZone.zeds}"/> | 
-						<img src="${pageContext.request.contextPath}/resources/img/icons/blocked.png" alt="danger"/> <c:out value="${Math.max(myZone.danger, 0)}"/>
+						<img src="${pageContext.request.contextPath}/resources/img/icons/blocked.png" alt="danger"/> <c:out value="${ Integer.max(myZone.danger, 0)}"/>
 					</div>
 					<div class="card-body" style="display: inline-block">
 					<c:set var="itemStacks" value="${myZone.itemStacks}"/>

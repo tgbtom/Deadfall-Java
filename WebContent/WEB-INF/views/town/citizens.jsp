@@ -45,7 +45,7 @@
 						</c:otherwise>
 					</c:choose>
 
-						<div class="sub-3"><c:out value="${c.name}"/></div>
+						<div class="sub-3"><c:out value="${c.name} [${c.zone.x},${c.zone.y}]"/></div>
 						<div class="sub-3"><img src="${pageContext.request.contextPath}/resources/img/icons/${c.classification}.png"> <c:out value="${c.classification}"/></div>
 						<div class="sub-3">
 							<!-- Items here -->

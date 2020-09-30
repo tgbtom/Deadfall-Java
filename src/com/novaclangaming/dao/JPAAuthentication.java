@@ -43,6 +43,7 @@ public class JPAAuthentication implements IAuthenticationDao{
 			result = charDao.findById(character.getCharId());
 			if(result.hasStatusByName("Dead")) {
 				request.getSession().setAttribute("character", null); //refreshes the session variable to match db
+				em.close();
 				return null;
 			}else {
 				request.getSession().setAttribute("character", result); //refreshes the session variable to match db

@@ -36,7 +36,6 @@ public class JPAStructureDao {
 		EntityManager em = JPAConnection.getInstance().createEntityManager();
 		TypedQuery<Structure> query = em.createNamedQuery("Structure.findAll", Structure.class);
 		List<Structure> results = query.getResultList();
-		em.close();
 		return results;
 	}
 	
@@ -84,7 +83,7 @@ public class JPAStructureDao {
 		try {
 			result = Optional.ofNullable(query.getSingleResult());
 		} catch (Exception e) {}
-		em.close();
+		em.clear();
 		return result;
 	}
 	
@@ -149,9 +148,19 @@ public class JPAStructureDao {
 	}
 	
 	private static boolean isStructureRequirementsMet(Town town, Structure structure, int level) {
-		Optional<StructureProgress> progress = findProgress(town, structure);
-		if(progress.isPresent()) {
-			if(progress.get().getLevel() < level) {
+//		Optional<StructureProgress> progress = findProgress(town, structure);
+//		if(progress.isPresent()) {
+//			if(progress.get().getLevel() < level) {
+//				return false;
+//			}
+//		}
+//		else {
+//			return false;
+//		}
+		
+		StructureProgress progress = town.findProgress(structure.getStructureId());
+		if (progress != null) {
+			if(progress.getLevel() < level) {
 				return false;
 			}
 		}

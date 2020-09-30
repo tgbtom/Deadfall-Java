@@ -174,6 +174,15 @@ public class Zone {
 	public List<ItemStackZone> getItemStacks() {
 		return itemStacks;
 	}
+	
+	public int numOfItemHere(int itemId) {
+		for(ItemStackZone stack : itemStacks) {
+			if(stack.getItem().getItemId() == itemId) {
+				return stack.getQuantity();
+			}
+		}
+		return 0;
+	}
 
 	public List<Character> getCharacters() {
 		return characters;

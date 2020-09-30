@@ -25,7 +25,6 @@ public class JPAItemStackZoneDao implements IItemStackZoneDao{
 
 	public Optional<ItemStackZone> findByZoneItem(int zoneId, int itemId) {
 		EntityManager em = JPAConnection.getInstance().createEntityManager();
-		em.getTransaction().begin();
 		TypedQuery<ItemStackZone> query = em.createNamedQuery("ItemStackZone.findByZoneItem", ItemStackZone.class);
 		query.setParameter("zone", townDao.findZoneById(zoneId));
 		query.setParameter("item", itemDao.findById(itemId));
@@ -37,7 +36,6 @@ public class JPAItemStackZoneDao implements IItemStackZoneDao{
 		else {
 			result = Optional.ofNullable(query.getResultList().get(0));
 		}
-		em.close();
 		return result;
 	}
 

@@ -93,7 +93,6 @@ pageEncoding="ISO-8859-1"%>
             <c:forEach items="${ sessionScope.bulletins }" var="item">
 
             	<div class="row bb">
-            		<%-- <div class="sub-3"><c:out value="${item.getPostedTime()}" /></div> --%>
             		<div class="sub-3 br"><fmt:formatDate pattern="MMM dd, yyyy" value="${item.getPostedTime()}" /></div>
             		
             		<div class="sub-9">

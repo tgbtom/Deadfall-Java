@@ -37,6 +37,7 @@
 							</tr>
 						</thead>
 						<tbody>
+						
 							
 							<c:forEach items="${sessionScope.unlockedDefence}" var="c">
 							<c:if test='${ c.key.category.equals("Defence") }'>
@@ -48,7 +49,7 @@
 								</c:forEach>
 								<c:set var="func" scope="page" value="showStructureModal(${ c.key.structureId }, \'${ c.key.name }\', \'${ c.key.description }\', \'${ costString }\', ${ c.key.apCost - c.value.ap }, ${ c.key.defence }, ${ c.value.level }, ${ c.key.levels })" />
 								
-								<c:choose>
+ 								<c:choose>
 									<c:when test="${ c.value.ap > 0 }">
 										<tr class="clickable-structure green-row" onclick="${ func }">
 									</c:when>
@@ -74,12 +75,12 @@
 											<img src="${pageContext.request.contextPath}/resources/img/items/rarity/<c:out value="${ cost.item.rarity }"/>.png" class="item-rarity" />
 											<img src="${pageContext.request.contextPath}/resources/img/items/<c:out value="${ cost.item.name }"/>.png" alt="<c:out value="${ cost.item.name }"/>" class="citizens-item" />	
 											
-												<c:set var="storageStack" value="${ sessionScope.stackZoneDao.findByZoneItem(sessionScope.storageId, cost.item.itemId) }"/>
+												<c:set var="storageStack" value="${ sessionScope.storageZone.numOfItemHere(cost.item.itemId) }"/>
 												
 												<c:choose>
-													<c:when test="${ storageStack.isPresent() }">
+													<c:when test="${ storageStack > 0 }">
 														<c:choose>
-															<c:when test="${ storageStack.get().getQuantity() >= cost.quantity }">
+															<c:when test="${ storageStack >= cost.quantity }">
 																<span class="citizens-item-counter text-bright-green"><c:out value="${ cost.quantity }"/></span>
 															</c:when>
 															<c:otherwise><span class="citizens-item-counter text-yellow"><c:out value="${ cost.quantity }"/></span></c:otherwise>
@@ -168,12 +169,12 @@
 												<img src="${pageContext.request.contextPath}/resources/img/items/rarity/<c:out value="${ cost.item.rarity }"/>.png" class="item-rarity" />
 												<img src="${pageContext.request.contextPath}/resources/img/items/<c:out value="${ cost.item.name }"/>.png" alt="<c:out value="${ cost.item.name }"/>" class="citizens-item" />	
 												
-												<c:set var="storageStack" value="${ sessionScope.stackZoneDao.findByZoneItem(sessionScope.storageId, cost.item.itemId) }"/>
+												<c:set var="storageStack" value="${ sessionScope.storageZone.numOfItemHere(cost.item.itemId) }"/>
 												
 												<c:choose>
-													<c:when test="${ storageStack.isPresent() }">
+													<c:when test="${ storageStack > 0 }">
 														<c:choose>
-															<c:when test="${ storageStack.get().getQuantity() >= cost.quantity }">
+															<c:when test="${ storageStack >= cost.quantity }">
 																<span class="citizens-item-counter text-bright-green"><c:out value="${ cost.quantity }"/></span>
 															</c:when>
 															<c:otherwise><span class="citizens-item-counter text-yellow"><c:out value="${ cost.quantity }"/></span></c:otherwise>
@@ -258,12 +259,12 @@
 												<img src="${pageContext.request.contextPath}/resources/img/items/rarity/<c:out value="${ cost.item.rarity }"/>.png" class="item-rarity" />
 												<img src="${pageContext.request.contextPath}/resources/img/items/<c:out value="${ cost.item.name }"/>.png" alt="<c:out value="${ cost.item.name }"/>" class="citizens-item" />	
 												
-												<c:set var="storageStack" value="${ sessionScope.stackZoneDao.findByZoneItem(sessionScope.storageId, cost.item.itemId) }"/>
+												<c:set var="storageStack" value="${ sessionScope.storageZone.numOfItemHere(cost.item.itemId) }"/>
 												
 												<c:choose>
-													<c:when test="${ storageStack.isPresent() }">
+													<c:when test="${ storageStack > 0 }">
 														<c:choose>
-															<c:when test="${ storageStack.get().getQuantity() >= cost.quantity }">
+															<c:when test="${ storageStack >= cost.quantity }">
 																<span class="citizens-item-counter text-bright-green"><c:out value="${ cost.quantity }"/></span>
 															</c:when>
 															<c:otherwise><span class="citizens-item-counter text-yellow"><c:out value="${ cost.quantity }"/></span></c:otherwise>

@@ -16,6 +16,7 @@ import com.novaclangaming.dao.IItemDao;
 import com.novaclangaming.dao.JPAAuthentication;
 import com.novaclangaming.dao.JPAItemDao;
 import com.novaclangaming.model.Item;
+import com.novaclangaming.model.User;
 
 @Controller
 public class HomeController {
@@ -35,8 +36,9 @@ public class HomeController {
 	@RequestMapping(value = "/dashboard", method = RequestMethod.GET)
 	public String dashboard(HttpServletRequest request) {
 		JPAAuthentication authDao = new JPAAuthentication();
-		if(authDao.loggedUser(request) != null) {
-			request.getSession().setAttribute("bulletins", authDao.loggedUser(request).getOrderedUserBulletins());
+		User user = authDao.loggedUser(request);
+		if(user != null) {
+			request.getSession().setAttribute("bulletins", user.getOrderedUserBulletins());
 			return "dashboard";
 		}
 		else {

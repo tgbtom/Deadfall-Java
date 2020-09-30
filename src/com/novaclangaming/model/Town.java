@@ -234,4 +234,13 @@ public class Town {
 		return result;
 	}
 	
+	public StructureProgress findProgress(int structureId) {
+		for (StructureProgress progress : structuresInProgress) {
+			if(progress.getStructure().getStructureId() == structureId) {
+				return progress;
+			}
+		}
+		return null;
+	}
+	
 }

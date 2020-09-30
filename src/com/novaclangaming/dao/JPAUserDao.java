@@ -17,21 +17,19 @@ public class JPAUserDao implements IUserDao{
 	public Optional<User> findByName(String username) {
 		User user = null;
 		EntityManager em = JPAConnection.getInstance().createEntityManager();
-		em.getTransaction().begin();
 		TypedQuery<User> query = em.createNamedQuery("User.findByName", User.class);
 		query.setParameter("name", username);
 		try {
 			user = query.getSingleResult();
 		} catch (NoResultException e) {}
-		em.close();
+		em.clear();
 		return Optional.ofNullable(user);
 	}
 
 	public User findById(int id) {
 		EntityManager em = JPAConnection.getInstance().createEntityManager();
-		em.getTransaction().begin();
 		User user = em.find(User.class, id);
-		em.close();
+		em.clear();
 		return user;
 	}
 

@@ -15,6 +15,9 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
+
 @NamedQueries({
 	@NamedQuery(name = "User.findByName", query = "SELECT u FROM user u WHERE u.username = :name")
 })
@@ -44,6 +47,7 @@ public class User {
 	@OneToMany(mappedBy = "user")
 	private List<Character> characters;
 	
+	@LazyCollection(value = LazyCollectionOption.FALSE)
 	@OneToMany(mappedBy = "user")
 	private List<UserBulletin> bulletins;
 

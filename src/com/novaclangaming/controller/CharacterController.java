@@ -283,13 +283,8 @@ public class CharacterController {
 				}
 			}
 			else {
-				System.out.println("Not enough space in the town");
+
 				return "fail";
-			}
-			
-			if (allSuccess.equals("success")) {
-				System.out.println("Success joining");
-				
 			}
 	
 			return allSuccess;
@@ -668,6 +663,8 @@ public class CharacterController {
 			for(Character aliveChar : aliveChars) {
 				charDao.removeStatus(aliveChar.findCharacterStatusByName("Day Ended"));
 				charDao.addStatus(new CharacterStatus(charDao.findStatusByName("Not Done"), aliveChar));
+				aliveChar.setCurrentAp(aliveChar.getMaxAp());
+				charDao.update(aliveChar);
 			}
 		}
 	}
