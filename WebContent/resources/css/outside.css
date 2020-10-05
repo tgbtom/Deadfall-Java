@@ -47,6 +47,18 @@
 	fill: rgb(135, 236, 235);
 }
 
+.bulletinChar{
+	color: #5a9c67;
+}
+
+.bulletinKill{
+	color: rgb(227, 128, 113);
+}
+
+.bulletinItem{
+	color: rgb(227, 228, 113);
+}
+
 .nav-arrow:hover{
 	cursor: pointer;
 	opacity: 0.4;

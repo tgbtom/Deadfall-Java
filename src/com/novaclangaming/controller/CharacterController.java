@@ -350,41 +350,53 @@ public class CharacterController {
 		if(user != null) {
 			Character character = auth.activeCharacter(request);
 			JPAItemStackCharacterDao itemStackDao = new JPAItemStackCharacterDao(charDao);
-			if(itemStackDao.findByCharItem(character.getCharId(), itemId).isPresent()) {
+			ItemStackCharacter itemHeld = character.hasItemById(itemId);
+			if(itemHeld != null) {
 				if(action.equals("Drop")) {
-					charDao.dropItem(character.getCharId(), itemDao.findById(itemId), 1);
+					charDao.dropItem(character, itemHeld.getItem(), 1);
 				} else if (action.equals("Attack")) {
-					//Check if we require AND Have the ammo
-					//ensure at least 1 zed in zone, make sure we have enough AP
-					Weapon weapon = itemDao.findById(itemId).getWeapon();
-					Zone zone = townDao.findZoneById(character.getZone().getZoneId());
-					Town town = townDao.findById(character.getTown().getTownId());
-					if(weapon.getApCost() <= character.getCurrentAp() && 
-							weapon.getAmmo() == null || 
-							itemStackDao.findByCharItem(character.getCharId(), weapon.getAmmo().getItemId()).isPresent() &&
-							zone.getZeds() >= 1){
-						//consume ammo -> chance of output to produce ammo, chance of injure, chance of break
-						if(weapon.getAmmo() != null) {
-							charDao.removeItem(character.getCharId(), weapon.getAmmo(), 1);
-						}	
-						character.setCurrentAp(character.getCurrentAp() - weapon.getApCost());
-						int kills = Math.min(zone.getZeds(), new Random().nextInt(weapon.getMaxKills() - weapon.getMinKills() + 1) + weapon.getMinKills());
-						zone.setZeds( zone.getZeds() - kills);
-						zone.setDanger(zone.getDanger() - kills);
-						zone = townDao.updateZone(zone);
-						character.setCurZedsKilled(character.getCurZedsKilled() + kills);
-						character = charDao.update(character);
-						town.setHordeSize(town.getHordeSize() - kills);
-						town = townDao.update(town);
-						
-						if(new Random().nextInt(100) + 1 <= weapon.getChanceOfBreak()) {
-							//weapon breaks
-							charDao.removeItem(character.getCharId(), weapon.getItem(), 1);
-							if(weapon.getItemOnBreak() != null) {
-								charDao.addItem(character.getCharId(), weapon.getItemOnBreak(), 1);
+					if(character.getZone().getZeds() > 0) {
+						//Check if we require AND Have the ammo
+						//ensure at least 1 zed in zone, make sure we have enough AP
+						Weapon weapon = itemDao.findById(itemId).getWeapon();
+						Zone zone = townDao.findZoneById(character.getZone().getZoneId());
+						Town town = townDao.findById(character.getTown().getTownId());
+						if(weapon.getApCost() <= character.getCurrentAp() && 
+								weapon.getAmmo() == null || 
+								itemStackDao.findByCharItem(character.getCharId(), weapon.getAmmo().getItemId()).isPresent() &&
+								zone.getZeds() >= 1){
+							//consume ammo -> chance of output to produce ammo, chance of injure, chance of break
+							if(weapon.getAmmo() != null) {
+								character.removeItem(weapon.getAmmo(), 1);
+								character = charDao.removeItem(character, weapon.getAmmo(), 1);
+							}	
+							character.setCurrentAp(character.getCurrentAp() - weapon.getApCost());
+							int kills = Math.min(zone.getZeds(), new Random().nextInt(weapon.getMaxKills() - weapon.getMinKills() + 1) + weapon.getMinKills());
+							zone.setZeds( zone.getZeds() - kills);
+							zone.setDanger(zone.getDanger() - kills);
+							zone = townDao.updateZone(zone);
+							character.setCurZedsKilled(character.getCurZedsKilled() + kills);
+							character = charDao.update(character);
+							String bulletinText = "<span class='bulletinChar'>"+character.getName() + "</span> killed <span class='bulletinKill'>" + kills + " zeds</span> using a <span class='bulletinItem'>" + weapon.getItem().getName() + "</span>.";
+							town.setHordeSize(town.getHordeSize() - kills);
+							
+							if(new Random().nextInt(100) + 1 <= weapon.getChanceOfInjury()) {
+								character = charDao.increaseInjury(character);
+								bulletinText += " <span class='bulletinKill'>They were injured while fighting.</span>";
 							}
+							if(new Random().nextInt(100) + 1 <= weapon.getChanceOfBreak()) {
+								//weapon breaks
+								character = charDao.removeItem(character, weapon.getItem(), 1);
+								if(weapon.getItemOnBreak() != null) {
+									charDao.addItem(character.getCharId(), weapon.getItemOnBreak(), 1);
+								}
+								bulletinText += " <span class='bulletinKill'>The weapon broke on use.</span>";
+							}
+							
+							ZoneBulletin zb = new ZoneBulletin(bulletinText, new Date(), zone);
+							townDao.addBulletin(zb);
+							town = townDao.update(town);
 						}
-						charDao.increaseInjury(character);
 					}
 				} else if (action.equals("Consume")) {
 					
@@ -397,16 +409,16 @@ public class CharacterController {
 							charDao.update(character);
 							charDao.addStatus(new CharacterStatus(charDao.findStatusByName("Drank"), character));
 						} 
-						charDao.decreaseThirst(character);
-						charDao.removeItem(character.getCharId(), consumable.getItem(), 1);
+						character = charDao.decreaseThirst(character);
+						character = charDao.removeItem(character, consumable.getItem(), 1);
 					} else if (consumable.getConsumeType().equals("Eat")) {
 						if(!character.hasStatusByName("Ate")) {
 							character.setCurrentAp(Math.min(character.getMaxAp(), character.getCurrentAp() + (character.getMaxAp() * consumable.getApGain() / 100)));
 							charDao.update(character);
 							charDao.addStatus(new CharacterStatus(charDao.findStatusByName("Ate"), character));
 						} 
-						charDao.decreaseHunger(character);
-						charDao.removeItem(character.getCharId(), consumable.getItem(), 1);
+						character = charDao.decreaseHunger(character);
+						character = charDao.removeItem(character, consumable.getItem(), 1);
 					}
 					
 				}
@@ -492,25 +504,27 @@ public class CharacterController {
 				}
 				else {
 					looted = itemDao.getRandom(ItemRarity.Scrap);
-					bulletinString = currentChar.getName() + " found <span class='text-Scrap'>" + looted.getName() + "</span>";
-				}
-				
-				if(currentChar.getCapacity() >= looted.getMass()) {
-					charDao.addItem(currentChar.getCharId(), looted, 1);
-				}else {
-					townDao.addItemToZone(currentChar.getZone().getZoneId(), looted.getItemId(), 1);
+					bulletinString = currentChar.getName() + " found <span class='text-Scrap'>" + looted.getName() + "</span>.";
 				}
 				
 				if(currentChar.getZone().getDanger() > 0) {
 					int chanceOfInjury = currentChar.getZone().getDanger() * 10;
 					int randomRoll = new Random().nextInt(100) + 1;
 					if(randomRoll <= chanceOfInjury) {
-						charDao.increaseInjury(currentChar);
+						currentChar = charDao.increaseInjury(currentChar);
+						bulletinString += " They were injured while searching.";
 					}
 				}
+				
+				if(currentChar.getCapacity() >= looted.getMass() && !currentChar.hasStatusByName("Dead")) {
+					charDao.addItem(currentChar.getCharId(), looted, 1);
+				}else {
+					townDao.addItemToZone(currentChar.getZone().getZoneId(), looted.getItemId(), 1);
+				}
+				
 				Zone thisZone = currentChar.getZone();
 				if(thisZone.getLootability() == 1) {
-					bulletinString += ". <span class='text-bright-red'>The zone has been depleted</span>.";
+					bulletinString += " <span class='text-bright-red'>The zone has been depleted</span>.";
 				}
 				thisZone.setLootability(Math.max(0, thisZone.getLootability() - 1));
 				townDao.updateZone(thisZone);

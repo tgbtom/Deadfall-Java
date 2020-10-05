@@ -335,6 +335,22 @@ public class Character {
 		return result;
 	}
 	
+	public ItemStackCharacter removeItem(Item item, int qty) {
+		for(int i = 0; i < itemStacks.size(); i++) {
+				if(itemStacks.get(i).getItem().getItemId() == item.getItemId()) {
+					ItemStackCharacter stack = itemStacks.get(i);
+					stack.removeFromStack(qty);
+					if (stack.getQuantity() <= 0) {
+						itemStacks.remove(i);
+						return null;
+					}else {
+						return itemStacks.get(i);
+					}
+				}
+		}
+		return null;
+	}
+	
 	public int getCapacity(){
 		int capacity = 20;
 		for (ItemStackCharacter stack : itemStacks) {
@@ -394,9 +410,9 @@ public class Character {
 	
 	public void removeStatus(Status status) {
 		//see if we already have the status effect
-		for(CharacterStatus active : this.status) {
-			if(active.getStatus().getStatusId() == status.getStatusId()) {
-				this.status.remove(active);
+		for(int i =0; i < this.status.size(); i++) {
+			if(this.status.get(i).getStatus().getStatusId() == status.getStatusId()) {
+				this.status.remove(i);
 				break;
 			}
 		}
@@ -432,6 +448,19 @@ public class Character {
 			}
 		}
 		return null;
+	}
+	
+	public ItemStackCharacter hasItemById(int itemId) {
+		for(ItemStackCharacter stack : itemStacks) {
+			if(stack.getItem().getItemId() == itemId) {
+				return stack;
+			}
+		}
+		return null;
+	}
+
+	public void setItemStacks(List<ItemStackCharacter> itemStacks) {
+		this.itemStacks = itemStacks;
 	}
 	
 }

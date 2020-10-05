@@ -40,7 +40,8 @@ public class TownController {
 	JPATownDao townDao = new JPATownDao();
 	ICharacterDao charDao = new JPACharacterDao();
 	IItemDao itemDao = new JPAItemDao();
-	JPAStructureDao structureDao = new JPAStructureDao();
+	JPAItemStackZoneDao stackZoneDao = new JPAItemStackZoneDao(townDao);
+	JPAStructureDao structureDao = new JPAStructureDao(townDao, stackZoneDao);
 
 	@RequestMapping(value = "/town/create", method = RequestMethod.POST)
 	public String create(HttpServletRequest request, @RequestParam String townName, @RequestParam int townSize,
@@ -95,14 +96,6 @@ public class TownController {
 				List<Structure> unlockedStructures = JPAStructureDao.findUnlockedStructures(town);
 				Map<Structure, StructureProgress> progressOfStructures = new TreeMap<Structure, StructureProgress>();
 				for (Structure base : unlockedStructures) {
-					// Check if it exists in town (meaning it was started)
-					
-//					  Optional<StructureProgress> progress = JPAStructureDao.findProgress(town,
-//					  base); if(progress.isPresent()) { progressOfStructures.put(base,
-//					  progress.get()); } else { StructureProgress filler = new
-//					  StructureProgress(town, base, 0, 0); progressOfStructures.put(base, filler);
-//					  }
-					 
 					StructureProgress progress = town.findProgress(base.getStructureId());
 					if (progress != null) {
 						progressOfStructures.put(base, progress);
@@ -113,8 +106,8 @@ public class TownController {
 				}
 				request.getSession().setAttribute("unlockedDefence", progressOfStructures);
 				request.getSession().setAttribute("townId", town.getTownId());
-				request.getSession().setAttribute("storageZone", this.townDao.findStorageZone(town.getTownId()));
-				request.getSession().setAttribute("structureDao", new JPAStructureDao());
+				request.getSession().setAttribute("storageZone", town.getZone(0, 0));
+				request.getSession().setAttribute("structureDao", structureDao);
 				return "town/construction";
 			} else {
 				return "redirect: /Deadfall/dashboard";
@@ -216,18 +209,7 @@ public class TownController {
 	}
 
 	@RequestMapping(value = "/town/construct/{structureId}/{apToAssign}", method = RequestMethod.GET)
-	public String assignAp(HttpServletRequest request, @PathVariable int structureId, @PathVariable int apToAssign) {
-		// 1, check the user is logged in, then check if the current char has enough AP
-		// 2a, ensure that the structure requirements ARE indeed met IF structure has
-		// not began
-		// 2b, see if we need to remove resources to start construction, if so, clarify
-		// we have enough
-		// 3, remove required resources and assign AP. If AP exceeds the required
-		// amount, reduce the consumed AP accordingly. (BUILDER IS 2X)
-		// 4, if AP >= requirement, update the structure level for the current town, and
-		// grant defence accordingly
-		// 5, Update the character stats for construction contributed
-		// 6, TODO Set message to display before redirecting to structures page
+	public String assignAp(HttpServletRequest request, @PathVariable Integer structureId, @PathVariable Integer apToAssign) {
 
 		if (auth.loggedUser(request) != null) {
 			Character character = auth.activeCharacter(request);
@@ -235,14 +217,15 @@ public class TownController {
 				return "redirect: /Deadfall/dashboard";
 			}
 			Structure structure = structureDao.findById(structureId);
-			Optional<StructureProgress> progress = JPAStructureDao.findProgress(character.getTown(), structure);
+			StructureProgress progress = character.getTown().findProgress(structureId);
+//			Optional<StructureProgress> progress = JPAStructureDao.findProgress(character.getTown(), structure);
 			// if character has enough ap AND the building is not already max level
-			if (character.getCurrentAp() >= apToAssign && progress.isPresent()
-					? progress.get().getLevel() < structure.getLevels()
+			if (character.getCurrentAp() >= apToAssign && progress != null
+					? progress.getLevel() < progress.getStructure().getLevels()
 					: true) {
 				// has the structure began yet?
 				boolean transferAp = false;
-				if (progress.isPresent() ? progress.get().getAp() > 0 : false) {
+				if (progress != null ? progress.getAp() > 0 : false) {
 					// Only need to worry about AP
 					transferAp = true;
 				} else {
@@ -252,7 +235,7 @@ public class TownController {
 						transferAp = true;
 						List<StructureCost> costs = structure.getCosts();
 						for (StructureCost cost : costs) {
-							if (!townDao.removeItemFromZone(townDao.findStorageZone(character.getTown().getTownId()),
+							if (!townDao.removeItemFromZone(character.getTown().getZone(0, 0),
 									cost.getItem(), cost.getQuantity())) {
 								transferAp = false;
 							}
@@ -261,7 +244,7 @@ public class TownController {
 				}
 
 				if (transferAp) {
-					StructureProgress currentProgress = progress.isPresent() ? progress.get()
+					StructureProgress currentProgress = progress != null ? progress
 							: new StructureProgress(character.getTown(), structure, 0, 0);
 
 					// If character is Builder, double the assigned amount
@@ -271,9 +254,9 @@ public class TownController {
 					}
 					if (apToAssign >= structure.getApCost() - currentProgress.getAp()) {
 						apToAssign = structure.getApCost() - currentProgress.getAp();
-						apToRemove = character.getClassification() == CharacterClass.Builder
-								? (int) Math.ceil(apToAssign / 2)
-								: apToAssign;
+						apToRemove = (int) (character.getClassification() == CharacterClass.Builder
+								? Math.ceil(apToAssign / 2)
+								: apToAssign);
 						currentProgress.setLevel(currentProgress.getLevel() + 1);
 						currentProgress.setAp(0);
 

@@ -19,6 +19,6 @@ public interface ICharacterDao {
 	public void addItem(int characterId, Item item, int qty);
 	public Status findStatusById(int statusId);
 	public void addStatus(CharacterStatus charStatus);
-	public void removeStatus(CharacterStatus charStatus);
+	public Character removeStatus(CharacterStatus charStatus);
 	public Character clearStatus(Character character);
 }

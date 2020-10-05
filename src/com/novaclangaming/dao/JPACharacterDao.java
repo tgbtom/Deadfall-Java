@@ -1,5 +1,6 @@
 package com.novaclangaming.dao;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -49,19 +50,15 @@ public class JPACharacterDao implements ICharacterDao{
 
 	public Character findById(int id) {
 		EntityManager em = JPAConnection.getInstance().createEntityManager();
-		em.getTransaction().begin();
 		Character c = em.find(Character.class, id);
-		em.close();
 		return c;
 	}
 
 	public List<Character> findByUserId(int id) {
 		EntityManager em = JPAConnection.getInstance().createEntityManager();
-		em.getTransaction().begin();
 		TypedQuery<Character> query = em.createNamedQuery("Character.findByUser", Character.class);
 		query.setParameter("user", id);
 		List<Character> characters = query.getResultList();
-		em.close();
 		return characters;
 	}
 
@@ -91,14 +88,12 @@ public class JPACharacterDao implements ICharacterDao{
 	public Optional<Character> findByCharName(int userId, String charName) {
 		Character character = null;
 		EntityManager em = JPAConnection.getInstance().createEntityManager();
-		em.getTransaction().begin();
 		TypedQuery<Character> query = em.createNamedQuery("Character.findByName", Character.class);
 		query.setParameter("userId", userId);
 		query.setParameter("charName", charName);
 		try {
 			character = query.getSingleResult();
 		} catch (NoResultException e) {}
-		em.close();
 		return Optional.ofNullable(character);
 	}
 
@@ -126,20 +121,22 @@ public class JPACharacterDao implements ICharacterDao{
 		 em.close();
 	}
 	
-	public void removeItem(int charId, Item item, int qty) {
+	public Character removeItem(Character character, Item item, int qty) {
 		EntityManager em = JPAConnection.getInstance().createEntityManager();
 		em.getTransaction().begin();
 		
-		Optional<ItemStackCharacter> stack = stackDao.findByCharItem(charId, item.getItemId());
+		Optional<ItemStackCharacter> stack = stackDao.findByCharItem(character.getCharId(), item.getItemId());
 		
 		if(stack.isPresent() && stack.get().getQuantity() >= qty) {
 			ItemStackCharacter charStack = stack.get();
 			charStack.removeFromStack(qty);
 			
 			if(charStack.getQuantity() > 0 ) {
+				character = em.merge(character);
 				em.merge(charStack);
 			}
 			else {
+				character = em.merge(character);
 				em.remove(em.merge(charStack));
 			}
 			
@@ -147,32 +144,28 @@ public class JPACharacterDao implements ICharacterDao{
 		
 		em.getTransaction().commit();
 		em.close();
+		return character;
 	}
 	
-	public void dropItem(int charId, Item item, int qty) {
+	public void dropItem(Character character, Item item, int qty) {
 		EntityManager em = JPAConnection.getInstance().createEntityManager();
+		ItemStackCharacter stack = character.hasItemById(item.getItemId());
 		em.getTransaction().begin();
-		
-		Character character = this.findById(charId);
-		Optional<ItemStackCharacter> stack = stackDao.findByCharItem(charId, item.getItemId());
-		
-		if(stack.isPresent() && stack.get().getQuantity() >= qty) {
-			ItemStackCharacter charStack = stack.get();
-			charStack.removeFromStack(qty);
+		if(stack != null && stack.getQuantity() >= qty) {
+			stack.removeFromStack(qty);
 			Zone zone = character.getZone();
 			townDao.addItemToZone(zone.getZoneId(), item.getItemId(), qty);
 			
-			if(charStack.getQuantity() > 0 ) {
+			if(stack.getQuantity() > 0 ) {
 				em.merge(zone);
-				em.merge(charStack);
+				em.merge(stack);
 			}
 			else {
 				em.merge(zone);
-				em.remove(em.merge(charStack));
+				em.remove(em.merge(stack));
 			}
 			
-		}
-		
+		}		
 		em.getTransaction().commit();
 		em.close();
 	}
@@ -187,11 +180,9 @@ public class JPACharacterDao implements ICharacterDao{
 	
 	public Status findStatusByName(String statusName) {
 		EntityManager em = JPAConnection.getInstance().createEntityManager();
-		em.getTransaction().begin();
 		TypedQuery<Status> query = em.createNamedQuery("Status.findByName", Status.class);
 		query.setParameter("name", statusName);
 		Status s = query.getSingleResult();
-		em.close();
 		return s;
 	}
 	
@@ -210,12 +201,14 @@ public class JPACharacterDao implements ICharacterDao{
 		em.close();
 	}
 
-	public void removeStatus(CharacterStatus charStatus){
+	public Character removeStatus(CharacterStatus charStatus){
 		EntityManager em = JPAConnection.getInstance().createEntityManager();
 		em.getTransaction().begin();
 		em.remove(em.merge(charStatus));
+		Character character = em.merge(charStatus.getCharacter());
 		em.getTransaction().commit();
 		em.close();
+		return character;
 	}
 
 	public Character clearStatus(Character character) {
@@ -249,33 +242,29 @@ public class JPACharacterDao implements ICharacterDao{
 	
 	public Character increaseInjury(Character character) {
 		//Check if we have an injury status or not
-		boolean increased = character.hasStatusByName("Dead");
-		for(CharacterStatus status : character.getStatus()) {
-			String statusName = status.getStatus().getName();
-			if(statusName.equals("Minor Injury")) {
-				removeStatus(status);
-				addStatus(new CharacterStatus(findStatusByName("Moderate Injury"), character));		
-				increased = true;
-				break;
-			}else if (statusName.equals("Moderate Injury")) {
-				removeStatus(status);
-				addStatus(new CharacterStatus(findStatusByName("Severe Injury"), character));	
-				increased = true;
-				break;
-			}else if (statusName.equals("Severe Injury")) {
-				removeStatus(status);
-				addStatus(new CharacterStatus(findStatusByName("Infected"), character));	
-				increased = true;
-				break;
-			}else if (statusName.equals("Infected")) {
-				removeStatus(status);
-				killCharacter(character);
-				townDao.addBulletin(new TownBulletin(character.getName() + " died of infection.", new Date(), character.getTown()));
-				increased = true;
-				break;
+		Character result;
+		boolean dead = character.hasStatusByName("Dead");
+		if(!dead) {
+			for(CharacterStatus status : character.getStatus()) {
+				String statusName = status.getStatus().getName();
+				if(statusName.equals("Minor Injury")) {
+					addStatus(new CharacterStatus(findStatusByName("Moderate Injury"), character));		
+					character.removeStatus(status.getStatus());
+					return removeStatus(status);
+				}else if (statusName.equals("Moderate Injury")) {
+					addStatus(new CharacterStatus(findStatusByName("Severe Injury"), character));	
+					character.removeStatus(status.getStatus());
+					return removeStatus(status);
+				}else if (statusName.equals("Severe Injury")) {
+					addStatus(new CharacterStatus(findStatusByName("Infected"), character));	
+					character.removeStatus(status.getStatus());
+					return removeStatus(status);
+				}else if (statusName.equals("Infected")) {
+					townDao.addBulletin(new TownBulletin(character.getName() + " died of infection.", new Date(), character.getTown()));
+					character.removeStatus(status.getStatus());
+					return killCharacter(removeStatus(status));
+				}
 			}
-		}
-		if(!increased) {
 			addStatus(new CharacterStatus(findStatusByName("Minor Injury"), character));
 		}
 		return character;
@@ -293,21 +282,25 @@ public class JPACharacterDao implements ICharacterDao{
 			for(CharacterStatus status : character.getStatus()) {
 				String statusName = status.getStatus().getName();
 				if(statusName.equals("Full")) {
+					character.removeStatus(status.getStatus());
 					removeStatus(status);
 					addStatus(new CharacterStatus(findStatusByName("Hungry"), character));		
 					increased = true;
 					break;
 				}else if (statusName.equals("Hungry")) {
+					character.removeStatus(status.getStatus());
 					removeStatus(status);
 					addStatus(new CharacterStatus(findStatusByName("Very Hungry"), character));	
 					increased = true;
 					break;
 				}else if (statusName.equals("Very Hungry")) {
+					character.removeStatus(status.getStatus());
 					removeStatus(status);
 					addStatus(new CharacterStatus(findStatusByName("Starving"), character));	
 					increased = true;
 					break;
 				}else if (statusName.equals("Starving")) {
+					character.removeStatus(status.getStatus());
 					removeStatus(status);
 					killCharacter(character);
 					townDao.addBulletin(new TownBulletin(character.getName() + " died of starvation.", new Date(), character.getTown()));
@@ -329,21 +322,25 @@ public class JPACharacterDao implements ICharacterDao{
 			for(CharacterStatus status : character.getStatus()) {
 				String statusName = status.getStatus().getName();
 				if(statusName.equals("Quenched")) {
+					character.removeStatus(status.getStatus());
 					removeStatus(status);
 					addStatus(new CharacterStatus(findStatusByName("Thirsty"), character));		
 					increased = true;
 					break;
 				}else if (statusName.equals("Thirsty")) {
+					character.removeStatus(status.getStatus());
 					removeStatus(status);
 					addStatus(new CharacterStatus(findStatusByName("Very Thirsty"), character));	
 					increased = true;
 					break;
 				}else if (statusName.equals("Very Thirsty")) {
+					character.removeStatus(status.getStatus());
 					removeStatus(status);
 					addStatus(new CharacterStatus(findStatusByName("Dehydrated"), character));	
 					increased = true;
 					break;
 				}else if (statusName.equals("Dehydrated")) {
+					character.removeStatus(status.getStatus());
 					removeStatus(status);
 					killCharacter(character);
 					townDao.addBulletin(new TownBulletin(character.getName() + " died of dehydration.", new Date(), character.getTown()));
@@ -365,25 +362,19 @@ public class JPACharacterDao implements ICharacterDao{
 			for(CharacterStatus status : character.getStatus()) {
 				String statusName = status.getStatus().getName();
 				if(statusName.equals("Starving")) {
-					removeStatus(status);
 					addStatus(new CharacterStatus(findStatusByName("Very Hungry"), character));		
-					decreased = true;
-					break;
+					character.removeStatus(status.getStatus());
+					return removeStatus(status);
 				}else if (statusName.equals("Very Hungry")) {
-					removeStatus(status);
 					addStatus(new CharacterStatus(findStatusByName("Hungry"), character));	
-					decreased = true;
-					break;
+					character.removeStatus(status.getStatus());
+					return removeStatus(status);
 				}else if (statusName.equals("Hungry")) {
-					removeStatus(status);
-					addStatus(new CharacterStatus(findStatusByName("Full"), character));	
-					decreased = true;
-					break;
+					addStatus(new CharacterStatus(findStatusByName("Full"), character));	;
+					character.removeStatus(status.getStatus());
+					return removeStatus(status);
 				}
 			}
-		}
-		if(!decreased) {
-			addStatus(new CharacterStatus(findStatusByName("Starving"), character));
 		}
 		return character;
 	}
@@ -395,35 +386,34 @@ public class JPACharacterDao implements ICharacterDao{
 			for(CharacterStatus status : character.getStatus()) {
 				String statusName = status.getStatus().getName();
 				if(statusName.equals("Dehydrated")) {
-					removeStatus(status);
 					addStatus(new CharacterStatus(findStatusByName("Very Thirsty"), character));		
-					decreased = true;
-					break;
+					character.removeStatus(status.getStatus());
+					return removeStatus(status);
 				}else if (statusName.equals("Very Thirsty")) {
-					removeStatus(status);
 					addStatus(new CharacterStatus(findStatusByName("Thirsty"), character));	
-					decreased = true;
-					break;
+					character.removeStatus(status.getStatus());
+					return removeStatus(status);
 				}else if (statusName.equals("Thirsty")) {
-					removeStatus(status);
 					addStatus(new CharacterStatus(findStatusByName("Quenched"), character));	
-					decreased = true;
-					break;
+					character.removeStatus(status.getStatus());
+					return removeStatus(status);
 				}
 			}
-		}
-		if(!decreased) {
-			addStatus(new CharacterStatus(findStatusByName("Dehydrated"), character));
 		}
 		return character;
 	}
 	
-	public void killCharacter(Character character) {
-		addStatus(new CharacterStatus(findStatusByName("Dead"), character));
+	public Character killCharacter(Character character) {
+		Status dead = findStatusByName("Dead");
+		addStatus(new CharacterStatus(dead, character));
+		character.addStatus(dead);
 		//drop all items
 		for(ItemStackCharacter stack : character.getItemStacks()) {
-			dropItem(character.getCharId(), stack.getItem(), stack.getQuantity());
+			dropItem(character, stack.getItem(), stack.getQuantity());
 		}
+		//Empty the local instance of the entity so it does not try to persist the items back
+		character.setItemStacks(new ArrayList<ItemStackCharacter>());
+		return character;
 	}
 	
 }

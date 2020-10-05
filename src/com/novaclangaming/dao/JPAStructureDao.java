@@ -25,6 +25,12 @@ public class JPAStructureDao {
 	private JPATownDao townDao;
 	private JPAItemStackZoneDao stackDao;
 	
+	public JPAStructureDao(JPATownDao towndao, JPAItemStackZoneDao stackDao) {
+		super();
+		this.townDao = townDao;
+		this.stackDao = stackDao;
+	}
+
 	public Structure findById(int id) {
 		EntityManager em = JPAConnection.getInstance().createEntityManager();
 		Structure result = em.find(Structure.class, id);
@@ -148,15 +154,6 @@ public class JPAStructureDao {
 	}
 	
 	private static boolean isStructureRequirementsMet(Town town, Structure structure, int level) {
-//		Optional<StructureProgress> progress = findProgress(town, structure);
-//		if(progress.isPresent()) {
-//			if(progress.get().getLevel() < level) {
-//				return false;
-//			}
-//		}
-//		else {
-//			return false;
-//		}
 		
 		StructureProgress progress = town.findProgress(structure.getStructureId());
 		if (progress != null) {

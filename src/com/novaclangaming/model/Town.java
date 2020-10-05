@@ -16,6 +16,9 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
+
 @NamedQueries({
 	@NamedQuery(name = "Town.findByName", query = "SELECT t FROM town t WHERE t.name = :name"),
 	@NamedQuery(name = "Town.findOpen", query = "SELECT t FROM town t WHERE t.status LIKE 'New'")
@@ -52,6 +55,7 @@ public class Town {
 	@Column(name = "day_number")
 	private int dayNumber;
 	
+	@LazyCollection(LazyCollectionOption.FALSE)
 	@OneToMany(mappedBy = "town")
 	private List<Character> characters;
 
@@ -65,6 +69,7 @@ public class Town {
 	@OneToMany(mappedBy = "town")
 	private List<Zone> zones;
 	
+	@LazyCollection(LazyCollectionOption.FALSE)
 	@OneToMany(mappedBy = "town")
 	private List<StructureProgress> structuresInProgress;
 	

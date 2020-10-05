@@ -148,7 +148,7 @@ posted_time TIMESTAMP
 );
 
 CREATE TABLE df_towns_structures(
-id INTEGER PRIMARY KEY,
+id INTEGER AUTO_INCREMENT PRIMARY KEY,
 town_id INTEGER,
 structure_id INTEGER NOT NULL,
 current_level INTEGER DEFAULT 1,

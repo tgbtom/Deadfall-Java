@@ -156,7 +156,6 @@ public class JPATownDao implements ITownDao {
 	
 	public Town findById(int townId) {
 		EntityManager em = JPAConnection.getInstance().createEntityManager();
-		em.getTransaction().begin();
 		Town town = em.find(Town.class, townId);
 		em.close();
 		return town;
@@ -276,29 +275,26 @@ public class JPATownDao implements ITownDao {
 	}
 	
 	public boolean removeItemFromZone(Zone zone, Item item, int qty) {
-		ItemStackZone stack;
-
 		EntityManager em = JPAConnection.getInstance().createEntityManager();
 		em.getTransaction().begin();
-		
-		Optional<ItemStackZone> storedLoc = stackDao.findByZoneItem(zone.getZoneId(), item.getItemId());
-		if(storedLoc.isPresent()) {
-			zone.removeItem(itemDao.findById(item.getItemId()), qty);
-			stack = storedLoc.get();
-			stack.removeFromStack(qty);
+		ItemStackZone zoneStack = zone.findStackHere(item.getItemId());
+		if(zoneStack != null ? zoneStack.getQuantity() >= qty : false) {
+			zone.removeItem(zoneStack.getItem(), qty);
+			zoneStack.removeFromStack(qty);
 		}
 		else {
+			em.getTransaction().commit();
 			em.close();
 			return false;
 		}
 		
-		if(stack.getQuantity() > 0) {
+		if(zoneStack.getQuantity() > 0) {
 			em.merge(zone);
-			em.merge(stack);
+			em.merge(zoneStack);
 		}
 		else {
 			em.merge(zone);
-			stack = em.merge(stack);
+			ItemStackZone stack = em.merge(zoneStack);
 			em.remove(stack);
 		}
 		

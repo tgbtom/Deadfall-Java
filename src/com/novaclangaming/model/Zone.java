@@ -183,6 +183,15 @@ public class Zone {
 		}
 		return 0;
 	}
+	
+	public ItemStackZone findStackHere(int itemId) {
+		for(ItemStackZone stack : itemStacks) {
+			if(stack.getItem().getItemId() == itemId) {
+				return stack;
+			}
+		}
+		return null;
+	}
 
 	public List<Character> getCharacters() {
 		return characters;
